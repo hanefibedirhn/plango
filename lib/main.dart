@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/legal_info_screen.dart';
 import 'engine/fp_engine.dart';
+import 'screens/about_screen.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -290,6 +291,17 @@ class HomeScreen extends StatelessWidget {
               const FeatureCard(title: 'Firmalar', icon: Icons.business),
               const FeatureCard(title: 'Uzmanlar', icon: Icons.verified_user),
               FeatureCard(
+  title: 'Hakkımızda',
+  icon: Icons.info_outline,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AboutScreen()),
+    );
+  },
+),
+
+FeatureCard(
   title: 'Yasal Bilgi',
   icon: Icons.gavel,
   onTap: () {
@@ -299,12 +311,12 @@ class HomeScreen extends StatelessWidget {
     );
   },
 ),
-            ],
+               ],
           ),
         ],
       ),
     );
-  }
+  }        
 
   Widget _heroCard(BuildContext context) {
     return Container(
