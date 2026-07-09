@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'legal_info_screen.dart';
+import 'screens/legal_info_screen.dart';
 import 'engine/fp_engine.dart';
 
 import 'package:intl/intl.dart';
