@@ -287,11 +287,10 @@ class HomeScreen extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             children: [
-              FeatureCard(title: 'FP Engine', icon: Icons.calculate, onTap: () => _openCalculator(context)),
-              const FeatureCard(title: 'Gündem', icon: Icons.campaign),
+              const FeatureCard(title: 'Duyurular', icon: Icons.campaign),
               const FeatureCard(title: 'Rehber', icon: Icons.menu_book),
 FeatureCard(
-  title: 'Firmalar',
+  title: 'Tasarruf Finansman\nŞirketleri',
   icon: Icons.business,
   onTap: () {
     Navigator.push(
@@ -342,7 +341,7 @@ FeatureCard(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Karar vermeden önce planını oluştur.',
+            'Tasarruf finansman planını oluştur.',
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
@@ -351,7 +350,7 @@ FeatureCard(
           ),
           const SizedBox(height: 10),
           const Text(
-            'Tahmini teslim süreni ve vade analizini FP Engine ile gör.',
+            'Ne zaman teslim alabileceğini ve tahmini vadeni görüntüle.',
             style: TextStyle(color: Colors.white70, fontSize: 15),
           ),
           const SizedBox(height: 18),

@@ -67,7 +67,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        title: const Text('FP Engine'),
+        title: const Text('Hesaplama'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -250,14 +250,7 @@ class _ResultCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text(
-            'FP Engine Analizi',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 14),
+          
           Text(
             '${result.estimatedDelivery} Ay',
             style: const TextStyle(
@@ -280,7 +273,7 @@ class _ResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           const Text(
-            'Bu sonuçlar FP Engine tarafından oluşturulan bağımsız tahmini analizlerdir. '
+            'Bu tahmini analiz FP Engine tarafından oluşturulmuştur. '
             'Resmî plan, sözleşme ve teslim bilgileri ilgili tasarruf finansman '
             'kuruluşu tarafından belirlenir.',
             textAlign: TextAlign.center,
