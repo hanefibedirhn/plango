@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/legal_info_screen.dart';
 import 'engine/fp_engine.dart';
 import 'screens/about_screen.dart';
+import 'screens/companies_screen.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -288,7 +289,18 @@ class HomeScreen extends StatelessWidget {
               FeatureCard(title: 'FP Engine', icon: Icons.calculate, onTap: () => _openCalculator(context)),
               const FeatureCard(title: 'Gündem', icon: Icons.campaign),
               const FeatureCard(title: 'Rehber', icon: Icons.menu_book),
-              const FeatureCard(title: 'Firmalar', icon: Icons.business),
+FeatureCard(
+  title: 'Firmalar',
+  icon: Icons.business,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const CompaniesScreen(),
+      ),
+    );
+  },
+),
               const FeatureCard(title: 'Uzmanlar', icon: Icons.verified_user),
               FeatureCard(
   title: 'Hakkımızda',
