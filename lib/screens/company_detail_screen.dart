@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'calculator_screen.dart';
 
 import '../models/company.dart';
 
@@ -24,6 +26,17 @@ class CompanyDetailScreen extends StatelessWidget {
         .replaceFirst('http://', '');
   }
 
+Future<void> _openUrl(String url) async {
+  final uri = Uri.parse(url);
+
+  if (!await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  )) {
+    throw Exception('Bağlantı açılamadı: $url');
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +53,7 @@ class CompanyDetailScreen extends StatelessWidget {
           const SizedBox(height: 18),
           _buildInfoCard(),
           const SizedBox(height: 14),
-          _buildActionCard(),
+          _buildActionCard(context),
           const SizedBox(height: 16),
           _buildDisclaimer(),
         ],
@@ -136,7 +149,7 @@ class CompanyDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionCard() {
+  Widget _buildActionCard(BuildContext context) {
   return Container(
     decoration: BoxDecoration(
       color: Colors.white,
@@ -150,13 +163,13 @@ class CompanyDetailScreen extends StatelessWidget {
           title: 'Resmî Web Sitesi',
           subtitle: _displayWebsite,
           subtitleColor: _linkBlue,
-          onTap: () {},
+          onTap: () => _openUrl(company.website),
         ),
         const Divider(height: 1, color: _divider),
         _ActionRow(
           icon: Icons.star_outline_rounded,
           title: 'Şikayetvar Sayfasını Aç',
-          onTap: () {},
+          onTap: () => _openUrl(company.complaintUrl),
         ),
         const Divider(height: 1, color: _divider),
         _ActionRow(
@@ -168,7 +181,14 @@ class CompanyDetailScreen extends StatelessWidget {
         _ActionRow(
           icon: Icons.calculate_outlined,
           title: 'FP Engine\'e Git',
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CalculatorScreen(),
+              ),
+            );
+          },
         ),
       ],
     ),
