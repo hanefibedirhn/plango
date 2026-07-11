@@ -4,6 +4,7 @@ import 'engine/fp_engine.dart';
 import 'screens/about_screen.dart';
 import 'screens/companies_screen.dart';
 import 'screens/calculator_screen.dart';
+import 'widgets/app_drawer.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -245,6 +246,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
+      drawer: AppDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.bg,
         title: const Text(
@@ -263,72 +265,185 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(18),
-        children: [
-          _heroCard(context),
-          const SizedBox(height: 18),
-          _sectionTitle('Piyasalar'),
-          Row(
-            children: const [
-              Expanded(child: MarketCard(title: 'Altın', value: 'Demo', icon: Icons.monetization_on)),
-              SizedBox(width: 10),
-              Expanded(child: MarketCard(title: 'Dolar', value: 'Demo', icon: Icons.attach_money)),
-              SizedBox(width: 10),
-              Expanded(child: MarketCard(title: 'Euro', value: 'Demo', icon: Icons.euro)),
-            ],
+  padding: const EdgeInsets.all(18),
+  children: [
+    _heroCard(context),
+    const SizedBox(height: 18),
+    _sectionTitle('Piyasalar'),
+    const Row(
+      children: [
+        Expanded(
+          child: MarketCard(
+            title: 'Altın',
+            value: 'Demo',
+            icon: Icons.monetization_on,
           ),
-          const SizedBox(height: 22),
-          _sectionTitle('V1 Bölümleri'),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.25,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              const FeatureCard(title: 'Duyurular', icon: Icons.campaign),
-              const FeatureCard(title: 'Rehber', icon: Icons.menu_book),
-FeatureCard(
-  title: 'Tasarruf Finansman\nŞirketleri',
-  icon: Icons.business,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const CompaniesScreen(),
-      ),
-    );
-  },
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: MarketCard(
+            title: 'Dolar',
+            value: 'Demo',
+            icon: Icons.attach_money,
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: MarketCard(
+            title: 'Euro',
+            value: 'Demo',
+            icon: Icons.euro,
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 22),
+    _highlightsSection(context),
+  ],
 ),
-              const FeatureCard(title: 'Uzmanlar', icon: Icons.verified_user),
-              FeatureCard(
-  title: 'Hakkımızda',
-  icon: Icons.info_outline,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AboutScreen()),
-    );
-  },
-),
-
-FeatureCard(
-  title: 'Yasal Bilgi',
-  icon: Icons.gavel,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const LegalInfoScreen()),
-    );
-  },
-),
-               ],
+);
+}
+Widget _highlightsSection(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          const Expanded(
+            child: Text(
+              'Öne Çıkanlar',
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              // İleride tüm duyurular sayfasına bağlanacak.
+            },
+            child: const Text('Tümünü Gör'),
           ),
         ],
       ),
-    );
-  }        
+      const SizedBox(height: 8),
+      Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: const Color(0xFFE5E7EB),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.035),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            _highlightRow(
+              icon: Icons.account_balance_outlined,
+              title: 'Sektörel gelişmeleri takip edin',
+              subtitle: 'Mevzuat ve sektör duyuruları',
+              onTap: () {},
+            ),
+            const Divider(
+              height: 1,
+              indent: 68,
+              color: Color(0xFFE5E7EB),
+            ),
+            _highlightRow(
+              icon: Icons.campaign_outlined,
+              title: 'Plango duyuruları',
+              subtitle: 'Yeni özellikler ve güncellemeler',
+              onTap: () {},
+            ),
+            const Divider(
+              height: 1,
+              indent: 68,
+              color: Color(0xFFE5E7EB),
+            ),
+            _highlightRow(
+              icon: Icons.auto_awesome_outlined,
+              title: 'Yeni içerikleri keşfedin',
+              subtitle: 'Hesaplama, şirketler ve bilgilendirmeler',
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _highlightRow({
+  required IconData icon,
+  required String title,
+  required String subtitle,
+  required VoidCallback onTap,
+}) {
+  return Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF7F1),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.green,
+                size: 21,
+              ),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF111827),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFF9CA3AF),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
   Widget _heroCard(BuildContext context) {
     return Container(
@@ -341,7 +456,7 @@ FeatureCard(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Tasarruf finansman planını oluştur.',
+            'Tasarruf planını oluştur.',
             style: TextStyle(
               color: Colors.white,
               fontSize: 22,
