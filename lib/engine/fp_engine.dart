@@ -96,12 +96,12 @@ if (totalPaid >= requiredSaving) {
       );
     }
 
+    final baseDelivery = (month * 0.45).ceil();
     final downPaymentRate = downPayment / finance;
 
-int deliveryMonth = (month * 0.45 * (1 - downPaymentRate)).ceil();
-
-if (saving45Month > 0 && deliveryMonth < saving45Month) {
-  deliveryMonth = saving45Month;
+    int deliveryMonth = (baseDelivery * (1 - downPaymentRate)).floor();
+    if (month >= 50 && installment <= 10000) {
+  deliveryMonth += 1;
 }
 if (saving45Month > 0 && deliveryMonth < saving45Month) {
   deliveryMonth = saving45Month;

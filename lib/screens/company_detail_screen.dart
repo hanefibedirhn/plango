@@ -180,7 +180,7 @@ Future<void> _openUrl(String url) async {
         const Divider(height: 1, color: _divider),
         _ActionRow(
           icon: Icons.calculate_outlined,
-          title: 'FP Engine\'e Git',
+          title: 'Hesaplamaya Git',
           onTap: () {
             Navigator.push(
               context,
