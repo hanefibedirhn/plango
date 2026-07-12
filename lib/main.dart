@@ -5,6 +5,7 @@ import 'screens/about_screen.dart';
 import 'screens/companies_screen.dart';
 import 'screens/calculator_screen.dart';
 import 'widgets/app_drawer.dart';
+import 'screens/login_selection_screen.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
@@ -243,30 +244,40 @@ class HomeScreen extends StatelessWidget {
 
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: AppColors.bg,
+    drawer: const AppDrawer(),
+    appBar: AppBar(
       backgroundColor: AppColors.bg,
-      drawer: AppDrawer(),
-      appBar: AppBar(
-        backgroundColor: AppColors.bg,
-        title: const Text(
-          'PLANGO',
-          style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.green),
+      title: const Text(
+        'PLANGO',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          color: AppColors.green,
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline),
-          ),
-        ],
       ),
-      body: ListView(
-  padding: const EdgeInsets.all(18),
-  children: [
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications_none),
+        ),
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const LoginSelectionScreen(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.person_outline),
+        ),
+      ],
+    ),
+    body: ListView(
+      padding: const EdgeInsets.all(18),
+      children: [
     _heroCard(context),
     const SizedBox(height: 18),
     _sectionTitle('Piyasalar'),

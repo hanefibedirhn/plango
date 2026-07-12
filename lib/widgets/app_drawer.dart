@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../screens/about_screen.dart';
 import '../screens/companies_screen.dart';
 import '../screens/legal_info_screen.dart';
+import '../screens/savings_finance_system_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -76,20 +77,6 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.campaign_outlined,
-                    title: 'Duyurular',
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _DrawerItem(
-                    icon: Icons.verified_user_outlined,
-                    title: 'Doğrulanmış Uzmanlar',
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _DrawerItem(
                     icon: Icons.business_outlined,
                     title: 'Tasarruf Finansman Şirketleri',
                     onTap: () {
@@ -100,8 +87,32 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
+                    icon: Icons.people_alt_outlined,
+                    title: 'Uzmanlar',
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _DrawerItem(
                     icon: Icons.account_balance_outlined,
-                    title: 'Faizsiz Finansman Sistemi',
+                    title: 'Tasarruf Finansman Sistemi',
+                    onTap: () {
+                      _openPage(
+                        context,
+                        const SavingsFinanceSystemScreen(),
+                      );
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.help_outline_rounded,
+                    title: 'Sıkça Sorulan Sorular',
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _DrawerItem(
+                    icon: Icons.feedback_outlined,
+                    title: 'Şikayet ve Öneri',
                     onTap: () {
                       Navigator.pop(context);
                     },
