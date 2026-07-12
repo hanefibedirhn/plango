@@ -1,5 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
+import '../repositories/user_repository.dart';
+import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,6 +26,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordAgainController =
       TextEditingController();
+      final AuthService _authService = AuthService();
+final UserRepository _userRepository = UserRepository();
 
   bool _passwordVisible = false;
   bool _passwordAgainVisible = false;
@@ -69,24 +74,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _usernameValidator(String? value) {
-    final String username = (value ?? '').trim();
+  final String username = (value ?? '').trim();
+  final String normalizedUsername = username.toLowerCase();
 
-    if (username.isEmpty) {
-      return 'Kullanıcı adınızı giriniz.';
-    }
+  const Set<String> reservedUsernames = {
+    'admin',
+    'administrator',
+    'support',
+    'plango',
+    'official',
+    'system',
+    'moderator',
+    'root',
+  };
 
-    if (username.length < 4) {
-      return 'Kullanıcı adı en az 4 karakter olmalıdır.';
-    }
-
-    final RegExp usernamePattern = RegExp(r'^[a-zA-Z0-9._]+$');
-
-    if (!usernamePattern.hasMatch(username)) {
-      return 'Yalnızca harf, rakam, nokta ve alt çizgi kullanabilirsiniz.';
-    }
-
-    return null;
+  if (username.isEmpty) {
+    return 'Kullanıcı adınızı giriniz.';
   }
+
+  if (username.length < 3) {
+    return 'Kullanıcı adı en az 3 karakter olmalıdır.';
+  }
+
+  if (username.length > 20) {
+    return 'Kullanıcı adı en fazla 20 karakter olabilir.';
+  }
+
+  final RegExp usernamePattern =
+      RegExp(r'^[a-zA-Z0-9._]+$');
+
+  if (!usernamePattern.hasMatch(username)) {
+    return 'Yalnızca harf, rakam, nokta ve alt çizgi kullanabilirsiniz.';
+  }
+
+  if (username == '.' ||
+    username == '..' ||
+    username.replaceAll('.', '').isEmpty) {
+  return 'Geçerli bir kullanıcı adı belirleyiniz.';
+}
+
+  if (reservedUsernames.contains(normalizedUsername)) {
+    return 'Bu kullanıcı adı kullanılamaz.';
+  }
+
+  return null;
+}
 
   String? _passwordValidator(String? value) {
     final String password = value ?? '';
@@ -135,54 +167,146 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _createAccount() async {
-    FocusScope.of(context).unfocus();
+  FocusScope.of(context).unfocus();
 
-    final bool isFormValid =
-        _formKey.currentState?.validate() ?? false;
+  final bool isFormValid =
+      _formKey.currentState?.validate() ?? false;
 
-    if (!isFormValid) {
-      return;
-    }
+  if (!isFormValid) {
+    return;
+  }
 
-    if (!_membershipAccepted ||
-        !_clarificationAcknowledged ||
-        !_privacyAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Devam etmek için gerekli metinleri inceleyiniz.',
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    // Firebase Authentication bağlandığında
-    // gerçek hesap oluşturma işlemi burada yapılacak.
-    await Future<void>.delayed(
-      const Duration(milliseconds: 450),
-    );
-
-    if (!mounted) return;
-
-    setState(() {
-      _isSubmitting = false;
-    });
-
+  if (!_membershipAccepted ||
+      !_clarificationAcknowledged ||
+      !_privacyAccepted) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Hesap oluşturma Firebase bağlantısıyla etkinleştirilecek.',
+          'Devam etmek için gerekli metinleri inceleyiniz.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
     );
+    return;
   }
+
+  setState(() {
+    _isSubmitting = true;
+  });
+
+  final String name = _nameController.text.trim();
+  final String surname = _surnameController.text.trim();
+  final String email =
+      _emailController.text.trim().toLowerCase();
+  final String username = _usernameController.text.trim();
+  final String normalizedUsername =
+      username.toLowerCase();
+  final String password = _passwordController.text;
+
+  bool authenticationAccountCreated = false;
+
+  try {
+    final credential =
+        await _authService.registerWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final firebaseUser = credential.user;
+
+    if (firebaseUser == null) {
+      throw const AuthServiceException(
+        code: 'user-not-created',
+        message: 'Kullanıcı hesabı oluşturulamadı.',
+      );
+    }
+
+    authenticationAccountCreated = true;
+
+    final AppUser appUser = AppUser(
+      uid: firebaseUser.uid,
+      name: name,
+      surname: surname,
+      email: email,
+      username: username,
+      usernameLowercase: normalizedUsername,
+      roles: const ['user'],
+      expertStatus: 'none',
+      phone: null,
+      createdAt: DateTime.now(),
+    );
+
+    await _userRepository.createUserProfile(appUser);
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Plango hesabınız başarıyla oluşturuldu.',
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
+    Navigator.pop(context);
+  } on UsernameAlreadyInUseException catch (error) {
+    if (authenticationAccountCreated) {
+      await _authService.rollbackNewlyCreatedUser();
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.toString()),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } on AuthServiceException catch (error) {
+    if (authenticationAccountCreated) {
+      await _authService.rollbackNewlyCreatedUser();
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } catch (error) {
+    if (authenticationAccountCreated) {
+      await _authService.rollbackNewlyCreatedUser();
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Hesap oluşturulurken beklenmeyen bir hata oluştu.',
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+}
 
   @override
   Widget build(BuildContext context) {
