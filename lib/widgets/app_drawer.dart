@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../screens/about_screen.dart';
 import '../screens/companies_screen.dart';
+import '../screens/faq_screen.dart';
 import '../screens/legal_info_screen.dart';
 import '../screens/savings_finance_system_screen.dart';
-import '../screens/faq_screen.dart';
+import '../screens/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -53,7 +54,8 @@ class AppDrawer extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Bağımsız Tasarruf Finansmanı\nKarar Destek Platformu',
+                      'Bağımsız Tasarruf Finansmanı\n'
+                      'Karar Destek Platformu',
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.45,
@@ -105,15 +107,15 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-  icon: Icons.help_outline_rounded,
-  title: 'Sıkça Sorulan Sorular',
-  onTap: () {
-    _openPage(
-      context,
-      const FaqScreen(),
-    );
-  },
-),
+                    icon: Icons.help_outline_rounded,
+                    title: 'Sıkça Sorulan Sorular',
+                    onTap: () {
+                      _openPage(
+                        context,
+                        const FaqScreen(),
+                      );
+                    },
+                  ),
                   _DrawerItem(
                     icon: Icons.feedback_outlined,
                     title: 'Şikayet ve Öneri',
@@ -145,7 +147,10 @@ class AppDrawer extends StatelessWidget {
                     icon: Icons.settings_outlined,
                     title: 'Ayarlar',
                     onTap: () {
-                      Navigator.pop(context);
+                      _openPage(
+                        context,
+                        const SettingsScreen(),
+                      );
                     },
                   ),
                 ],
