@@ -1,22 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../models/user_model.dart';
+import '../repositories/user_repository.dart';
 import 'change_password_screen.dart';
+import '../services/auth_service.dart';
 
 class ProfileInformationScreen extends StatefulWidget {
-  const ProfileInformationScreen({
-    super.key,
-    this.initialName = 'Hanefi',
-    this.initialSurname = 'Turanoğlu',
-    this.initialEmail = 'hanoturan@gmail.com',
-    this.initialUsername = 'hanoturan',
-    this.initialPhone,
-  });
-
-  final String initialName;
-  final String initialSurname;
-  final String initialEmail;
-  final String initialUsername;
-  final String? initialPhone;
+  const ProfileInformationScreen({super.key});
 
   @override
   State<ProfileInformationScreen> createState() =>
@@ -30,32 +21,29 @@ class _ProfileInformationScreenState
   static const Color _textDark = Color(0xFF111827);
   static const Color _textMuted = Color(0xFF6B7280);
   static const Color _danger = Color(0xFFB42318);
+  static const Color _border = Color(0xFFE5E7EB);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  late final TextEditingController _nameController;
-  late final TextEditingController _surnameController;
-  late final TextEditingController _phoneController;
+  final UserRepository _userRepository = UserRepository();
+
+  final AuthService _authService = AuthService();
+
+  final TextEditingController _nameController =
+      TextEditingController();
+
+  final TextEditingController _surnameController =
+      TextEditingController();
+
+  final TextEditingController _phoneController =
+      TextEditingController();
 
   bool _isEditing = false;
-  bool _isSaving = false;
+bool _isSaving = false;
+bool _isDeletingAccount = false;
 
-  @override
-  void initState() {
-    super.initState();
-
-    _nameController = TextEditingController(
-      text: widget.initialName,
-    );
-
-    _surnameController = TextEditingController(
-      text: widget.initialSurname,
-    );
-
-    _phoneController = TextEditingController(
-      text: widget.initialPhone ?? '',
-    );
-  }
+String? _loadedUserId;
+AppUser? _currentProfile;
 
   @override
   void dispose() {
@@ -63,6 +51,19 @@ class _ProfileInformationScreenState
     _surnameController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  void _loadControllers(AppUser user) {
+    if (_loadedUserId == user.uid) {
+      return;
+    }
+
+    _loadedUserId = user.uid;
+    _currentProfile = user;
+
+    _nameController.text = user.name;
+    _surnameController.text = user.surname;
+    _phoneController.text = user.phone ?? '';
   }
 
   String? _requiredValidator(
@@ -87,7 +88,7 @@ class _ProfileInformationScreenState
     }
 
     if (phone.length != 10 || !phone.startsWith('5')) {
-      return 'Telefon numarasını 5XX XXX XX XX biçiminde giriniz.';
+      return 'Telefonu 5XX XXX XX XX biçiminde giriniz.';
     }
 
     return null;
@@ -103,333 +104,645 @@ class _ProfileInformationScreenState
       return;
     }
 
+    final User? firebaseUser =
+        FirebaseAuth.instance.currentUser;
+
+    if (firebaseUser == null) {
+      _showMessage(
+        'Aktif kullanıcı oturumu bulunamadı.',
+      );
+      return;
+    }
+
     setState(() {
       _isSaving = true;
     });
 
-    // Firebase bağlandığında bilgiler burada güncellenecek.
-    await Future<void>.delayed(
-      const Duration(milliseconds: 400),
-    );
+    try {
+      await _userRepository.updateProfile(
+        uid: firebaseUser.uid,
+        name: _nameController.text,
+        surname: _surnameController.text,
+        phone: _phoneController.text,
+      );
 
-    if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _isEditing = false;
+      });
+
+      _showMessage(
+        'Profil bilgileriniz güncellendi.',
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      _showMessage(
+        error is ArgumentError
+            ? error.message.toString()
+            : 'Profil bilgileri güncellenemedi.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+
+  void _cancelEditing() {
+    final AppUser? user = _currentProfile;
+
+    if (user == null) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
 
     setState(() {
-      _isSaving = false;
+      _nameController.text = user.name;
+      _surnameController.text = user.surname;
+      _phoneController.text = user.phone ?? '';
       _isEditing = false;
     });
+  }
 
+  void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Profil bilgileriniz güncellendi.',
-        ),
+      SnackBar(
+        content: Text(message),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  void _cancelEditing() {
-    FocusScope.of(context).unfocus();
+  Future<void> _showDeleteAccountDialog() async {
+  final TextEditingController passwordController =
+      TextEditingController();
 
-    setState(() {
-      _nameController.text = widget.initialName;
-      _surnameController.text = widget.initialSurname;
-      _phoneController.text = widget.initialPhone ?? '';
-      _isEditing = false;
-    });
+  bool passwordVisible = false;
+
+  final String? password = await showDialog<String>(
+    context: context,
+    barrierDismissible: !_isDeletingAccount,
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22),
+            ),
+            icon: const Icon(
+              Icons.warning_amber_rounded,
+              color: _danger,
+              size: 38,
+            ),
+            title: const Text(
+              'Hesabı Kalıcı Olarak Sil',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Hesabınız, profil bilgileriniz ve kullanıcı adı '
+                  'kaydınız kalıcı olarak silinecektir. Bu işlem '
+                  'geri alınamaz.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                TextField(
+                  controller: passwordController,
+                  obscureText: !passwordVisible,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: 'Mevcut Şifre',
+                    prefixIcon: const Icon(
+                      Icons.lock_outline_rounded,
+                    ),
+                    suffixIcon: IconButton(
+                      tooltip: passwordVisible
+                          ? 'Şifreyi gizle'
+                          : 'Şifreyi göster',
+                      onPressed: () {
+                        setDialogState(() {
+                          passwordVisible = !passwordVisible;
+                        });
+                      },
+                      icon: Icon(
+                        passwordVisible
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: const Text('Vazgeç'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  final String password =
+                      passwordController.text;
+
+                  if (password.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Devam etmek için mevcut şifrenizi giriniz.',
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                    return;
+                  }
+
+                  Navigator.pop(
+                    dialogContext,
+                    password,
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: _danger,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Hesabı Sil'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  passwordController.dispose();
+
+  if (password == null || password.isEmpty || !mounted) {
+    return;
   }
 
-  Future<void> _showDeleteAccountDialog() async {
-    final bool? shouldContinue = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+  final AppUser? profile = _currentProfile;
+  final User? firebaseUser =
+      FirebaseAuth.instance.currentUser;
+
+  if (profile == null || firebaseUser == null) {
+    _showMessage(
+      'Aktif kullanıcı bilgileri bulunamadı.',
+    );
+    return;
+  }
+
+  final bool? confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+        title: const Text(
+          'Son Onay',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
           ),
-          icon: const Icon(
-            Icons.warning_amber_rounded,
-            color: _danger,
-            size: 34,
+        ),
+        content: const Text(
+          'Hesabınızı kalıcı olarak silmek istediğinizden '
+          'emin misiniz? Bu işlem geri alınamaz.',
+          style: TextStyle(
+            height: 1.5,
           ),
-          title: const Text(
-            'Hesabı Sil',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-            ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext, false);
+            },
+            child: const Text('Vazgeç'),
           ),
-          content: const Text(
-            'Hesabınızı silmek istediğinizden emin misiniz? '
-            'Bu işlem hesabınıza erişiminizi sona erdirecektir.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              height: 1.5,
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext, true);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: _danger,
+              foregroundColor: Colors.white,
             ),
+            child: const Text('Evet, Hesabımı Sil'),
           ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext, false);
-              },
-              child: const Text('Vazgeç'),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(dialogContext, true);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: _danger,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Devam Et'),
-            ),
-          ],
-        );
-      },
+        ],
+      );
+    },
+  );
+
+  if (confirmed != true || !mounted) {
+    return;
+  }
+
+  setState(() {
+    _isDeletingAccount = true;
+  });
+
+  try {
+    // Önce şifre kontrol edilir.
+    await _authService.reauthenticateCurrentUser(
+      currentPassword: password,
     );
 
-    if (shouldContinue != true || !mounted) {
+    // Kullanıcı hâlâ oturum açmışken Firestore kayıtları silinir.
+    await _userRepository.deleteUserProfile(
+      uid: firebaseUser.uid,
+      username: profile.username,
+    );
+
+    // Son olarak Authentication hesabı silinir.
+    await _authService.deleteAuthenticatedUser();
+
+    if (!mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Hesap silme işlemi Firebase bağlantısı sırasında etkinleştirilecek.',
+          'Plango hesabınız kalıcı olarak silindi.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
     );
+
+    Navigator.of(context).popUntil(
+      (route) => route.isFirst,
+    );
+  } on AuthServiceException catch (error) {
+    if (!mounted) {
+      return;
+    }
+
+    _showMessage(error.message);
+  } catch (_) {
+    if (!mounted) {
+      return;
+    }
+
+    _showMessage(
+      'Hesap silinirken beklenmeyen bir hata oluştu.',
+    );
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isDeletingAccount = false;
+      });
+    }
   }
+}
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _background,
-      appBar: AppBar(
-        backgroundColor: _background,
-        foregroundColor: _textDark,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text(
-          'Profil Bilgilerim',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        actions: [
-          if (!_isEditing)
-            IconButton(
-              tooltip: 'Bilgileri düzenle',
-              onPressed: () {
-                setState(() {
-                  _isEditing = true;
-                });
-              },
-              icon: const Icon(
-                Icons.edit_outlined,
-              ),
-            ),
-        ],
+    final User? firebaseUser =
+        FirebaseAuth.instance.currentUser;
+
+    if (firebaseUser == null) {
+      return const _ProfileErrorScreen(
+        message: 'Aktif kullanıcı oturumu bulunamadı.',
+      );
+    }
+
+    return StreamBuilder<AppUser?>(
+      stream: _userRepository.watchUserById(
+        firebaseUser.uid,
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 10, 18, 36),
-          children: [
-            const _ProfileHeader(),
-            const SizedBox(height: 20),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState ==
+                ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return const _ProfileLoadingScreen();
+        }
 
-            Form(
-              key: _formKey,
-              child: Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    _EditableProfileField(
-                      controller: _nameController,
-                      label: 'Ad',
-                      icon: Icons.person_outline_rounded,
-                      enabled: _isEditing,
-                      validator: (value) {
-                        return _requiredValidator(value, 'Ad');
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _EditableProfileField(
-                      controller: _surnameController,
-                      label: 'Soyad',
-                      icon: Icons.badge_outlined,
-                      enabled: _isEditing,
-                      validator: (value) {
-                        return _requiredValidator(value, 'Soyad');
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    _EditableProfileField(
-                      controller: _phoneController,
-                      label: 'Telefon',
-                      hint: 'Henüz eklenmedi',
-                      icon: Icons.phone_outlined,
-                      enabled: _isEditing,
-                      keyboardType: TextInputType.phone,
-                      validator: _phoneValidator,
-                    ),
-                    const SizedBox(height: 15),
-                    _ReadOnlyProfileField(
-                      label: 'E-posta',
-                      value: widget.initialEmail,
-                      icon: Icons.mail_outline_rounded,
-                    ),
-                    const SizedBox(height: 15),
-                    _ReadOnlyProfileField(
-                      label: 'Kullanıcı Adı',
-                      value: widget.initialUsername,
-                      icon: Icons.alternate_email_rounded,
-                    ),
-                  ],
-                ),
+        if (snapshot.hasError) {
+          return const _ProfileErrorScreen(
+            message:
+                'Profil bilgileriniz alınırken bir sorun oluştu.',
+          );
+        }
+
+        final AppUser? user = snapshot.data;
+
+        if (user == null) {
+          return const _ProfileErrorScreen(
+            message: 'Kullanıcı profili bulunamadı.',
+          );
+        }
+
+        _currentProfile = user;
+
+        if (!_isEditing) {
+          _loadControllers(user);
+        }
+
+        return Scaffold(
+          backgroundColor: _background,
+          appBar: AppBar(
+            backgroundColor: _background,
+            foregroundColor: _textDark,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            title: const Text(
+              'Profil Bilgilerim',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
               ),
             ),
+            actions: [
+              if (!_isEditing)
+                IconButton(
+                  tooltip: 'Bilgileri düzenle',
+                  onPressed: () {
+                    setState(() {
+                      _isEditing = true;
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                  ),
+                ),
+            ],
+          ),
+          body: SafeArea(
+            child: ListView(
+              padding:
+                  const EdgeInsets.fromLTRB(18, 10, 18, 36),
+              children: [
+                _ProfileHeader(
+                  fullName: user.fullName,
+                  username: user.username,
+                ),
+                const SizedBox(height: 20),
 
-            if (_isEditing) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed:
-                          _isSaving ? null : _cancelEditing,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _textDark,
-                        minimumSize: const Size.fromHeight(54),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
+                Form(
+                  key: _formKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.circular(22),
+                      border: Border.all(
+                        color: _border,
                       ),
-                      child: const Text(
-                        'Vazgeç',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
+                    ),
+                    child: Column(
+                      children: [
+                        _EditableProfileField(
+                          controller: _nameController,
+                          label: 'Ad',
+                          icon:
+                              Icons.person_outline_rounded,
+                          enabled: _isEditing,
+                          validator: (value) {
+                            return _requiredValidator(
+                              value,
+                              'Ad',
+                            );
+                          },
                         ),
-                      ),
+                        const SizedBox(height: 15),
+                        _EditableProfileField(
+                          controller: _surnameController,
+                          label: 'Soyad',
+                          icon: Icons.badge_outlined,
+                          enabled: _isEditing,
+                          validator: (value) {
+                            return _requiredValidator(
+                              value,
+                              'Soyad',
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        _EditableProfileField(
+                          controller: _phoneController,
+                          label: 'Telefon',
+                          hint: 'Henüz eklenmedi',
+                          icon: Icons.phone_outlined,
+                          enabled: _isEditing,
+                          keyboardType:
+                              TextInputType.phone,
+                          validator: _phoneValidator,
+                        ),
+                        const SizedBox(height: 15),
+                        _ReadOnlyProfileField(
+                          label: 'E-posta',
+                          value: user.email,
+                          icon:
+                              Icons.mail_outline_rounded,
+                        ),
+                        const SizedBox(height: 15),
+                        _ReadOnlyProfileField(
+                          label: 'Kullanıcı Adı',
+                          value: user.username,
+                          icon:
+                              Icons.alternate_email_rounded,
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed:
-                          _isSaving ? null : _saveProfile,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _green,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(54),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                ),
+
+                if (_isEditing) ...[
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _isSaving
+                              ? null
+                              : _cancelEditing,
+                          style:
+                              OutlinedButton.styleFrom(
+                            foregroundColor: _textDark,
+                            minimumSize:
+                                const Size.fromHeight(54),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: const Text(
+                            'Vazgeç',
+                            style: TextStyle(
+                              fontWeight:
+                                  FontWeight.w800,
+                            ),
+                          ),
                         ),
                       ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.3,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'Kaydet',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                              ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _isSaving
+                              ? null
+                              : _saveProfile,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _green,
+                            foregroundColor:
+                                Colors.white,
+                            minimumSize:
+                                const Size.fromHeight(54),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(15),
                             ),
-                    ),
+                          ),
+                          child: _isSaving
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child:
+                                      CircularProgressIndicator(
+                                    strokeWidth: 2.3,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Kaydet',
+                                  style: TextStyle(
+                                    fontWeight:
+                                        FontWeight.w900,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
 
-            const SizedBox(height: 24),
-            const _SectionTitle(
-              title: 'Güvenlik',
-            ),
-            const SizedBox(height: 10),
+                const SizedBox(height: 24),
+                const _SectionTitle(
+                  title: 'Güvenlik',
+                ),
+                const SizedBox(height: 10),
 
-            _SettingsCard(
-              icon: Icons.lock_reset_rounded,
-              title: 'Şifremi Değiştir',
-              subtitle: 'Hesap şifrenizi güvenli şekilde güncelleyin.',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const ChangePasswordScreen(),
-                  ),
-                );
-              },
-            ),
+                _SettingsCard(
+                  icon: Icons.lock_reset_rounded,
+                  title: 'Şifremi Değiştir',
+                  subtitle:
+                      'Hesap şifrenizi güvenli şekilde güncelleyin.',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const ChangePasswordScreen(),
+                      ),
+                    );
+                  },
+                ),
 
-            const SizedBox(height: 26),
-            const _SectionTitle(
-              title: 'Hesap İşlemleri',
-            ),
-            const SizedBox(height: 10),
+                const SizedBox(height: 26),
+                const _SectionTitle(
+                  title: 'Hesap İşlemleri',
+                ),
+                const SizedBox(height: 10),
 
-            _SettingsCard(
-              icon: Icons.delete_outline_rounded,
-              title: 'Hesabı Sil',
-              subtitle: 'Plango hesabınızın silinmesini talep edin.',
-              iconColor: _danger,
-              titleColor: _danger,
-              backgroundColor: const Color(0xFFFFF4F3),
-              onTap: _showDeleteAccountDialog,
+                _SettingsCard(
+  icon: Icons.delete_outline_rounded,
+  title: 'Hesabı Sil',
+  subtitle: _isDeletingAccount
+      ? 'Hesabınız siliniyor...'
+      : 'Plango hesabınızı kalıcı olarak silin.',
+  iconColor: _danger,
+  titleColor: _danger,
+  backgroundColor: const Color(0xFFFFF4F3),
+  onTap: _isDeletingAccount
+      ? () {}
+      : _showDeleteAccountDialog,
+),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader();
+  const _ProfileHeader({
+    required this.fullName,
+    required this.username,
+  });
+
+  final String fullName;
+  final String username;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(19),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1EC),
-        borderRadius: BorderRadius.circular(22),
+        color: _ProfileInformationScreenState._green,
+        borderRadius: BorderRadius.circular(24),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(
-            Icons.manage_accounts_outlined,
-            color: _ProfileInformationScreenState._green,
-            size: 30,
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(19),
+            ),
+            child: const Icon(
+              Icons.person_outline_rounded,
+              color: Colors.white,
+              size: 31,
+            ),
           ),
-          SizedBox(width: 13),
+          const SizedBox(width: 14),
           Expanded(
-            child: Text(
-              'Profil bilgilerinizi buradan görüntüleyebilir ve '
-              'izin verilen alanları güncelleyebilirsiniz.',
-              style: TextStyle(
-                color: _ProfileInformationScreenState._textDark,
-                fontSize: 14,
-                height: 1.45,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fullName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '@$username',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -463,7 +776,10 @@ class _EditableProfileField extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       keyboardType: keyboardType,
-      textCapitalization: TextCapitalization.words,
+      textCapitalization:
+          keyboardType == TextInputType.phone
+              ? TextCapitalization.none
+              : TextCapitalization.words,
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
@@ -494,7 +810,8 @@ class _EditableProfileField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: _ProfileInformationScreenState._green,
+            color:
+                _ProfileInformationScreenState._green,
             width: 1.7,
           ),
         ),
@@ -572,8 +889,10 @@ class _SettingsCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.iconColor = _ProfileInformationScreenState._green,
-    this.titleColor = _ProfileInformationScreenState._textDark,
+    this.iconColor =
+        _ProfileInformationScreenState._green,
+    this.titleColor =
+        _ProfileInformationScreenState._textDark,
     this.backgroundColor = Colors.white,
   });
 
@@ -611,7 +930,8 @@ class _SettingsCard extends StatelessWidget {
               const SizedBox(width: 13),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
@@ -626,7 +946,8 @@ class _SettingsCard extends StatelessWidget {
                       subtitle,
                       style: const TextStyle(
                         color:
-                            _ProfileInformationScreenState._textMuted,
+                            _ProfileInformationScreenState
+                                ._textMuted,
                         fontSize: 12.5,
                         height: 1.35,
                       ),
@@ -639,6 +960,59 @@ class _SettingsCard extends StatelessWidget {
                 color: Color(0xFF9CA3AF),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileLoadingScreen extends StatelessWidget {
+  const _ProfileLoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: Color(0xFFF7F8F5),
+      body: Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFF0B5D3B),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileErrorScreen extends StatelessWidget {
+  const _ProfileErrorScreen({
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F8F5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF7F8F5),
+        title: const Text(
+          'Profil Bilgilerim',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              height: 1.5,
+            ),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'profile_information_screen.dart';
+import '../services/auth_service.dart';
 
 enum ExpertApplicationStatus {
   none,
@@ -9,13 +10,14 @@ enum ExpertApplicationStatus {
 }
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({
+ AccountScreen({
     super.key,
     this.userName = 'Hanefi Bedirhan',
     this.expertStatus = ExpertApplicationStatus.none,
     this.isAdmin = false,
   });
 
+  final AuthService _authService = AuthService();
   final String userName;
   final ExpertApplicationStatus expertStatus;
   final bool isAdmin;
@@ -149,17 +151,18 @@ class AccountScreen extends StatelessWidget {
             const SizedBox(height: 10),
 
             _AccountCard(
-              icon: Icons.person_outline_rounded,
-              title: 'Profil Bilgilerim',
-              subtitle: 'Kişisel bilgilerinizi ve şifrenizi yönetin.',
-              onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const ProfileInformationScreen(),
-    ),
-  );
-},
+  icon: Icons.person_outline_rounded,
+  title: 'Profil Bilgilerim',
+  subtitle: 'Kişisel bilgilerinizi ve şifrenizi yönetin.',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ProfileInformationScreen(),
+      ),
+    );
+  },
+),
 
             _AccountCard(
               icon: Icons.bookmark_border_rounded,
@@ -216,74 +219,101 @@ class AccountScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             OutlinedButton.icon(
-              onPressed: () {
-                showDialog<void>(
-                  context: context,
-                  builder: (dialogContext) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      title: const Text(
-                        'Çıkış Yap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      content: const Text(
-                        'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
-                        style: TextStyle(
-                          height: 1.45,
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(dialogContext);
-                          },
-                          child: const Text('Vazgeç'),
-                        ),
-                        FilledButton(
-                          onPressed: () {
-                            Navigator.pop(dialogContext);
-
-                            // Firebase bağlandığında oturum burada kapatılacak.
-                            _showComingSoon(
-                              context,
-                              'Çıkış işlemi Firebase bağlantısıyla etkinleştirilecek.',
-                            );
-                          },
-                          style: FilledButton.styleFrom(
-                            backgroundColor: _green,
-                          ),
-                          child: const Text('Çıkış Yap'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              icon: const Icon(
-                Icons.logout_rounded,
-              ),
-              label: const Text(
-                'Çıkış Yap',
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFB42318),
-                side: const BorderSide(
-                  color: Color(0xFFF2B8B5),
-                ),
-                minimumSize: const Size.fromHeight(56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 15.5,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
+  onPressed: () {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          title: const Text(
+            'Çıkış Yap',
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
             ),
+          ),
+          content: const Text(
+            'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
+            style: TextStyle(
+              height: 1.45,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Vazgeç'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+
+                try {
+                  await _authService.logout();
+
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  Navigator.of(context).popUntil(
+                    (route) => route.isFirst,
+                  );
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Hesabınızdan çıkış yapıldı.',
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                } on AuthServiceException catch (error) {
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(error.message),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: _green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Çıkış Yap'),
+            ),
+          ],
+        );
+      },
+    );
+  },
+  icon: const Icon(
+    Icons.logout_rounded,
+  ),
+  label: const Text(
+    'Çıkış Yap',
+  ),
+  style: OutlinedButton.styleFrom(
+    foregroundColor: const Color(0xFFB42318),
+    side: const BorderSide(
+      color: Color(0xFFF2B8B5),
+    ),
+    minimumSize: const Size.fromHeight(56),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+    textStyle: const TextStyle(
+      fontSize: 15.5,
+      fontWeight: FontWeight.w900,
+    ),
+    ),
+),
           ],
         ),
       ),

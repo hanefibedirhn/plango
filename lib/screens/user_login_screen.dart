@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
@@ -20,14 +21,16 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _loginController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+final TextEditingController _loginController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
 
-  final FocusNode _loginFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+final FocusNode _loginFocusNode = FocusNode();
+final FocusNode _passwordFocusNode = FocusNode();
 
-  bool _isPasswordVisible = false;
-  bool _isSubmitting = false;
+final AuthService _authService = AuthService();
+
+bool _isPasswordVisible = false;
+bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -48,51 +51,87 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   }
 
   Future<void> _login() async {
-    FocusScope.of(context).unfocus();
+  FocusScope.of(context).unfocus();
 
-    final bool isValid = _formKey.currentState?.validate() ?? false;
+  final bool isValid =
+      _formKey.currentState?.validate() ?? false;
 
-    if (!isValid) {
+  if (!isValid) {
+    return;
+  }
+
+  setState(() {
+    _isSubmitting = true;
+  });
+
+  try {
+    await _authService.loginWithEmailAndPassword(
+      email: _loginController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    if (!mounted) {
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Giriş başarıyla gerçekleştirildi.'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
 
-    // Firebase Authentication bağlandığında
-    // gerçek giriş işlemi burada yapılacak.
-    await Future<void>.delayed(const Duration(milliseconds: 450));
+    Navigator.pop(context);
+  } on AuthServiceException catch (error) {
+    if (!mounted) {
+      return;
+    }
 
-    if (!mounted) return;
-
-    setState(() {
-      _isSubmitting = false;
-    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } catch (_) {
+    if (!mounted) {
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Giriş altyapısı Firebase bağlantısı sırasında etkinleştirilecek.',
+          'Giriş yapılırken beklenmeyen bir hata oluştu.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
     );
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
+}
 
   String? _validateLogin(String? value) {
-    final String text = value?.trim() ?? '';
+  final String email = (value ?? '').trim();
 
-    if (text.isEmpty) {
-      return 'Kullanıcı adınızı veya e-posta adresinizi giriniz.';
-    }
-
-    if (text.length < 3) {
-      return 'Girdiğiniz bilgi en az 3 karakter olmalıdır.';
-    }
-
-    return null;
+  if (email.isEmpty) {
+    return 'E-posta adresinizi giriniz.';
   }
+
+  final RegExp emailPattern = RegExp(
+    r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
+  );
+
+  if (!emailPattern.hasMatch(email)) {
+    return 'Geçerli bir e-posta adresi giriniz.';
+  }
+
+  return null;
+}
 
   String? _validatePassword(String? value) {
     final String text = value ?? '';
@@ -200,7 +239,7 @@ class _LoginHeader extends StatelessWidget {
         ),
         SizedBox(height: 9),
         Text(
-          'Hesabınıza kullanıcı adınız veya e-posta adresinizle giriş yapın.',
+          'Hesabınıza e-posta adresiniz ve şifrenizle giriş yapın.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _UserLoginScreenState._textMuted,
@@ -298,8 +337,8 @@ class _LoginCard extends StatelessWidget {
                 AutofillHints.email,
               ],
               decoration: _inputDecoration(
-                label: 'Kullanıcı Adı veya E-posta',
-                hint: 'Kullanıcı adınızı veya e-postanızı girin',
+                label: 'E-posta',
+                hint: 'E-posta adresinizi girin',
                 icon: Icons.alternate_email_rounded,
               ),
               validator: validateLogin,

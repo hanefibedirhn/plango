@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -16,6 +17,8 @@ class _ChangePasswordScreenState
   static const Color _textMuted = Color(0xFF6B7280);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final AuthService _authService = AuthService();
 
   final TextEditingController _currentPasswordController =
       TextEditingController();
@@ -57,68 +60,97 @@ class _ChangePasswordScreenState
   }
 
   Future<void> _updatePassword() async {
-    FocusScope.of(context).unfocus();
+  FocusScope.of(context).unfocus();
 
-    final bool isValid =
-        _formKey.currentState?.validate() ?? false;
+  final bool isValid =
+      _formKey.currentState?.validate() ?? false;
 
-    if (!isValid) {
-      return;
-    }
+  if (!isValid) {
+    return;
+  }
 
-    if (_newPasswordController.text !=
-        _newPasswordAgainController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Yeni şifreler birbiriyle eşleşmiyor.',
-          ),
-          behavior: SnackBarBehavior.floating,
+  if (_newPasswordController.text !=
+      _newPasswordAgainController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Yeni şifreler birbiriyle eşleşmiyor.',
         ),
-      );
-      return;
-    }
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    return;
+  }
 
-    if (_currentPasswordController.text ==
-        _newPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Yeni şifreniz mevcut şifrenizden farklı olmalıdır.',
-          ),
-          behavior: SnackBarBehavior.floating,
+  if (_currentPasswordController.text ==
+      _newPasswordController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Yeni şifreniz mevcut şifrenizden farklı olmalıdır.',
         ),
-      );
-      return;
-    }
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    return;
+  }
 
-    setState(() {
-      _isSubmitting = true;
-    });
+  setState(() {
+    _isSubmitting = true;
+  });
 
-    // Firebase bağlandığında yeniden kimlik doğrulama
-    // ve şifre güncelleme işlemi burada yapılacak.
-    await Future<void>.delayed(
-      const Duration(milliseconds: 450),
+  try {
+    await _authService.updatePassword(
+      currentPassword: _currentPasswordController.text,
+      newPassword: _newPasswordController.text,
     );
 
-    if (!mounted) return;
-
-    setState(() {
-      _isSubmitting = false;
-    });
+    if (!mounted) {
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Şifreniz güncellendi.',
+          'Şifreniz başarıyla güncellendi.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
     );
 
     Navigator.pop(context);
+  } on AuthServiceException catch (error) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } catch (_) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Şifre güncellenirken beklenmeyen bir hata oluştu.',
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
+}
 
   @override
   Widget build(BuildContext context) {

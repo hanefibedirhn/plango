@@ -5,7 +5,7 @@ import 'screens/about_screen.dart';
 import 'screens/companies_screen.dart';
 import 'screens/calculator_screen.dart';
 import 'widgets/app_drawer.dart';
-import 'screens/login_selection_screen.dart';
+import 'screens/account_router_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -275,7 +275,7 @@ Widget build(BuildContext context) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const LoginSelectionScreen(),
+                builder: (_) => AccountRouterScreen(),
               ),
             );
           },

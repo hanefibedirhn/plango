@@ -158,6 +158,75 @@ class AuthService {
     }
   }
 
+  Future<void> reauthenticateCurrentUser({
+  required String currentPassword,
+}) async {
+  final User? user = _firebaseAuth.currentUser;
+
+  if (user == null) {
+    throw const AuthServiceException(
+      code: 'user-not-found',
+      message: 'Aktif kullanıcı oturumu bulunamadı.',
+    );
+  }
+
+  final String? email = user.email;
+
+  if (email == null || email.isEmpty) {
+    throw const AuthServiceException(
+      code: 'email-not-found',
+      message: 'Kullanıcının e-posta bilgisi bulunamadı.',
+    );
+  }
+
+  try {
+    final AuthCredential credential =
+        EmailAuthProvider.credential(
+      email: email,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+  } on FirebaseAuthException catch (error) {
+    throw AuthServiceException(
+      code: error.code,
+      message: _messageForCode(error.code),
+    );
+  } catch (_) {
+    throw const AuthServiceException(
+      code: 'unknown',
+      message:
+          'Kimliğiniz doğrulanırken beklenmeyen bir hata oluştu.',
+    );
+  }
+}
+
+Future<void> deleteAuthenticatedUser() async {
+  final User? user = _firebaseAuth.currentUser;
+
+  if (user == null) {
+    throw const AuthServiceException(
+      code: 'user-not-found',
+      message: 'Aktif kullanıcı oturumu bulunamadı.',
+    );
+  }
+
+  try {
+    await user.delete();
+  } on FirebaseAuthException catch (error) {
+    throw AuthServiceException(
+      code: error.code,
+      message: _messageForCode(error.code),
+    );
+  } catch (_) {
+    throw const AuthServiceException(
+      code: 'unknown',
+      message: 'Hesap silinirken beklenmeyen bir hata oluştu.',
+    );
+  }
+}
+  
+  
   Future<void> deleteCurrentUser({
     required String currentPassword,
   }) async {
