@@ -6,11 +6,19 @@ import 'screens/companies_screen.dart';
 import 'screens/calculator_screen.dart';
 import 'widgets/app_drawer.dart';
 import 'screens/login_selection_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const PlangoApp());
 }
 
