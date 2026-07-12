@@ -4,6 +4,7 @@ import '../screens/about_screen.dart';
 import '../screens/companies_screen.dart';
 import '../screens/legal_info_screen.dart';
 import '../screens/savings_finance_system_screen.dart';
+import '../screens/faq_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -104,12 +105,15 @@ class AppDrawer extends StatelessWidget {
                     },
                   ),
                   _DrawerItem(
-                    icon: Icons.help_outline_rounded,
-                    title: 'Sıkça Sorulan Sorular',
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+  icon: Icons.help_outline_rounded,
+  title: 'Sıkça Sorulan Sorular',
+  onTap: () {
+    _openPage(
+      context,
+      const FaqScreen(),
+    );
+  },
+),
                   _DrawerItem(
                     icon: Icons.feedback_outlined,
                     title: 'Şikayet ve Öneri',
