@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "759037506750",
-    "project_id": "plango-3f14a",
-    "storage_bucket": "plango-3f14a.firebasestorage.app"
+    "project_number": "87639162167",
+    "project_id": "plango-4e23f",
+    "storage_bucket": "plango-4e23f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:759037506750:android:066e14461f184d8aabdaef",
+        "mobilesdk_app_id": "1:87639162167:android:46c737d38c4082f2846eb2",
         "android_client_info": {
           "package_name": "com.example.plango"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDNiBRZcES0SqxSXXF4PdDRhNFPJHKWAd0"
+          "current_key": "AIzaSyBnoLE7gwxMDN3gQkgylGkg7UHTeLCiyyc"
         }
       ],
       "services": {

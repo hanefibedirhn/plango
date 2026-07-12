@@ -41,31 +41,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA4VUgp6cJlHNxSRlvWDzO7U4ePpPGBelE',
-    appId: '1:759037506750:web:b49f973d27b232c2abdaef',
-    messagingSenderId: '759037506750',
-    projectId: 'plango-3f14a',
-    authDomain: 'plango-3f14a.firebaseapp.com',
-    storageBucket: 'plango-3f14a.firebasestorage.app',
+    apiKey: 'AIzaSyAamSEf36YuhAwQO-L9XAnL_MNdyVBMKdg',
+    appId: '1:87639162167:web:a004ad5f2d16bbdd846eb2',
+    messagingSenderId: '87639162167',
+    projectId: 'plango-4e23f',
+    authDomain: 'plango-4e23f.firebaseapp.com',
+    storageBucket: 'plango-4e23f.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDNiBRZcES0SqxSXXF4PdDRhNFPJHKWAd0',
-    appId: '1:759037506750:android:066e14461f184d8aabdaef',
-    messagingSenderId: '759037506750',
-    projectId: 'plango-3f14a',
-    storageBucket: 'plango-3f14a.firebasestorage.app',
+    apiKey: 'AIzaSyBnoLE7gwxMDN3gQkgylGkg7UHTeLCiyyc',
+    appId: '1:87639162167:android:46c737d38c4082f2846eb2',
+    messagingSenderId: '87639162167',
+    projectId: 'plango-4e23f',
+    storageBucket: 'plango-4e23f.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDYXBJoPKr8zwp9CAxOwVcl0r9YpJRCWVI',
-    appId: '1:759037506750:ios:6abd4c7d1a9e41f1abdaef',
-    messagingSenderId: '759037506750',
-    projectId: 'plango-3f14a',
-    storageBucket: 'plango-3f14a.firebasestorage.app',
+    apiKey: 'AIzaSyDnQxykeOC0v__ihwA0KAA37u6Ytg4hUnk',
+    appId: '1:87639162167:ios:96ead5c47328a3c7846eb2',
+    messagingSenderId: '87639162167',
+    projectId: 'plango-4e23f',
+    storageBucket: 'plango-4e23f.firebasestorage.app',
     iosBundleId: 'com.example.plango',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDYXBJoPKr8zwp9CAxOwVcl0r9YpJRCWVI',
     appId: '1:759037506750:ios:6abd4c7d1a9e41f1abdaef',
