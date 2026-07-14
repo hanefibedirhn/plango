@@ -252,72 +252,70 @@ class ExpertReviewRepository {
         _expertsCollection.doc(application.uid);
 
     await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            applicationSnapshot =
-            await transaction.get(
-          applicationReference,
-        );
+  (transaction) async {
+    final DocumentSnapshot<Map<String, dynamic>>
+        applicationSnapshot =
+        await transaction.get(
+      applicationReference,
+    );
 
-        if (!applicationSnapshot.exists ||
-            applicationSnapshot.data() == null) {
-          throw const ExpertReviewException(
-            'Başvuru bulunamadı.',
-          );
-        }
+    DocumentSnapshot<Map<String, dynamic>>?
+        expertSnapshot;
 
-        if (applicationSnapshot.data()!['status'] !=
-            'pending') {
-          throw const ExpertReviewException(
-            'Bu başvuru daha önce sonuçlandırılmış.',
-          );
-        }
+    if (application.isProfileUpdateApplication) {
+      expertSnapshot = await transaction.get(
+        expertReference,
+      );
+    }
 
-        transaction.update(
-          applicationReference,
-          {
-            'status': 'rejected',
-            'reviewNote': normalizedNote,
-            'reviewedBy': adminUid,
-            'reviewedAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
-        );
+    if (!applicationSnapshot.exists ||
+        applicationSnapshot.data() == null) {
+      throw const ExpertReviewException(
+        'Başvuru bulunamadı.',
+      );
+    }
 
-        transaction.update(
-          userReference,
-          {
-            'expertStatus': 'rejected',
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
-        );
+    if (applicationSnapshot.data()!['status'] !=
+        'pending') {
+      throw const ExpertReviewException(
+        'Bu başvuru daha önce sonuçlandırılmış.',
+      );
+    }
 
-        if (application.isProfileUpdateApplication) {
-          final DocumentSnapshot<Map<String, dynamic>>
-              expertSnapshot =
-              await transaction.get(
-            expertReference,
-          );
-
-          if (expertSnapshot.exists) {
-            transaction.update(
-              expertReference,
-              {
-                'status': 'suspended',
-                'verificationStatus': 'rejected',
-                'acceptsNewRequests': false,
-                'suspensionReason':
-                    normalizedNote,
-                'updatedAt':
-                    FieldValue.serverTimestamp(),
-              },
-            );
-          }
-        }
+    transaction.update(
+      applicationReference,
+      {
+        'status': 'rejected',
+        'reviewNote': normalizedNote,
+        'reviewedBy': adminUid,
+        'reviewedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       },
     );
+
+    transaction.update(
+      userReference,
+      {
+        'expertStatus': 'rejected',
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+    );
+
+    if (application.isProfileUpdateApplication &&
+        expertSnapshot != null &&
+        expertSnapshot.exists) {
+      transaction.update(
+        expertReference,
+        {
+          'status': 'suspended',
+          'verificationStatus': 'rejected',
+          'acceptsNewRequests': false,
+          'suspensionReason': normalizedNote,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+    }
+  },
+);
   }
 }

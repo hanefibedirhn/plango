@@ -3,6 +3,7 @@ import 'profile_information_screen.dart';
 import 'expert_application_screen.dart';
 import '../services/auth_service.dart';
 import 'admin/admin_dashboard_screen.dart';
+import 'expert_panel_screen.dart';
 
 enum ExpertApplicationStatus {
   none,
@@ -69,11 +70,13 @@ class AccountScreen extends StatelessWidget {
       break;
 
     case ExpertApplicationStatus.approved:
-      _showComingSoon(
-        context,
-        'Uzman paneli yakında açılacak.',
-      );
-      break;
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const ExpertPanelScreen(),
+    ),
+  );
+  break;
   }
 }
 
