@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'profile_information_screen.dart';
+import 'expert_application_screen.dart';
 import '../services/auth_service.dart';
+import 'admin/admin_dashboard_screen.dart';
 
 enum ExpertApplicationStatus {
   none,
@@ -41,36 +43,39 @@ class AccountScreen extends StatelessWidget {
   }
 
   void _handleExpertAction(BuildContext context) {
-    switch (expertStatus) {
-      case ExpertApplicationStatus.none:
-        _showComingSoon(
-          context,
-          'Uzman başvuru ekranı bir sonraki adımda bağlanacak.',
-        );
-        break;
+  switch (expertStatus) {
+    case ExpertApplicationStatus.none:
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const ExpertApplicationScreen(),
+        ),
+      );
+      break;
 
-      case ExpertApplicationStatus.pending:
-        _showComingSoon(
-          context,
-          'Uzman başvurunuz yönetici tarafından inceleniyor.',
-        );
-        break;
+    case ExpertApplicationStatus.pending:
+      _showComingSoon(
+        context,
+        'Uzman başvurunuz incelenmektedir.',
+      );
+      break;
 
-      case ExpertApplicationStatus.rejected:
-        _showComingSoon(
-          context,
-          'Uzman başvuru sonucu ekranı bir sonraki adımda bağlanacak.',
-        );
-        break;
+    case ExpertApplicationStatus.rejected:
+      _showComingSoon(
+        context,
+        'Başvurunuz reddedildi. Detay ekranı yakında eklenecek.',
+      );
+      break;
 
-      case ExpertApplicationStatus.approved:
-        _showComingSoon(
-          context,
-          'Uzman paneli bir sonraki adımda bağlanacak.',
-        );
-        break;
-    }
+    case ExpertApplicationStatus.approved:
+      _showComingSoon(
+        context,
+        'Uzman paneli yakında açılacak.',
+      );
+      break;
   }
+}
 
   String get _expertTitle {
     switch (expertStatus) {
@@ -204,17 +209,19 @@ class AccountScreen extends StatelessWidget {
             ),
 
             if (isAdmin)
-              _AccountCard(
-                icon: Icons.admin_panel_settings_outlined,
-                title: 'Yönetici Paneline Git',
-                subtitle: 'Plango yönetim işlemlerine erişin.',
-                onTap: () {
-                  _showComingSoon(
-                    context,
-                    'Yönetici paneli bir sonraki adımda bağlanacak.',
-                  );
-                },
-              ),
+  _AccountCard(
+    icon: Icons.admin_panel_settings_outlined,
+    title: 'Yönetici Paneline Git',
+    subtitle: 'Plango yönetim işlemlerine erişin.',
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AdminDashboardScreen(),
+        ),
+      );
+    },
+  ),
 
             const SizedBox(height: 24),
 
