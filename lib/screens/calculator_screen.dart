@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../engine/fp_engine.dart';
+import 'consultation/select_company_screen.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
@@ -169,9 +170,48 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             ),
           ),
           if (result != null) ...[
-            const SizedBox(height: 22),
-            _ResultCard(result: result!),
-          ],
+  const SizedBox(height: 22),
+  _ResultCard(result: result!),
+
+  if (result!.success) ...[
+    const SizedBox(height: 14),
+
+    SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  const SelectCompanyScreen(),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.support_agent_rounded,
+          size: 22,
+        ),
+        label: const Text(
+          'Ücretsiz Uzman Görüşü Al',
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _green,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    ),
+  ],
+],
         ],
       ),
     );

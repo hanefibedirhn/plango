@@ -23,11 +23,16 @@ class ExpertRepository {
     return _firestore.collection('experts');
   }
 
-  /// Aktif uzman profilini getirir.
+  CollectionReference<Map<String, dynamic>>
+      get _expertProfilesCollection {
+    return _firestore.collection('expertProfiles');
+  }
+
+  /// Uzmanın özel profilini getirir.
   Future<Expert> getExpert(
     String uid,
   ) async {
-    final document =
+    final DocumentSnapshot<Map<String, dynamic>> document =
         await _expertsCollection.doc(uid).get();
 
     if (!document.exists || document.data() == null) {
@@ -37,14 +42,13 @@ class ExpertRepository {
     return Expert.fromDocument(document);
   }
 
-  /// Uzman profilini gerçek zamanlı dinler.
+  /// Uzmanın özel profilini gerçek zamanlı dinler.
   Stream<Expert?> watchExpert(
     String uid,
   ) {
     return _expertsCollection.doc(uid).snapshots().map(
       (document) {
-        if (!document.exists ||
-            document.data() == null) {
+        if (!document.exists || document.data() == null) {
           return null;
         }
 
@@ -54,60 +58,220 @@ class ExpertRepository {
   }
 
   /// Yeni uzman profili oluşturur.
+  ///
+  /// Normal kullanıcı istemcisinden çağrılmamalıdır.
+  /// Uzman onayı, yönetici repository'si üzerinden yapılır.
   Future<void> createExpert(
     Expert expert,
   ) async {
-    await _expertsCollection.doc(expert.uid).set(
-          expert.toMap(),
-        );
+    final WriteBatch batch = _firestore.batch();
+
+    final DocumentReference<Map<String, dynamic>>
+        expertReference =
+        _expertsCollection.doc(expert.uid);
+
+    final DocumentReference<Map<String, dynamic>>
+        publicProfileReference =
+        _expertProfilesCollection.doc(expert.uid);
+
+    batch.set(
+      expertReference,
+      expert.toMap(),
+    );
+
+    batch.set(
+      publicProfileReference,
+      {
+        'uid': expert.uid,
+        'firstName': expert.firstName.trim(),
+        'lastName': expert.lastName.trim(),
+        'companyName': expert.companyName.trim(),
+        'branch': expert.branch.trim(),
+        'position': expert.position.trim(),
+        'status': expert.status,
+        'acceptsNewRequests': expert.acceptsNewRequests,
+        'createdAt': Timestamp.fromDate(expert.createdAt),
+        'updatedAt': Timestamp.fromDate(expert.updatedAt),
+      },
+    );
+
+    await batch.commit();
   }
 
   /// Uzmanı geçici olarak pasife alır.
+  ///
+  /// Askıya alındığında açık profil de görünmez hâle gelir.
   Future<void> suspendExpert({
     required String uid,
     required String reason,
   }) async {
-    await _expertsCollection.doc(uid).update({
-      'status': 'suspended',
-      'verificationStatus': 'pendingUpdate',
-      'acceptsNewRequests': false,
-      'suspendedAt': FieldValue.serverTimestamp(),
-      'suspensionReason': reason,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    final WriteBatch batch = _firestore.batch();
+
+    final DocumentReference<Map<String, dynamic>>
+        expertReference =
+        _expertsCollection.doc(uid);
+
+    final DocumentReference<Map<String, dynamic>>
+        publicProfileReference =
+        _expertProfilesCollection.doc(uid);
+
+    batch.update(
+      expertReference,
+      {
+        'status': 'suspended',
+        'verificationStatus': 'pendingUpdate',
+        'acceptsNewRequests': false,
+        'suspendedAt': FieldValue.serverTimestamp(),
+        'suspensionReason': reason.trim(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+    );
+
+    batch.set(
+      publicProfileReference,
+      {
+        'status': 'suspended',
+        'acceptsNewRequests': false,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    await batch.commit();
   }
 
-  /// Uzmanı tekrar aktif hale getirir.
+  /// Uzmanı onaylı bilgilerle tekrar aktif hâle getirir.
   Future<void> activateExpert({
     required Expert expert,
   }) async {
-    await _expertsCollection.doc(expert.uid).update({
-      'companyName': expert.companyName,
-      'branch': expert.branch,
-      'position': expert.position,
-      'corporateEmail':
-          expert.corporateEmail.toLowerCase(),
-      'phone': expert.phone,
-      'status': 'active',
-      'verificationStatus': 'approved',
-      'acceptsNewRequests': true,
-      'lastVerifiedAt':
-          FieldValue.serverTimestamp(),
-      'updatedAt':
-          FieldValue.serverTimestamp(),
-      'suspendedAt': null,
-      'suspensionReason': null,
-    });
+    final WriteBatch batch = _firestore.batch();
+
+    final DocumentReference<Map<String, dynamic>>
+        expertReference =
+        _expertsCollection.doc(expert.uid);
+
+    final DocumentReference<Map<String, dynamic>>
+        publicProfileReference =
+        _expertProfilesCollection.doc(expert.uid);
+
+    batch.update(
+      expertReference,
+      {
+        'firstName': expert.firstName.trim(),
+        'lastName': expert.lastName.trim(),
+        'companyName': expert.companyName.trim(),
+        'branch': expert.branch.trim(),
+        'position': expert.position.trim(),
+        'corporateEmail':
+            expert.corporateEmail.trim().toLowerCase(),
+        'phone': expert.phone.trim(),
+        'status': 'active',
+        'verificationStatus': 'approved',
+        'acceptsNewRequests': true,
+        'lastVerifiedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'suspendedAt': null,
+        'suspensionReason': null,
+      },
+    );
+
+    batch.set(
+      publicProfileReference,
+      {
+        'uid': expert.uid,
+        'firstName': expert.firstName.trim(),
+        'lastName': expert.lastName.trim(),
+        'companyName': expert.companyName.trim(),
+        'branch': expert.branch.trim(),
+        'position': expert.position.trim(),
+        'status': 'active',
+        'acceptsNewRequests': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    await batch.commit();
   }
 
-  /// Uzmanın yeni talep alıp almayacağını değiştirir.
+  /// Uzmanın yeni danışma talebi alıp almayacağını değiştirir.
+  ///
+  /// Özel uzman kaydı ile kullanıcıların göreceği açık uzman
+  /// profili aynı batch içinde birlikte güncellenir.
   Future<void> setAcceptsNewRequests({
-    required String uid,
-    required bool value,
-  }) async {
-    await _expertsCollection.doc(uid).update({
-      'acceptsNewRequests': value,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
+  required String uid,
+  required bool value,
+}) async {
+  final DocumentReference<Map<String, dynamic>>
+      expertReference =
+      _expertsCollection.doc(uid);
+
+  final DocumentReference<Map<String, dynamic>>
+      publicProfileReference =
+      _expertProfilesCollection.doc(uid);
+
+  await _firestore.runTransaction<void>(
+    (transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>>
+          expertSnapshot =
+          await transaction.get(expertReference);
+
+      if (!expertSnapshot.exists ||
+          expertSnapshot.data() == null) {
+        throw const ExpertNotFoundException();
+      }
+
+      final Map<String, dynamic> expertData =
+          expertSnapshot.data()!;
+
+      final String status =
+          expertData['status'] as String? ?? 'inactive';
+
+      final String verificationStatus =
+          expertData['verificationStatus'] as String? ??
+              'rejected';
+
+      if (value &&
+          (status != 'active' ||
+              verificationStatus != 'approved')) {
+        throw StateError(
+          'Aktif ve onaylı olmayan uzman yeni talep alımını açamaz.',
+        );
+      }
+
+      transaction.update(
+        expertReference,
+        {
+          'acceptsNewRequests': value,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+
+      transaction.set(
+        publicProfileReference,
+        {
+          'uid': uid,
+          'firstName':
+              expertData['firstName'] as String? ?? '',
+          'lastName':
+              expertData['lastName'] as String? ?? '',
+          'companyName':
+              expertData['companyName'] as String? ?? '',
+          'branch':
+              expertData['branch'] as String? ?? '',
+          'position':
+              expertData['position'] as String? ?? '',
+          'status': status,
+          'acceptsNewRequests': value,
+          'createdAt':
+              expertData['createdAt'] ??
+                  FieldValue.serverTimestamp(),
+          'updatedAt':
+              FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    },
+  );
+}
 }
