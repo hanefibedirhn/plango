@@ -3,27 +3,43 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../engine/fp_engine.dart';
+import '../models/calculation_plan.dart';
 import 'consultation/select_company_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CalculatorScreen extends StatefulWidget {
-  const CalculatorScreen({super.key});
+  const CalculatorScreen({
+    super.key,
+  });
 
   @override
-  State<CalculatorScreen> createState() => _CalculatorScreenState();
+  State<CalculatorScreen> createState() =>
+      _CalculatorScreenState();
 }
 
-class _CalculatorScreenState extends State<CalculatorScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _dark = Color(0xFF10231B);
-  static const Color _gold = Color(0xFFD6A84F);
-  static const Color _background = Color(0xFFF7F8F5);
+class _CalculatorScreenState
+    extends State<CalculatorScreen> {
+  static const Color _green =
+      Color(0xFF0B5D3B);
+  static const Color _dark =
+      Color(0xFF10231B);
+  static const Color _gold =
+      Color(0xFFD6A84F);
+  static const Color _background =
+      Color(0xFFF7F8F5);
 
-  final financeController = TextEditingController(text: '0');
-  final downPaymentController = TextEditingController(text: '0');
-  final installmentController = TextEditingController(text: '0');
+  final TextEditingController financeController =
+      TextEditingController(text: '0');
+
+  final TextEditingController downPaymentController =
+      TextEditingController(text: '0');
+
+  final TextEditingController installmentController =
+      TextEditingController(text: '0');
 
   String? model;
   FpResult? result;
+  CalculationPlan? calculationPlan;
 
   @override
   void dispose() {
@@ -33,34 +49,143 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     super.dispose();
   }
 
+  double _readAmount(
+    TextEditingController controller,
+  ) {
+    return double.tryParse(
+          controller.text.replaceAll('.', ''),
+        ) ??
+        0;
+  }
+
   void calculate() {
     if (model == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Lütfen ödeme modelini seçiniz.'),
+          content: Text(
+            'Lütfen ödeme modelini seçiniz.',
+          ),
         ),
       );
       return;
     }
 
-    final finance =
-        double.tryParse(financeController.text.replaceAll('.', '')) ?? 0;
+    final double finance =
+        _readAmount(financeController);
 
-    final downPayment =
-        double.tryParse(downPaymentController.text.replaceAll('.', '')) ?? 0;
+    final double downPayment =
+        _readAmount(downPaymentController);
 
-    final installment =
-        double.tryParse(installmentController.text.replaceAll('.', '')) ?? 0;
+    final double installment =
+        _readAmount(installmentController);
+
+    final FpResult calculatedResult =
+        FpEngine.calculate(
+      finance: finance,
+      downPayment: downPayment,
+      installment: installment,
+      model: model!,
+    );
 
     setState(() {
-      result = FpEngine.calculate(
-        finance: finance,
-        downPayment: downPayment,
-        installment: installment,
-        model: model!,
-      );
+      result = calculatedResult;
+
+      if (calculatedResult.success) {
+        calculationPlan = CalculationPlan(
+          financeAmount: finance,
+          downPayment: downPayment,
+          monthlyInstallment: installment,
+          increaseModel: model!,
+          estimatedDelivery:
+              calculatedResult.estimatedDelivery,
+          estimatedTerm:
+              calculatedResult.estimatedTerm,
+        );
+      } else {
+        calculationPlan = null;
+      }
     });
   }
+
+  Future<void> _openConsultationFlow() async {
+  final CalculationPlan? plan = calculationPlan;
+
+  if (plan == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Önce geçerli bir plan hesaplayınız.',
+        ),
+      ),
+    );
+    return;
+  }
+
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      final UserCredential credential =
+          await FirebaseAuth.instance.signInAnonymously();
+
+      user = credential.user;
+    }
+
+    if (user == null) {
+      throw StateError(
+        'Misafir oturumu oluşturulamadı.',
+      );
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SelectCompanyScreen(
+          plan: plan,
+        ),
+      ),
+    );
+  } on FirebaseAuthException catch (error) {
+    if (!mounted) {
+      return;
+    }
+
+    final String message;
+
+    if (error.code == 'operation-not-allowed') {
+      message =
+          'Firebase anonim giriş özelliği etkin değil.';
+    } else if (error.code == 'too-many-requests') {
+      message =
+          'Çok fazla deneme yapıldı. Lütfen biraz sonra tekrar deneyin.';
+    } else {
+      message =
+          'Misafir oturumu başlatılamadı. Lütfen tekrar deneyin.';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  } catch (_) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Danışma ekranı açılamadı. Lütfen tekrar deneyin.',
+        ),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +193,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        title: const Text('Hesaplama'),
+        title: const Text(
+          'Hesaplama',
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -81,14 +208,28 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _input('Finansman Tutarı', financeController),
-          _input('Peşinat', downPaymentController),
-          _input('İlk Taksit', installmentController),
+
+          _input(
+            'Finansman Tutarı',
+            financeController,
+          ),
+          _input(
+            'Peşinat',
+            downPaymentController,
+          ),
+          _input(
+            'İlk Taksit',
+            installmentController,
+          ),
+
           const SizedBox(height: 10),
+
           DropdownButtonFormField<String>(
             initialValue: model,
             hint: const Text('Seçiniz'),
-            decoration: _decor('Ödeme Modeli'),
+            decoration: _decor(
+              'Ödeme Modeli',
+            ),
             items: const [
               DropdownMenuItem(
                 value: 'Sabit',
@@ -96,59 +237,98 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ),
               DropdownMenuItem(
                 value: 'Aylık %1 Artış',
-                child: Text('Aylık %1 Artış'),
+                child: Text(
+                  'Aylık %1 Artış',
+                ),
               ),
               DropdownMenuItem(
                 value: 'Aylık %2 Artış',
-                child: Text('Aylık %2 Artış'),
+                child: Text(
+                  'Aylık %2 Artış',
+                ),
               ),
               DropdownMenuItem(
                 value: 'Aylık %3 Artış',
-                child: Text('Aylık %3 Artış'),
+                child: Text(
+                  'Aylık %3 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '3 Ayda Bir %5 Artış',
-                child: Text('3 Ayda Bir %5 Artış'),
+                value:
+                    '3 Ayda Bir %5 Artış',
+                child: Text(
+                  '3 Ayda Bir %5 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '3 Ayda Bir %10 Artış',
-                child: Text('3 Ayda Bir %10 Artış'),
+                value:
+                    '3 Ayda Bir %10 Artış',
+                child: Text(
+                  '3 Ayda Bir %10 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '3 Ayda Bir %15 Artış',
-                child: Text('3 Ayda Bir %15 Artış'),
+                value:
+                    '3 Ayda Bir %15 Artış',
+                child: Text(
+                  '3 Ayda Bir %15 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '3 Ayda Bir %20 Artış',
-                child: Text('3 Ayda Bir %20 Artış'),
+                value:
+                    '3 Ayda Bir %20 Artış',
+                child: Text(
+                  '3 Ayda Bir %20 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '6 Ayda Bir %10 Artış',
-                child: Text('6 Ayda Bir %10 Artış'),
+                value:
+                    '6 Ayda Bir %10 Artış',
+                child: Text(
+                  '6 Ayda Bir %10 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '6 Ayda Bir %15 Artış',
-                child: Text('6 Ayda Bir %15 Artış'),
+                value:
+                    '6 Ayda Bir %15 Artış',
+                child: Text(
+                  '6 Ayda Bir %15 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '6 Ayda Bir %20 Artış',
-                child: Text('6 Ayda Bir %20 Artış'),
+                value:
+                    '6 Ayda Bir %20 Artış',
+                child: Text(
+                  '6 Ayda Bir %20 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '12 Ayda Bir %10 Artış',
-                child: Text('12 Ayda Bir %10 Artış'),
+                value:
+                    '12 Ayda Bir %10 Artış',
+                child: Text(
+                  '12 Ayda Bir %10 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '12 Ayda Bir %15 Artış',
-                child: Text('12 Ayda Bir %15 Artış'),
+                value:
+                    '12 Ayda Bir %15 Artış',
+                child: Text(
+                  '12 Ayda Bir %15 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '12 Ayda Bir %20 Artış',
-                child: Text('12 Ayda Bir %20 Artış'),
+                value:
+                    '12 Ayda Bir %20 Artış',
+                child: Text(
+                  '12 Ayda Bir %20 Artış',
+                ),
               ),
               DropdownMenuItem(
-                value: '12 Ayda Bir %30 Artış',
-                child: Text('12 Ayda Bir %30 Artış'),
+                value:
+                    '12 Ayda Bir %30 Artış',
+                child: Text(
+                  '12 Ayda Bir %30 Artış',
+                ),
               ),
             ],
             onChanged: (value) {
@@ -157,7 +337,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               });
             },
           ),
+
           const SizedBox(height: 18),
+
           SizedBox(
             height: 54,
             child: ElevatedButton(
@@ -166,52 +348,59 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 backgroundColor: _green,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Hesapla'),
+              child: const Text(
+                'Hesapla',
+              ),
             ),
           ),
+
           if (result != null) ...[
-  const SizedBox(height: 22),
-  _ResultCard(result: result!),
+            const SizedBox(height: 22),
 
-  if (result!.success) ...[
-    const SizedBox(height: 14),
-
-    SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  const SelectCompanyScreen(),
+            _ResultCard(
+              result: result!,
             ),
-          );
-        },
-        icon: const Icon(
-          Icons.support_agent_rounded,
-          size: 22,
-        ),
-        label: const Text(
-          'Ücretsiz Uzman Görüşü Al',
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _green,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 15.5,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-    ),
-  ],
-],
+
+            if (result!.success) ...[
+              const SizedBox(height: 14),
+
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed:
+                      _openConsultationFlow,
+                  icon: const Icon(
+                    Icons.support_agent_rounded,
+                    size: 22,
+                  ),
+                  label: const Text(
+                    'Ücretsiz Uzman Görüşü Al',
+                  ),
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor: _green,
+                    foregroundColor:
+                        Colors.white,
+                    elevation: 0,
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+                    ),
+                    textStyle:
+                        const TextStyle(
+                      fontSize: 15.5,
+                      fontWeight:
+                          FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ],
       ),
     );
@@ -222,12 +411,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     TextEditingController controller,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding:
+          const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
         inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
+          FilteringTextInputFormatter
+              .digitsOnly,
           CurrencyInputFormatter(),
         ],
         decoration: _decor(label).copyWith(
@@ -237,13 +428,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  InputDecoration _decor(String label) {
+  InputDecoration _decor(
+    String label,
+  ) {
     return InputDecoration(
       labelText: label,
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius:
+            BorderRadius.circular(18),
         borderSide: BorderSide.none,
       ),
     );
@@ -251,11 +445,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 }
 
 class _ResultCard extends StatelessWidget {
-  final FpResult result;
-
   const _ResultCard({
     required this.result,
   });
+
+  final FpResult result;
 
   @override
   Widget build(BuildContext context) {
@@ -264,13 +458,15 @@ class _ResultCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF1F2),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius:
+              BorderRadius.circular(24),
           border: Border.all(
             color: const Color(0xFFFECACA),
           ),
         ),
         child: Text(
-          result.errorMessage ?? 'Hesaplama sırasında bir hata oluştu.',
+          result.errorMessage ??
+              'Hesaplama sırasında bir hata oluştu.',
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Color(0xFF991B1B),
@@ -286,11 +482,11 @@ class _ResultCard extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: _CalculatorScreenState._dark,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius:
+            BorderRadius.circular(26),
       ),
       child: Column(
         children: [
-          
           Text(
             '${result.estimatedDelivery} Ay',
             style: const TextStyle(
@@ -301,13 +497,16 @@ class _ResultCard extends StatelessWidget {
           ),
           const Text(
             'Tahmini Teslim Süresi',
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(
+              color: Colors.white70,
+            ),
           ),
           const SizedBox(height: 18),
           Text(
             '${result.estimatedTerm} Ay Tahmini Vade',
             style: const TextStyle(
-              color: _CalculatorScreenState._gold,
+              color:
+                  _CalculatorScreenState._gold,
               fontSize: 18,
             ),
           ),
@@ -329,27 +528,39 @@ class _ResultCard extends StatelessWidget {
   }
 }
 
-class CurrencyInputFormatter extends TextInputFormatter {
-  final NumberFormat formatter = NumberFormat('#,##0', 'tr_TR');
+class CurrencyInputFormatter
+    extends TextInputFormatter {
+  final NumberFormat formatter =
+      NumberFormat(
+    '#,##0',
+    'tr_TR',
+  );
 
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    final text = newValue.text.replaceAll('.', '');
+    final String text =
+        newValue.text.replaceAll('.', '');
 
     if (text.isEmpty) {
-      return const TextEditingValue(text: '');
+      return const TextEditingValue(
+        text: '',
+      );
     }
 
-    final number = int.tryParse(text);
+    final int? number =
+        int.tryParse(text);
 
     if (number == null) {
       return oldValue;
     }
 
-    final newText = formatter.format(number).replaceAll(',', '.');
+    final String newText =
+        formatter
+            .format(number)
+            .replaceAll(',', '.');
 
     return TextEditingValue(
       text: newText,

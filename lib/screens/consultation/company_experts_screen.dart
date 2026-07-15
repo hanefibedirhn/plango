@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../models/calculation_plan.dart';
 import '../../models/company.dart';
 import '../../models/expert_profile_model.dart';
 import '../../repositories/expert_profile_repository.dart';
@@ -9,9 +10,11 @@ class CompanyExpertsScreen extends StatelessWidget {
   const CompanyExpertsScreen({
     super.key,
     required this.company,
+    required this.plan,
   });
 
   final Company company;
+  final CalculationPlan plan;
 
   static const Color _green = Color(0xFF0B5D3B);
   static const Color _background = Color(0xFFF7F8F5);
@@ -23,29 +26,20 @@ class CompanyExpertsScreen extends StatelessWidget {
       Color(0xFFF3F4F6);
 
   void _selectExpert(
-  BuildContext context,
-  ExpertProfile expert,
-) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ConsultationRequestScreen(
-        company: company,
-        expert: expert,
-
-        // Geçici test verileri
-        financeAmount: 1000000,
-        downPayment: 350000,
-        monthlyInstallment: 20000,
-
-        increaseModel: 'Sabit',
-
-        estimatedDelivery: 10,
-        estimatedTerm: 32,
+    BuildContext context,
+    ExpertProfile expert,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ConsultationRequestScreen(
+  company: company,
+  expert: expert,
+  plan: plan,
+),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,16 +83,16 @@ class CompanyExpertsScreen extends StatelessWidget {
             final List<ExpertProfile> experts =
                 snapshot.data ?? const [];
 
-            final List<ExpertProfile> availableExperts =
-                experts
+            final List<ExpertProfile>
+                availableExperts = experts
                     .where(
                       (expert) =>
                           expert.canReceiveRequests,
                     )
                     .toList();
 
-            final List<ExpertProfile> unavailableExperts =
-                experts
+            final List<ExpertProfile>
+                unavailableExperts = experts
                     .where(
                       (expert) =>
                           expert.isVisible &&
@@ -135,7 +129,7 @@ class CompanyExpertsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 11),
 
-                    for (final expert
+                    for (final ExpertProfile expert
                         in availableExperts)
                       _ExpertCard(
                         expert: expert,
@@ -162,7 +156,7 @@ class CompanyExpertsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 11),
 
-                    for (final expert
+                    for (final ExpertProfile expert
                         in unavailableExperts)
                       _ExpertCard(
                         expert: expert,
@@ -358,7 +352,8 @@ class _CompanyHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(17),
             ),
             child: Text(
-              companyName.characters.first.toUpperCase(),
+              companyName.characters.first
+                  .toUpperCase(),
               style: const TextStyle(
                 color: CompanyExpertsScreen._green,
                 fontSize: 21,
@@ -452,7 +447,9 @@ class _ExpertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 11),
+      padding: const EdgeInsets.only(
+        bottom: 11,
+      ),
       child: Container(
         padding: const EdgeInsets.all(17),
         decoration: BoxDecoration(
@@ -628,7 +625,9 @@ class _ExpertCard extends StatelessWidget {
     );
   }
 
-  String _initials(ExpertProfile expert) {
+  String _initials(
+    ExpertProfile expert,
+  ) {
     final String firstInitial =
         expert.firstName.trim().isEmpty
             ? ''

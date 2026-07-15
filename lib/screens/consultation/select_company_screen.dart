@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../../data/companies.dart';
+import '../../models/calculation_plan.dart';
 import '../../models/company.dart';
-import 'company_experts_screen.dart';
 import 'company_experts_screen.dart';
 
 class SelectCompanyScreen extends StatelessWidget {
   const SelectCompanyScreen({
     super.key,
+    required this.plan,
   });
+
+  final CalculationPlan plan;
 
   static const Color _green = Color(0xFF0B5D3B);
   static const Color _background = Color(0xFFF7F8F5);
@@ -18,18 +21,19 @@ class SelectCompanyScreen extends StatelessWidget {
   static const Color _softGreen = Color(0xFFE8F1EC);
 
   void _selectCompany(
-  BuildContext context,
-  Company company,
-) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => CompanyExpertsScreen(
-        company: company,
+    BuildContext context,
+    Company company,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CompanyExpertsScreen(
+          company: company,
+          plan: plan,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +64,6 @@ class SelectCompanyScreen extends StatelessWidget {
               currentStep: 0,
             ),
             const SizedBox(height: 22),
-
             const Text(
               'Şirket Seçiniz',
               style: TextStyle(
@@ -70,7 +73,6 @@ class SelectCompanyScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -178,8 +180,9 @@ class _ConsultationProgress extends StatelessWidget {
                     child: Column(
                       children: [
                         AnimatedContainer(
-                          duration:
-                              const Duration(milliseconds: 180),
+                          duration: const Duration(
+                            milliseconds: 180,
+                          ),
                           width: 34,
                           height: 34,
                           alignment: Alignment.center,
@@ -212,11 +215,13 @@ class _ConsultationProgress extends StatelessWidget {
                         Text(
                           _steps[index],
                           maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          overflow:
+                              TextOverflow.ellipsis,
                           style: TextStyle(
                             color: isCurrent || isCompleted
                                 ? SelectCompanyScreen._green
-                                : SelectCompanyScreen._textMuted,
+                                : SelectCompanyScreen
+                                    ._textMuted,
                             fontSize: 11.5,
                             fontWeight: isCurrent
                                 ? FontWeight.w900
@@ -284,7 +289,8 @@ class _CompanySelectionRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(13),
                 ),
                 child: Text(
-                  company.name.characters.first.toUpperCase(),
+                  company.name.characters.first
+                      .toUpperCase(),
                   style: const TextStyle(
                     color: SelectCompanyScreen._green,
                     fontSize: 18,
@@ -297,7 +303,8 @@ class _CompanySelectionRow extends StatelessWidget {
                 child: Text(
                   company.name,
                   style: const TextStyle(
-                    color: SelectCompanyScreen._textDark,
+                    color:
+                        SelectCompanyScreen._textDark,
                     fontSize: 15.5,
                     fontWeight: FontWeight.w800,
                   ),
@@ -312,7 +319,8 @@ class _CompanySelectionRow extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.chevron_right_rounded,
-                  color: SelectCompanyScreen._textMuted,
+                  color:
+                      SelectCompanyScreen._textMuted,
                   size: 21,
                 ),
               ),
