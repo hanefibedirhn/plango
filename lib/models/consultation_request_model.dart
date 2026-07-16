@@ -8,7 +8,6 @@ class ConsultationRequest {
     required this.userId,
     required this.isGuest,
     required this.userFullName,
-    required this.userPhone,
     required this.expertId,
     required this.companyName,
     required this.plan,
@@ -40,7 +39,6 @@ class ConsultationRequest {
   final String userFullName;
 
   /// Uzman talebi kabul edene kadar gizli tutulacak telefon.
-  final String userPhone;
 
   /// Talebin gönderildiği uzmanın Firebase UID'si.
   final String expertId;
@@ -121,7 +119,6 @@ class ConsultationRequest {
     String? userId,
     bool? isGuest,
     String? userFullName,
-    String? userPhone,
     String? expertId,
     String? companyName,
     CalculationPlan? plan,
@@ -155,7 +152,6 @@ class ConsultationRequest {
       isGuest: isGuest ?? this.isGuest,
       userFullName:
           userFullName ?? this.userFullName,
-      userPhone: userPhone ?? this.userPhone,
       expertId: expertId ?? this.expertId,
       companyName:
           companyName ?? this.companyName,
@@ -203,7 +199,6 @@ class ConsultationRequest {
       'userId': userId,
       'isGuest': isGuest,
       'userFullName': userFullName.trim(),
-      'userPhone': userPhone.trim(),
       'expertId': expertId,
       'companyName': companyName.trim(),
       'financeAmount': plan.financeAmount,
@@ -256,8 +251,6 @@ class ConsultationRequest {
       isGuest: map['isGuest'] as bool? ?? false,
       userFullName:
           map['userFullName'] as String? ?? '',
-      userPhone:
-          map['userPhone'] as String? ?? '',
       expertId:
           map['expertId'] as String? ?? '',
       companyName:

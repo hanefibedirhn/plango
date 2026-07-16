@@ -252,10 +252,11 @@ class _ConsultationRequestScreenState
       );
 
       final String requestId =
-          await _repository
-              .createConsultationRequest(
-        request,
-      );
+    await _repository
+        .createConsultationRequest(
+  request,
+  userPhone: _normalizedPhone(),
+);
 
       if (!mounted) {
         return;
