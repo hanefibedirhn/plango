@@ -68,11 +68,14 @@ class AccountRouterScreen extends StatelessWidget {
             final AppUser? appUser = userSnapshot.data;
 
             if (appUser == null) {
-              return const _AccountErrorScreen(
-                message:
-                    'Kullanıcı profiliniz bulunamadı. Lütfen tekrar giriş yapın.',
-              );
-            }
+  return _AccountErrorScreen(
+    message:
+        'Bu oturum için kullanıcı profili bulunamadı.',
+    onSignOut: () async {
+      await FirebaseAuth.instance.signOut();
+    },
+  );
+}
 
             return AccountScreen(
               userName: appUser.fullName,
@@ -108,10 +111,12 @@ class _AccountErrorScreen extends StatelessWidget {
   const _AccountErrorScreen({
     required this.message,
     this.onRetry,
+    this.onSignOut,
   });
 
   final String message;
   final VoidCallback? onRetry;
+  final Future<void> Function()? onSignOut;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +161,18 @@ class _AccountErrorScreen extends StatelessWidget {
                   child: const Text('Tekrar Dene'),
                 ),
               ],
+              if (onSignOut != null) ...[
+  const SizedBox(height: 18),
+  FilledButton(
+    onPressed: () async {
+      await onSignOut!();
+    },
+    style: FilledButton.styleFrom(
+      backgroundColor: const Color(0xFF0B5D3B),
+    ),
+    child: const Text('Oturumu Kapat'),
+  ),
+],
             ],
           ),
         ),

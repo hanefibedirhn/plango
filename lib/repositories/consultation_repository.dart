@@ -82,6 +82,12 @@ class ConsultationRepository {
     return _firestore.collection('experts');
   }
 
+  CollectionReference<Map<String, dynamic>>
+    get _expertProfilesCollection {
+  return _firestore.collection(
+    'expertProfiles',
+  );
+  }
   /// Yeni danışma talebi oluşturur.
   ///
   /// Kayıtlı veya anonim kullanıcının UID değeri
@@ -108,10 +114,10 @@ class ConsultationRepository {
   }
 
   final DocumentSnapshot<Map<String, dynamic>>
-      expertSnapshot =
-      await _expertsCollection
-          .doc(request.expertId)
-          .get();
+    expertSnapshot =
+    await _expertProfilesCollection
+        .doc(request.expertId)
+        .get();
 
   if (!expertSnapshot.exists ||
       expertSnapshot.data() == null) {
@@ -125,11 +131,6 @@ class ConsultationRepository {
       expertData['status'] as String? ??
           'inactive';
 
-  final String verificationStatus =
-      expertData['verificationStatus']
-              as String? ??
-          'rejected';
-
   final bool acceptsNewRequests =
       expertData['acceptsNewRequests']
               as bool? ??
@@ -141,7 +142,6 @@ class ConsultationRepository {
           '';
 
   if (expertStatus != 'active' ||
-      verificationStatus != 'approved' ||
       !acceptsNewRequests) {
     throw const ConsultationExpertUnavailableException();
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/expert_model.dart';
 import '../../repositories/expert_repository.dart';
+import 'expert_consultation_requests_screen.dart';
 
 class ExpertPanelScreen extends StatefulWidget {
   const ExpertPanelScreen({
@@ -213,8 +214,16 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
           subtitle:
               'Yeni, devam eden ve tamamlanan danışma taleplerinizi yönetin.',
           onTap: () {
-            _showComingSoon('Danışma Taleplerim');
-          },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>
+          ExpertConsultationRequestsScreen(
+        expertId: expert.uid,
+      ),
+    ),
+  );
+},
         ),
 
         _ExpertActionCard(

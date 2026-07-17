@@ -236,7 +236,6 @@ class _ConsultationRequestScreenState
         isGuest: user.isAnonymous,
         userFullName:
             _fullNameController.text.trim(),
-        userPhone: _normalizedPhone(),
         expertId: widget.expert.uid,
         companyName: widget.company.name,
         plan: widget.plan,
@@ -289,20 +288,28 @@ class _ConsultationRequestScreenState
               : 'Oturum başlatılamadı. Lütfen tekrar deneyin.';
 
       _showMessage(message);
-    } on FirebaseException catch (error) {
-      if (!mounted) {
-        return;
-      }
+    } on FirebaseException catch (error, stackTrace) {
+  debugPrint('==========================');
+  debugPrint('FIREBASE ERROR');
+  debugPrint('Code: ${error.code}');
+  debugPrint('Message: ${error.message}');
+  debugPrint('Exception: $error');
+  debugPrintStack(stackTrace: stackTrace);
+  debugPrint('==========================');
 
-      final String message =
-          error.code == 'permission-denied'
-              ? 'Danışma talebi için Firestore erişim '
-                  'kurallarının güncellenmesi gerekiyor.'
-              : 'Danışma talebi kaydedilemedi. '
-                  'Lütfen tekrar deneyin.';
+  if (!mounted) {
+    return;
+  }
 
-      _showMessage(message);
-    } catch (_) {
+  final String message =
+      error.code == 'permission-denied'
+          ? 'Danışma talebi için Firestore erişim '
+              'kurallarının güncellenmesi gerekiyor.'
+          : 'Danışma talebi kaydedilemedi. '
+              'Lütfen tekrar deneyin.';
+
+  _showMessage(message);
+} catch (_) {
       if (!mounted) {
         return;
       }
