@@ -22,7 +22,9 @@ class ConsultationRequest {
     this.rejectedAt,
     this.cancelledAt,
     this.rejectionReason,
-    this.reassignedFromExpertId,
+this.adminQueueReason,
+this.waitingForAdminAt,
+this.reassignedFromExpertId,
   });
 
   /// Firestore danışma talebi belge kimliği.
@@ -69,6 +71,8 @@ class ConsultationRequest {
   final DateTime? cancelledAt;
 
   final String? rejectionReason;
+  final String? adminQueueReason;
+final DateTime? waitingForAdminAt;
 
   /// Talep başka uzmana yönlendirildiyse önceki uzman UID'si.
   final String? reassignedFromExpertId;
@@ -133,7 +137,9 @@ class ConsultationRequest {
     DateTime? rejectedAt,
     DateTime? cancelledAt,
     String? rejectionReason,
-    String? reassignedFromExpertId,
+String? adminQueueReason,
+DateTime? waitingForAdminAt,
+String? reassignedFromExpertId,
     bool clearRequestId = false,
     bool clearUserNote = false,
     bool clearAcceptedAt = false,
@@ -142,6 +148,8 @@ class ConsultationRequest {
     bool clearRejectedAt = false,
     bool clearCancelledAt = false,
     bool clearRejectionReason = false,
+    bool clearAdminQueueReason = false,
+bool clearWaitingForAdminAt = false,
     bool clearReassignedFromExpertId = false,
   }) {
     return ConsultationRequest(
@@ -182,6 +190,14 @@ class ConsultationRequest {
           ? null
           : rejectionReason ??
               this.rejectionReason,
+              adminQueueReason: clearAdminQueueReason
+    ? null
+    : adminQueueReason ??
+        this.adminQueueReason,
+waitingForAdminAt: clearWaitingForAdminAt
+    ? null
+    : waitingForAdminAt ??
+        this.waitingForAdminAt,
       reassignedFromExpertId:
           clearReassignedFromExpertId
               ? null
@@ -235,6 +251,11 @@ class ConsultationRequest {
           : Timestamp.fromDate(cancelledAt!),
       'rejectionReason':
           _nullableTrimmed(rejectionReason),
+          'adminQueueReason':
+    _nullableTrimmed(adminQueueReason),
+'waitingForAdminAt': waitingForAdminAt == null
+    ? null
+    : Timestamp.fromDate(waitingForAdminAt!),
       'reassignedFromExpertId':
           reassignedFromExpertId,
     };
@@ -298,6 +319,12 @@ class ConsultationRequest {
           _readNullableDate(map['cancelledAt']),
       rejectionReason:
           map['rejectionReason'] as String?,
+          adminQueueReason:
+    map['adminQueueReason'] as String?,
+waitingForAdminAt:
+    _readNullableDate(
+      map['waitingForAdminAt'],
+    ),
       reassignedFromExpertId:
           map['reassignedFromExpertId']
               as String?,

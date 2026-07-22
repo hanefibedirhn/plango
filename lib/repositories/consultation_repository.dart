@@ -433,14 +433,40 @@ class ConsultationRepository {
         )
         .snapshots()
         .map(
-      (snapshot) {
-        return snapshot.docs
-            .map(
-              ConsultationRequest.fromDocument,
-            )
-            .toList();
-      },
-    );
+  (snapshot) {
+    final DateTime now = DateTime.now();
+
+    return snapshot.docs
+        .map(
+          ConsultationRequest.fromDocument,
+        )
+        .where(
+  (request) {
+    const visibleStatuses = {
+      'pending',
+      'accepted',
+      'contacted',
+      'completed',
+    };
+
+    if (!visibleStatuses.contains(
+      request.status,
+    )) {
+      return false;
+    }
+
+    if (request.status == 'pending' &&
+        request.expiresAt != null &&
+        !request.expiresAt!.isAfter(now)) {
+      return false;
+    }
+
+    return true;
+  },
+)
+        .toList();
+  },
+);
   }
 
   /// Uzmanın yalnızca yanıt bekleyen taleplerini dinler.
@@ -483,56 +509,64 @@ class ConsultationRepository {
         _requestsCollection.doc(requestId);
 
     await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(
-          requestReference,
-        );
+  (transaction) async {
+    print("1- Transaction başladı");
 
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
+    final requestSnapshot =
+        await transaction.get(requestReference);
 
-        final Map<String, dynamic> data =
-            requestSnapshot.data()!;
+    print("2- Snapshot alındı");
 
-        if (data['expertId'] != expertId) {
-          throw const ConsultationRepositoryException(
-            'Bu danışma talebi size ait değil.',
-          );
-        }
+    if (!requestSnapshot.exists ||
+        requestSnapshot.data() == null) {
+      print("3- Talep bulunamadı");
+      throw const ConsultationRequestNotFoundException();
+    }
 
-        if (data['status'] != 'pending') {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
+    final data = requestSnapshot.data()!;
+    print("4- Data okundu");
 
-        final DateTime? expiresAt =
-            _readNullableDate(
-          data['expiresAt'],
-        );
+    if (data['expertId'] != expertId) {
+      print("5- Expert uyuşmuyor");
+      throw const ConsultationRepositoryException(
+        'Bu danışma talebi size ait değil.',
+      );
+    }
 
-        if (expiresAt == null ||
-            !DateTime.now()
-                .isBefore(expiresAt)) {
-          throw const ConsultationRequestExpiredException();
-        }
+    if (data['status'] != 'pending') {
+      print("6- Status pending değil");
+      throw const ConsultationRequestAlreadyProcessedException();
+    }
 
-        transaction.update(
-          requestReference,
-          {
-            'status': 'accepted',
-            'acceptedAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-            'rejectedAt': null,
-            'rejectionReason': null,
-          },
-        );
+    final expiresAt =
+        _readNullableDate(data['expiresAt']);
+
+    print("7- Expires okundu");
+
+    if (expiresAt == null ||
+        !DateTime.now().isBefore(expiresAt)) {
+      print("8- Süresi dolmuş");
+      throw const ConsultationRequestExpiredException();
+    }
+
+    print("9- Update başlıyor");
+
+    transaction.update(
+      requestReference,
+      {
+        'status': 'accepted',
+        'acceptedAt':
+            FieldValue.serverTimestamp(),
+        'updatedAt':
+            FieldValue.serverTimestamp(),
+        'rejectedAt': null,
+        'rejectionReason': null,
       },
     );
+
+    print("10- Update tamam");
+  },
+);
   }
 
   /// Uzman danışma talebini reddeder.
@@ -581,17 +615,19 @@ class ConsultationRepository {
         }
 
         transaction.update(
-          requestReference,
-          {
-            'status': 'rejected',
-            'rejectionReason':
-                normalizedReason,
-            'rejectedAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
-        );
+  requestReference,
+  {
+    'status': 'waiting_for_admin',
+    'rejectionReason': normalizedReason,
+    'rejectedAt':
+        FieldValue.serverTimestamp(),
+    'waitingForAdminAt':
+        FieldValue.serverTimestamp(),
+    'adminQueueReason': 'expert_rejected',
+    'updatedAt':
+        FieldValue.serverTimestamp(),
+  },
+);
       },
     );
   }
@@ -692,6 +728,58 @@ class ConsultationRepository {
     );
   }
 
+  /// Yönetici tarafından yeniden atanmayı bekleyen talepleri dinler.
+Stream<List<ConsultationRequest>>
+    watchWaitingForAdminRequests() {
+  return _requestsCollection
+      .where(
+        'status',
+        isEqualTo: 'waiting_for_admin',
+      )
+      .orderBy(
+        'updatedAt',
+        descending: true,
+      )
+      .snapshots()
+      .map(
+        (snapshot) {
+          return snapshot.docs
+              .map(
+                ConsultationRequest.fromDocument,
+              )
+              .toList();
+        },
+      );
+}
+
+  Future<String?> getRequestPhone({
+  required String requestId,
+  required String expertId,
+}) async {
+  final contactSnapshot =
+      await _requestContactsCollection
+          .doc(requestId)
+          .get();
+
+  if (!contactSnapshot.exists ||
+      contactSnapshot.data() == null) {
+    return null;
+  }
+
+  final data = contactSnapshot.data()!;
+
+  if (data['expertId'] != expertId) {
+    throw ConsultationRepositoryException(
+      'Bu iletişim bilgisine erişim yetkiniz yok.',
+    );
+  }
+
+  final String phone =
+      data['userPhone'] as String? ?? '';
+
+  return phone.isEmpty ? null : phone;
+}
+
   Future<void> _updateExpertOwnedStatus({
     required String requestId,
     required String expertId,
@@ -785,13 +873,16 @@ class ConsultationRepository {
         }
 
         transaction.update(
-          requestReference,
-          {
-            'status': 'expired',
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
-        );
+  requestReference,
+  {
+    'status': 'waiting_for_admin',
+    'waitingForAdminAt':
+        FieldValue.serverTimestamp(),
+    'adminQueueReason': 'response_expired',
+    'updatedAt':
+        FieldValue.serverTimestamp(),
+  },
+);
 
         return true;
       },

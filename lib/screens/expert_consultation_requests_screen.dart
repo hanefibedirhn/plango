@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/consultation_request_model.dart';
 import '../../repositories/consultation_repository.dart';
+import 'package:plango/screens/expert_request_detail_screen.dart';
 
 class ExpertConsultationRequestsScreen
     extends StatelessWidget {
@@ -63,8 +64,11 @@ class ExpertConsultationRequestsScreen
 }
 
           final List<ConsultationRequest> requests =
-              snapshot.data ?? [];
-
+    (snapshot.data ?? [])
+        .where(
+          (request) => request.status != 'expired',
+        )
+        .toList();
           if (requests.isEmpty) {
             return const _RequestMessage(
               icon: Icons.inbox_outlined,
@@ -247,8 +251,22 @@ class _RequestCard extends StatelessWidget {
     children: [
       Expanded(
         child: OutlinedButton(
-          onPressed: () {
-            // Bir sonraki adımda bağlayacağız.
+          onPressed: () async {
+            try {
+              await repository.rejectRequest(
+                requestId: request.requestId!,
+                expertId: expertId,
+                rejectionReason: "Uzman tarafından reddedildi",
+              );
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString()),
+                  ),
+                );
+              }
+            }
           },
           child: const Text("Reddet"),
         ),
@@ -276,6 +294,29 @@ class _RequestCard extends StatelessWidget {
         ),
       ),
     ],
+  ),
+],
+
+if (request.status == 'accepted' ||
+    request.status == 'contacted' ||
+    request.status == 'completed') ...[
+  const SizedBox(height: 18),
+  SizedBox(
+    width: double.infinity,
+    child: FilledButton.icon(
+      icon: const Icon(Icons.visibility_outlined),
+      label: const Text("Talep Detayını Gör"),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ExpertRequestDetailScreen(
+              request: request,
+            ),
+          ),
+        );
+      },
+    ),
   ),
 ],
         ],

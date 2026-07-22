@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'admin_expert_applications_screen.dart';
+import 'admin_consultation_management_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({
@@ -84,11 +85,14 @@ class AdminDashboardScreen extends StatelessWidget {
               subtitle:
                   'Kullanıcı ve uzman arasındaki danışma taleplerini takip edin.',
               onTap: () {
-                _showComingSoon(
-                  context,
-                  'Danışma Yönetimi',
-                );
-              },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>
+          const AdminConsultationManagementScreen(),
+    ),
+  );
+},
             ),
 
             _AdminModuleCard(
