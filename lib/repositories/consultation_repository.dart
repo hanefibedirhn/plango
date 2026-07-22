@@ -888,84 +888,239 @@ Stream<List<ConsultationRequest>>
       },
     );
   }
-
-  /// Süresi dolmuş veya reddedilmiş talebi
-  /// başka uzmana yönlendirir.
+  
+  /// Reddedilen veya yanıt süresi dolan talebi
+  /// yönetici tarafından başka bir uzmana atar.
+  ///
+  /// Eski talep reassigned durumuna geçirilir.
+  /// Yeni uzman için yeni bir pending talep oluşturulur.
+  /// Kullanıcının iletişim bilgisi yeni talebe kopyalanır.
   Future<String> reassignRequest({
-    required ConsultationRequest
-        previousRequest,
+    required ConsultationRequest previousRequest,
     required String newExpertId,
   }) async {
     final String? previousRequestId =
         previousRequest.requestId;
 
+    final String normalizedNewExpertId =
+        newExpertId.trim();
+
     if (previousRequestId == null ||
-        previousRequestId.isEmpty) {
+        previousRequestId.trim().isEmpty) {
       throw const ConsultationRequestNotFoundException();
     }
 
-    if (newExpertId ==
+    if (normalizedNewExpertId.isEmpty) {
+      throw const ConsultationRepositoryException(
+        'Yeni uzman kimliği bulunamadı.',
+      );
+    }
+
+    if (normalizedNewExpertId ==
         previousRequest.expertId) {
       throw const ConsultationRepositoryException(
         'Talep aynı uzmana yeniden yönlendirilemez.',
       );
     }
 
-    final DateTime now = DateTime.now();
+    final DocumentReference<Map<String, dynamic>>
+        previousRequestReference =
+        _requestsCollection.doc(previousRequestId);
 
-    final ConsultationRequest
-        reassignedRequest =
-        previousRequest.copyWith(
-      clearRequestId: true,
-      expertId: newExpertId,
-      status: 'pending',
-      createdAt: now,
-      updatedAt: now,
-      expiresAt:
-          now.add(responseDuration),
-      reassignedFromExpertId:
-          previousRequest.expertId,
-      clearAcceptedAt: true,
-      clearContactedAt: true,
-      clearCompletedAt: true,
-      clearRejectedAt: true,
-      clearCancelledAt: true,
-      clearRejectionReason: true,
+    final DocumentReference<Map<String, dynamic>>
+        previousContactReference =
+        _requestContactsCollection.doc(
+      previousRequestId,
     );
 
-    final DocumentSnapshot<Map<String, dynamic>>
-    previousContactSnapshot =
-    await _requestContactsCollection
-        .doc(previousRequestId)
-        .get();
+    final DocumentReference<Map<String, dynamic>>
+        newExpertReference =
+        _expertProfilesCollection.doc(
+      normalizedNewExpertId,
+    );
 
-if (!previousContactSnapshot.exists ||
-    previousContactSnapshot.data() == null) {
-  throw const ConsultationRepositoryException(
-    'Danışma talebinin iletişim bilgisi bulunamadı.',
-  );
-}
+    final DocumentReference<Map<String, dynamic>>
+        newRequestReference =
+        _requestsCollection.doc();
 
-final String previousUserPhone =
-    previousContactSnapshot.data()!['userPhone']
-            as String? ??
-        '';
+    final DocumentReference<Map<String, dynamic>>
+        newContactReference =
+        _requestContactsCollection.doc(
+      newRequestReference.id,
+    );
 
-final String newRequestId =
-    await createConsultationRequest(
-  reassignedRequest,
-  userPhone: previousUserPhone,
-);
+    final DateTime expiresAt =
+        DateTime.now().add(responseDuration);
 
-    await _requestsCollection
-        .doc(previousRequestId)
-        .update({
-      'status': 'reassigned',
-      'updatedAt':
-          FieldValue.serverTimestamp(),
-    });
+    await _firestore.runTransaction<void>(
+      (transaction) async {
+        // Transaction içinde önce bütün okumalar yapılır.
+        final DocumentSnapshot<Map<String, dynamic>>
+            previousRequestSnapshot =
+            await transaction.get(
+          previousRequestReference,
+        );
 
-    return newRequestId;
+        final DocumentSnapshot<Map<String, dynamic>>
+            previousContactSnapshot =
+            await transaction.get(
+          previousContactReference,
+        );
+
+        final DocumentSnapshot<Map<String, dynamic>>
+            newExpertSnapshot =
+            await transaction.get(
+          newExpertReference,
+        );
+
+        if (!previousRequestSnapshot.exists ||
+            previousRequestSnapshot.data() == null) {
+          throw const ConsultationRequestNotFoundException();
+        }
+
+        if (!previousContactSnapshot.exists ||
+            previousContactSnapshot.data() == null) {
+          throw const ConsultationRepositoryException(
+            'Danışma talebinin iletişim bilgisi bulunamadı.',
+          );
+        }
+
+        if (!newExpertSnapshot.exists ||
+            newExpertSnapshot.data() == null) {
+          throw const ConsultationExpertUnavailableException();
+        }
+
+        final Map<String, dynamic> previousRequestData =
+            previousRequestSnapshot.data()!;
+
+        final Map<String, dynamic> previousContactData =
+            previousContactSnapshot.data()!;
+
+        final Map<String, dynamic> newExpertData =
+            newExpertSnapshot.data()!;
+
+        final String previousStatus =
+            previousRequestData['status']
+                    as String? ??
+                '';
+
+        if (previousStatus != 'waiting_for_admin') {
+          throw const ConsultationRequestAlreadyProcessedException();
+        }
+
+        final String currentExpertId =
+            previousRequestData['expertId']
+                    as String? ??
+                '';
+
+        if (currentExpertId.isEmpty) {
+          throw const ConsultationRepositoryException(
+            'Talebin önceki uzman bilgisi bulunamadı.',
+          );
+        }
+
+        if (currentExpertId ==
+            normalizedNewExpertId) {
+          throw const ConsultationRepositoryException(
+            'Talep aynı uzmana yeniden yönlendirilemez.',
+          );
+        }
+
+        final String newExpertStatus =
+            newExpertData['status'] as String? ??
+                'inactive';
+
+        final bool acceptsNewRequests =
+            newExpertData['acceptsNewRequests']
+                    as bool? ??
+                false;
+
+        final String newExpertCompanyName =
+            newExpertData['companyName']
+                    as String? ??
+                '';
+
+        final String requestCompanyName =
+            previousRequestData['companyName']
+                    as String? ??
+                previousRequest.companyName;
+
+        if (newExpertStatus != 'active' ||
+            !acceptsNewRequests) {
+          throw const ConsultationExpertUnavailableException();
+        }
+
+        if (_normalize(newExpertCompanyName) !=
+            _normalize(requestCompanyName)) {
+          throw const ConsultationRepositoryException(
+            'Seçilen uzman ile şirket bilgisi eşleşmiyor.',
+          );
+        }
+
+        final String userPhone =
+            previousContactData['userPhone']
+                    as String? ??
+                '';
+
+        if (!_isValidPhone(userPhone)) {
+          throw const ConsultationRepositoryException(
+            'Danışma talebinin telefon bilgisi geçerli değil.',
+          );
+        }
+
+        final Map<String, dynamic> newRequestData = {
+          ...previousRequestData,
+          'requestId': newRequestReference.id,
+          'expertId': normalizedNewExpertId,
+          'status': 'pending',
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+          'expiresAt': Timestamp.fromDate(expiresAt),
+          'acceptedAt': null,
+          'contactedAt': null,
+          'completedAt': null,
+          'rejectedAt': null,
+          'cancelledAt': null,
+          'rejectionReason': null,
+          'waitingForAdminAt': null,
+          'adminQueueReason': null,
+          'reassignedFromExpertId':
+              currentExpertId,
+        };
+
+        final Map<String, dynamic> newContactData = {
+          ...previousContactData,
+          'requestId': newRequestReference.id,
+          'expertId': normalizedNewExpertId,
+          'userPhone': userPhone,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        };
+
+        // Bütün kontroller tamamlandıktan sonra
+        // yazma işlemleri gerçekleştirilir.
+        transaction.update(
+          previousRequestReference,
+          {
+            'status': 'reassigned',
+            'updatedAt':
+                FieldValue.serverTimestamp(),
+          },
+        );
+
+        transaction.set(
+          newRequestReference,
+          newRequestData,
+        );
+
+        transaction.set(
+          newContactReference,
+          newContactData,
+        );
+      },
+    );
+
+    return newRequestReference.id;
   }
 
   static String _normalize(

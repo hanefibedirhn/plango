@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/consultation_request_model.dart';
 import '../../models/expert_profile_model.dart';
+import '../../repositories/consultation_repository.dart';
 import '../../repositories/expert_profile_repository.dart';
 
 class AdminConsultationRequestDetailScreen
@@ -21,13 +22,17 @@ class AdminConsultationRequestDetailScreen
   static const Color _softGreen = Color(0xFFE8F1EC);
 
   @override
-Widget build(BuildContext context) {
-  final String note =
-      request.userNote?.trim() ?? '';
+  Widget build(BuildContext context) {
+    final String note =
+        request.userNote?.trim() ?? '';
 
-  final ExpertProfileRepository
-      expertProfileRepository =
-      ExpertProfileRepository();
+    final ExpertProfileRepository
+        expertProfileRepository =
+        ExpertProfileRepository();
+
+    final ConsultationRepository
+        consultationRepository =
+        ConsultationRepository();
 
     return Scaffold(
       backgroundColor: _background,
@@ -100,7 +105,8 @@ Widget build(BuildContext context) {
                 const SizedBox(height: 14),
                 _DetailRow(
                   label: 'Tahmini Vade',
-                  value: '${request.estimatedTerm} ay',
+                  value:
+                      '${request.estimatedTerm} ay',
                 ),
                 const SizedBox(height: 14),
                 _DetailRow(
@@ -129,12 +135,14 @@ Widget build(BuildContext context) {
             ],
             const SizedBox(height: 14),
             _SectionCard(
-              icon: Icons.admin_panel_settings_outlined,
+              icon:
+                  Icons.admin_panel_settings_outlined,
               title: 'Atama Bilgileri',
               children: [
                 _DetailRow(
                   label: 'Talep Durumu',
-                  value: _statusLabel(request.status),
+                  value:
+                      _statusLabel(request.status),
                 ),
                 const SizedBox(height: 14),
                 _DetailRow(
@@ -157,39 +165,48 @@ Widget build(BuildContext context) {
                   const SizedBox(height: 14),
                   _DetailRow(
                     label: 'Red Nedeni',
-                    value: request.rejectionReason!,
+                    value:
+                        request.rejectionReason!,
                   ),
                 ],
-                if (request.expertId.trim().isNotEmpty) ...[
-  const SizedBox(height: 14),
-  FutureBuilder<ExpertProfile>(
-    future: expertProfileRepository.getExpertProfile(
-      request.expertId,
-    ),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState ==
-          ConnectionState.waiting) {
-        return const _DetailRow(
-          label: 'Önceki Uzman',
-          value: 'Yükleniyor...',
-        );
-      }
+                if (request.expertId
+                    .trim()
+                    .isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  FutureBuilder<ExpertProfile>(
+                    future:
+                        expertProfileRepository
+                            .getExpertProfile(
+                      request.expertId,
+                    ),
+                    builder:
+                        (context, snapshot) {
+                      if (snapshot
+                              .connectionState ==
+                          ConnectionState.waiting) {
+                        return const _DetailRow(
+                          label: 'Önceki Uzman',
+                          value: 'Yükleniyor...',
+                        );
+                      }
 
-      if (snapshot.hasError ||
-          !snapshot.hasData) {
-        return const _DetailRow(
-          label: 'Önceki Uzman',
-          value: 'Uzman bilgisi bulunamadı',
-        );
-      }
+                      if (snapshot.hasError ||
+                          !snapshot.hasData) {
+                        return const _DetailRow(
+                          label: 'Önceki Uzman',
+                          value:
+                              'Uzman bilgisi bulunamadı',
+                        );
+                      }
 
-      return _DetailRow(
-        label: 'Önceki Uzman',
-        value: snapshot.data!.fullName,
-      );
-    },
-  ),
-],
+                      return _DetailRow(
+                        label: 'Önceki Uzman',
+                        value:
+                            snapshot.data!.fullName,
+                      );
+                    },
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 22),
@@ -197,9 +214,78 @@ Widget build(BuildContext context) {
               width: double.infinity,
               height: 54,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Bir sonraki adımda uzman seçme akışını bağlayacağız.
-                },
+                onPressed: () async {
+  debugPrint(
+    'ADMIN: Yeni Uzman Ata butonuna basıldı.',
+  );
+
+  try {
+    final ExpertProfile? selectedExpert =
+        await _selectNewExpert(
+      context: context,
+      repository: expertProfileRepository,
+    );
+
+    debugPrint(
+      'ADMIN: Seçilen uzman: '
+      '${selectedExpert?.fullName ?? "seçilmedi"}',
+    );
+
+    if (selectedExpert == null ||
+        !context.mounted) {
+      return;
+    }
+
+    final bool confirmed =
+        await _confirmAssignment(
+      context: context,
+      expert: selectedExpert,
+    );
+
+    if (!confirmed || !context.mounted) {
+      return;
+    }
+
+    await consultationRepository.reassignRequest(
+      previousRequest: request,
+      newExpertId: selectedExpert.uid,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Talep ${selectedExpert.fullName} adlı uzmana atandı.',
+        ),
+      ),
+    );
+
+    Navigator.of(context).pop();
+  } catch (error, stackTrace) {
+    debugPrint(
+      'ADMIN UZMAN ATAMA HATASI: $error',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Uzman listesi açılamadı: $error',
+        ),
+      ),
+    );
+  }
+},
                 icon: const Icon(
                   Icons.person_search_rounded,
                 ),
@@ -226,6 +312,241 @@ Widget build(BuildContext context) {
     );
   }
 
+  Future<ExpertProfile?> _selectNewExpert({
+    required BuildContext context,
+    required ExpertProfileRepository repository,
+  }) {
+    return showModalBottomSheet<ExpertProfile>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (bottomSheetContext) {
+        return SafeArea(
+          child: SizedBox(
+            height: MediaQuery.of(
+                  bottomSheetContext,
+                ).size.height *
+                0.70,
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    4,
+                    20,
+                    12,
+                  ),
+                  child: Text(
+                    'Yeni Uzman Seç',
+                    style: TextStyle(
+                      color: _textDark,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    '${request.companyName} şirketinde talep alan uzmanlar',
+                    style: const TextStyle(
+                      color: _textMuted,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Expanded(
+                  child: StreamBuilder<
+                      List<ExpertProfile>>(
+                    stream: repository
+                        .watchAvailableExperts(
+                      request.companyName,
+                    ),
+                    builder:
+                        (context, snapshot) {
+                      if (snapshot
+                                  .connectionState ==
+                              ConnectionState
+                                  .waiting &&
+                          !snapshot.hasData) {
+                        return const Center(
+                          child:
+                              CircularProgressIndicator(
+                            color: _green,
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.all(
+                              24,
+                            ),
+                            child: Text(
+                              snapshot.error
+                                  .toString(),
+                              textAlign:
+                                  TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final List<ExpertProfile>
+                          experts =
+                          (snapshot.data ?? [])
+                              .where(
+                                (expert) =>
+                                    expert.uid !=
+                                    request
+                                        .expertId,
+                              )
+                              .toList();
+
+                      if (experts.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding:
+                                EdgeInsets.all(24),
+                            child: Text(
+                              'Bu şirkette talep alabilecek başka bir uzman bulunmuyor.',
+                              textAlign:
+                                  TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ListView.separated(
+                        padding:
+                            const EdgeInsets.fromLTRB(
+                          14,
+                          0,
+                          14,
+                          24,
+                        ),
+                        itemCount: experts.length,
+                        separatorBuilder:
+                            (context, index) {
+                          return const Divider(
+                            height: 1,
+                          );
+                        },
+                        itemBuilder:
+                            (context, index) {
+                          final ExpertProfile
+                              expert =
+                              experts[index];
+
+                          final String details = [
+                            expert.position.trim(),
+                            expert.branch.trim(),
+                          ]
+                              .where(
+                                (value) =>
+                                    value.isNotEmpty,
+                              )
+                              .join(' • ');
+
+                          return ListTile(
+                            leading:
+                                const CircleAvatar(
+                              backgroundColor:
+                                  _softGreen,
+                              foregroundColor:
+                                  _green,
+                              child: Icon(
+                                Icons
+                                    .person_outline_rounded,
+                              ),
+                            ),
+                            title: Text(
+                              expert.fullName,
+                              style:
+                                  const TextStyle(
+                                color: _textDark,
+                                fontWeight:
+                                    FontWeight.w800,
+                              ),
+                            ),
+                            subtitle:
+                                details.isEmpty
+                                    ? const Text(
+                                        'Talep alıyor',
+                                      )
+                                    : Text(details),
+                            trailing: const Icon(
+                              Icons
+                                  .chevron_right_rounded,
+                            ),
+                            onTap: () {
+                              Navigator.of(
+                                bottomSheetContext,
+                              ).pop(expert);
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> _confirmAssignment({
+    required BuildContext context,
+    required ExpertProfile expert,
+  }) async {
+    final bool? result =
+        await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            'Uzman Atamasını Onayla',
+          ),
+          content: Text(
+            'Bu danışma talebi ${expert.fullName} adlı uzmana atansın mı?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(
+                  false,
+                );
+              },
+              child: const Text('Vazgeç'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(
+                  true,
+                );
+              },
+              child: const Text('Ata'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
   static String _formatCurrency(double value) {
     final String digits = value
         .round()
@@ -241,10 +562,13 @@ Widget build(BuildContext context) {
   static String _formatDate(DateTime value) {
     final String day =
         value.day.toString().padLeft(2, '0');
+
     final String month =
         value.month.toString().padLeft(2, '0');
+
     final String hour =
         value.hour.toString().padLeft(2, '0');
+
     final String minute =
         value.minute.toString().padLeft(2, '0');
 
@@ -263,6 +587,10 @@ Widget build(BuildContext context) {
         return 'İletişime geçildi';
       case 'completed':
         return 'Tamamlandı';
+      case 'reassigned':
+        return 'Başka uzmana atandı';
+      case 'cancelled':
+        return 'İptal edildi';
       default:
         return status;
     }
@@ -311,7 +639,8 @@ class _SectionCard extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -334,14 +663,16 @@ class _SectionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 11),
-              Text(
-                title,
-                style: const TextStyle(
-                  color:
-                      AdminConsultationRequestDetailScreen
-                          ._textDark,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color:
+                        AdminConsultationRequestDetailScreen
+                            ._textDark,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
@@ -366,7 +697,8 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(

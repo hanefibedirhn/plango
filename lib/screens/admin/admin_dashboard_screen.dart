@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'admin_expert_applications_screen.dart';
 import 'admin_consultation_management_screen.dart';
+import 'admin_content_management_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({
@@ -114,10 +115,13 @@ class AdminDashboardScreen extends StatelessWidget {
               subtitle:
                   'Öne Çıkanlar, şirket bilgileri, duyurular ve uygulama içeriklerini yönetin.',
               onTap: () {
-                _showComingSoon(
-                  context,
-                  'İçerik Yönetimi',
-                );
+                Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) =>
+        const AdminContentManagementScreen(),
+  ),
+);
               },
             ),
 
