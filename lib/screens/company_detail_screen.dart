@@ -173,12 +173,6 @@ Future<void> _openUrl(String url) async {
         ),
         const Divider(height: 1, color: _divider),
         _ActionRow(
-          icon: Icons.verified_user_outlined,
-          title: 'Doğrulanmış Uzmanları Gör',
-          onTap: () {},
-        ),
-        const Divider(height: 1, color: _divider),
-        _ActionRow(
           icon: Icons.calculate_outlined,
           title: 'Hesaplamaya Git',
           onTap: () {

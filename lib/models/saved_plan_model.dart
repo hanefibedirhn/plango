@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class SavedPaymentPlanItem {
   const SavedPaymentPlanItem({
     required this.month,
+    required this.paymentDate,
     required this.installment,
     required this.totalSaving,
     required this.isDeliveryMonth,
@@ -10,6 +11,11 @@ class SavedPaymentPlanItem {
   });
 
   final int month;
+
+  // Eski kayıtların içinde tarih olmadığı
+  // için nullable bırakıyoruz.
+  final DateTime? paymentDate;
+
   final double installment;
   final double totalSaving;
   final bool isDeliveryMonth;
@@ -20,6 +26,8 @@ class SavedPaymentPlanItem {
   ) {
     return SavedPaymentPlanItem(
       month: _readInt(map['month']),
+      paymentDate:
+          _readDateTime(map['paymentDate']),
       installment:
           _readDouble(map['installment']),
       totalSaving:
@@ -36,6 +44,9 @@ class SavedPaymentPlanItem {
   Map<String, dynamic> toMap() {
     return {
       'month': month,
+      if (paymentDate != null)
+        'paymentDate':
+            Timestamp.fromDate(paymentDate!),
       'installment': installment,
       'totalSaving': totalSaving,
       'isDeliveryMonth': isDeliveryMonth,
@@ -57,6 +68,24 @@ class SavedPaymentPlanItem {
     }
 
     return 0;
+  }
+
+  static DateTime? _readDateTime(
+    dynamic value,
+  ) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    if (value is String) {
+      return DateTime.tryParse(value);
+    }
+
+    return null;
   }
 }
 

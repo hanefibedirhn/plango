@@ -1,5 +1,6 @@
 class PaymentPlanItem {
   final int month;
+  final DateTime paymentDate;
   final double installment;
   final double totalSaving;
   final bool isDeliveryMonth;
@@ -7,6 +8,7 @@ class PaymentPlanItem {
 
   const PaymentPlanItem({
     required this.month,
+    required this.paymentDate,
     required this.installment,
     required this.totalSaving,
     required this.isDeliveryMonth,
@@ -15,6 +17,7 @@ class PaymentPlanItem {
 
   PaymentPlanItem copyWith({
     int? month,
+    DateTime? paymentDate,
     double? installment,
     double? totalSaving,
     bool? isDeliveryMonth,
@@ -22,11 +25,17 @@ class PaymentPlanItem {
   }) {
     return PaymentPlanItem(
       month: month ?? this.month,
-      installment: installment ?? this.installment,
-      totalSaving: totalSaving ?? this.totalSaving,
+      paymentDate:
+          paymentDate ?? this.paymentDate,
+      installment:
+          installment ?? this.installment,
+      totalSaving:
+          totalSaving ?? this.totalSaving,
       isDeliveryMonth:
-          isDeliveryMonth ?? this.isDeliveryMonth,
-      isLastMonth: isLastMonth ?? this.isLastMonth,
+          isDeliveryMonth ??
+              this.isDeliveryMonth,
+      isLastMonth:
+          isLastMonth ?? this.isLastMonth,
     );
   }
 }
@@ -52,12 +61,48 @@ class FpResult {
 }
 
 class FpEngine {
+  static DateTime _addMonthsClamped(
+  DateTime baseDate,
+  int monthsToAdd,
+) {
+  final int totalMonths =
+      baseDate.year * 12 +
+          baseDate.month -
+          1 +
+          monthsToAdd;
+
+  final int targetYear =
+      totalMonths ~/ 12;
+
+  final int targetMonth =
+      totalMonths % 12 + 1;
+
+  final int lastDayOfTargetMonth =
+      DateTime(
+    targetYear,
+    targetMonth + 1,
+    0,
+  ).day;
+
+  final int targetDay =
+      baseDate.day >
+              lastDayOfTargetMonth
+          ? lastDayOfTargetMonth
+          : baseDate.day;
+
+  return DateTime(
+    targetYear,
+    targetMonth,
+    targetDay,
+  );
+}
   static FpResult calculate({
-    required double finance,
-    required double downPayment,
-    required double installment,
-    required String model,
-  }) {
+  required double finance,
+  required double downPayment,
+  required double installment,
+  required String model,
+  DateTime? calculationDate,
+}) {
     if (finance <= 0) {
       return _error(
         'Finansman tutarı 0’dan büyük olmalıdır.',
@@ -82,6 +127,16 @@ class FpEngine {
       );
     }
 
+    final DateTime now =
+    calculationDate ?? DateTime.now();
+
+final DateTime firstPaymentDate =
+    DateTime(
+  now.year,
+  now.month,
+  now.day,
+);
+    
     final _IncreaseRule increase =
         _getIncreaseRule(model);
 
@@ -156,14 +211,18 @@ class FpEngine {
       }
 
       temporaryPaymentPlan.add(
-        PaymentPlanItem(
-          month: month,
-          installment: payment,
-          totalSaving: totalPaid,
-          isDeliveryMonth: false,
-          isLastMonth: remaining <= 0,
-        ),
-      );
+  PaymentPlanItem(
+    month: month,
+    paymentDate: _addMonthsClamped(
+      firstPaymentDate,
+      month - 1,
+    ),
+    installment: payment,
+    totalSaving: totalPaid,
+    isDeliveryMonth: false,
+    isLastMonth: remaining <= 0,
+  ),
+);
     }
 
     if (month >= 240 && remaining > 0) {

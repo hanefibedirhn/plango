@@ -81,12 +81,13 @@ class _CalculatorScreenState
         _readAmount(installmentController);
 
     final FpResult calculatedResult =
-        FpEngine.calculate(
-      finance: finance,
-      downPayment: downPayment,
-      installment: installment,
-      model: model!,
-    );
+    FpEngine.calculate(
+  finance: finance,
+  downPayment: downPayment,
+  installment: installment,
+  model: model!,
+  calculationDate: DateTime.now(),
+);
 
     setState(() {
       result = calculatedResult;
@@ -504,14 +505,30 @@ class _CalculatorScreenState
 }
 
 class _ResultCard extends StatelessWidget {
-  const _ResultCard({
+  _ResultCard({
     required this.result,
   });
 
   final FpResult result;
 
+ PaymentPlanItem? get _deliveryItem {
+  for (final item in result.paymentPlan) {
+    if (item.isDeliveryMonth) {
+      return item;
+    }
+  }
+
+  return null;
+}
+
   @override
   Widget build(BuildContext context) {
+
+    final DateFormat _dateFormat =
+    DateFormat(
+  'd MMMM yyyy',
+  'tr_TR',
+);
     if (!result.success) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -561,14 +578,40 @@ class _ResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          Text(
-            '${result.estimatedTerm} Ay Tahmini Vade',
-            style: const TextStyle(
-              color:
-                  _CalculatorScreenState._gold,
-              fontSize: 18,
-            ),
-          ),
+
+Text(
+  _deliveryItem == null
+      ? '-'
+      : _dateFormat.format(
+          _deliveryItem!.paymentDate,
+        ),
+  style: const TextStyle(
+    color: Colors.white,
+    fontSize: 22,
+    fontWeight: FontWeight.w800,
+  ),
+),
+
+const SizedBox(height: 4),
+
+const Text(
+  'Tahmini Teslim Tarihi',
+  style: TextStyle(
+    color: Colors.white60,
+    fontSize: 13,
+  ),
+),
+
+const SizedBox(height: 18),
+
+Text(
+  'Toplam Vade: ${result.estimatedTerm} Ay',
+  style: const TextStyle(
+    color: _CalculatorScreenState._gold,
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+  ),
+),
           const SizedBox(height: 18),
           const Text(
             'Bu tahmini analiz FP Engine tarafından oluşturulmuştur. '

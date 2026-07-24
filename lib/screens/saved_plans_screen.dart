@@ -39,6 +39,41 @@ class _SavedPlansScreenState
   User? get _currentUser =>
       FirebaseAuth.instance.currentUser;
 
+   DateTime _addMonthsClamped(
+  DateTime baseDate,
+  int monthsToAdd,
+) {
+  final int totalMonths =
+      baseDate.year * 12 +
+          baseDate.month -
+          1 +
+          monthsToAdd;
+
+  final int targetYear =
+      totalMonths ~/ 12;
+
+  final int targetMonth =
+      totalMonths % 12 + 1;
+
+  final int lastDay =
+      DateTime(
+    targetYear,
+    targetMonth + 1,
+    0,
+  ).day;
+
+  final int targetDay =
+      baseDate.day > lastDay
+          ? lastDay
+          : baseDate.day;
+
+  return DateTime(
+    targetYear,
+    targetMonth,
+    targetDay,
+  );
+}
+
   Future<void> _confirmDelete(
     SavedPlan plan,
   ) async {
@@ -159,18 +194,27 @@ class _SavedPlansScreenState
         savedPlan.estimatedTerm,
   );
 
-  final List<PaymentPlanItem> paymentPlan =
-      savedPlan.paymentPlan.map((item) {
-    return PaymentPlanItem(
-      month: item.month,
-      installment: item.installment,
-      totalSaving: item.totalSaving,
-      isDeliveryMonth:
-          item.isDeliveryMonth,
-      isLastMonth:
-          item.isLastMonth,
-    );
-  }).toList(growable: false);
+  final DateTime fallbackStartDate =
+    savedPlan.createdAt ?? DateTime.now();
+
+final List<PaymentPlanItem> paymentPlan =
+    savedPlan.paymentPlan.map((item) {
+  return PaymentPlanItem(
+    month: item.month,
+    paymentDate:
+        item.paymentDate ??
+            _addMonthsClamped(
+              fallbackStartDate,
+              item.month - 1,
+            ),
+    installment: item.installment,
+    totalSaving: item.totalSaving,
+    isDeliveryMonth:
+        item.isDeliveryMonth,
+    isLastMonth:
+        item.isLastMonth,
+  );
+}).toList(growable: false);
 
   final FpResult result = FpResult(
     success: true,

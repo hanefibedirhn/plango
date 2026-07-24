@@ -7,35 +7,22 @@ class ContentRepository {
   ContentRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+  })  : _firestore =
+            firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  CollectionReference<Map<String, dynamic>> get _contentCollection {
+  CollectionReference<Map<String, dynamic>>
+      get _contentCollection {
     return _firestore.collection('content');
   }
 
   /// Admin panelinde bütün içerikleri getirir.
-  Stream<List<ContentModel>> watchAllContents() {
-    return _contentCollection.snapshots().map((snapshot) {
-      final contents = snapshot.docs
-          .map(ContentModel.fromFirestore)
-          .toList();
-
-      contents.sort(_sortForAdmin);
-
-      return contents;
-    });
-  }
-
-  /// Admin panelinde sadece seçilen içerik türünü getirir.
-  Stream<List<ContentModel>> watchAdminContentsByType(
-    ContentType type,
-  ) {
+  Stream<List<ContentModel>>
+      watchAllContents() {
     return _contentCollection
-        .where('type', isEqualTo: type.value)
         .snapshots()
         .map((snapshot) {
       final contents = snapshot.docs
@@ -48,8 +35,33 @@ class ContentRepository {
     });
   }
 
-  /// Kullanıcı tarafında yayınlanabilir Öne Çıkanları getirir.
-  Stream<List<ContentModel>> watchPublishedFeatured({
+  /// Admin panelinde sadece seçilen
+  /// içerik türünü getirir.
+  Stream<List<ContentModel>>
+      watchAdminContentsByType(
+    ContentType type,
+  ) {
+    return _contentCollection
+        .where(
+          'type',
+          isEqualTo: type.value,
+        )
+        .snapshots()
+        .map((snapshot) {
+      final contents = snapshot.docs
+          .map(ContentModel.fromFirestore)
+          .toList();
+
+      contents.sort(_sortForAdmin);
+
+      return contents;
+    });
+  }
+
+  /// Kullanıcı tarafında yayınlanabilir
+  /// Öne Çıkan içerikleri getirir.
+  Stream<List<ContentModel>>
+      watchPublishedFeatured({
     int? limit,
   }) {
     return _watchPublishedContents(
@@ -58,8 +70,10 @@ class ContentRepository {
     );
   }
 
-  /// Kullanıcı tarafında aktif kampanyaları getirir.
-  Stream<List<ContentModel>> watchPublishedCampaigns({
+  /// Kullanıcı tarafında yayınlanabilir
+  /// kampanyaları getirir.
+  Stream<List<ContentModel>>
+      watchPublishedCampaigns({
     int? limit,
   }) {
     return _watchPublishedContents(
@@ -68,23 +82,38 @@ class ContentRepository {
     );
   }
 
-  Stream<List<ContentModel>> _watchPublishedContents({
+  Stream<List<ContentModel>>
+      _watchPublishedContents({
     required ContentType type,
     int? limit,
   }) {
     return _contentCollection
-        .where('type', isEqualTo: type.value)
+        .where(
+          'type',
+          isEqualTo: type.value,
+        )
+        .where(
+          'status',
+          isEqualTo:
+              ContentStatus.published.value,
+        )
         .snapshots()
         .map((snapshot) {
       final contents = snapshot.docs
           .map(ContentModel.fromFirestore)
-          .where((content) => content.isVisibleToUsers)
+          .where(
+            (content) =>
+                content.isVisibleToUsers,
+          )
           .toList();
 
       contents.sort(_sortForUsers);
 
-      if (limit != null && contents.length > limit) {
-        return contents.take(limit).toList();
+      if (limit != null &&
+          contents.length > limit) {
+        return contents
+            .take(limit)
+            .toList(growable: false);
       }
 
       return contents;
@@ -95,18 +124,21 @@ class ContentRepository {
   Future<ContentModel?> getContentById(
     String contentId,
   ) async {
-    final document = await _contentCollection
-        .doc(contentId)
-        .get();
+    final document =
+        await _contentCollection
+            .doc(contentId)
+            .get();
 
     if (!document.exists) {
       return null;
     }
 
-    return ContentModel.fromFirestore(document);
+    return ContentModel.fromFirestore(
+      document,
+    );
   }
 
-  /// Yeni içerik oluşturur ve oluşturulan belge kimliğini döndürür.
+  /// Yeni içerik oluşturur.
   Future<String> createContent(
     ContentModel content,
   ) async {
@@ -116,18 +148,23 @@ class ContentRepository {
 
     if (currentUser == null) {
       throw StateError(
-        'İçerik oluşturmak için yönetici oturumu gereklidir.',
+        'İçerik oluşturmak için yönetici '
+        'oturumu gereklidir.',
       );
     }
 
-    final document = _contentCollection.doc();
+    final document =
+        _contentCollection.doc();
 
-    final contentToCreate = content.copyWith(
+    final contentToCreate =
+        content.copyWith(
       id: document.id,
       createdBy: currentUser.uid,
     );
 
-    await document.set(contentToCreate.toFirestore());
+    await document.set(
+      contentToCreate.toFirestore(),
+    );
 
     return document.id;
   }
@@ -138,7 +175,8 @@ class ContentRepository {
   ) async {
     if (content.id.trim().isEmpty) {
       throw ArgumentError(
-        'Güncellenecek içerik kimliği bulunamadı.',
+        'Güncellenecek içerik kimliği '
+        'bulunamadı.',
       );
     }
 
@@ -146,7 +184,6 @@ class ContentRepository {
 
     final data = content.toFirestore();
 
-    // Güncellemede oluşturulma tarihi yeniden yazılmamalıdır.
     data.remove('createdAt');
 
     await _contentCollection
@@ -154,35 +191,38 @@ class ContentRepository {
         .update(data);
   }
 
-  /// İçeriğin durumunu Taslak, Yayında veya Arşivde olarak günceller.
-Future<void> updateStatus({
-  required String contentId,
-  required ContentStatus status,
-}) async {
-  if (contentId.trim().isEmpty) {
-    throw ArgumentError(
-      'İçerik kimliği bulunamadı.',
-    );
+  /// İçeriğin durumunu günceller.
+  Future<void> updateStatus({
+    required String contentId,
+    required ContentStatus status,
+  }) async {
+    if (contentId.trim().isEmpty) {
+      throw ArgumentError(
+        'İçerik kimliği bulunamadı.',
+      );
+    }
+
+    final Map<String, dynamic>
+        updates = {
+      'status': status.value,
+      'updatedAt':
+          FieldValue.serverTimestamp(),
+    };
+
+    if (status ==
+        ContentStatus.published) {
+      updates['publishDate'] =
+          FieldValue.serverTimestamp();
+    } else {
+      updates['publishDate'] = null;
+    }
+
+    await _contentCollection
+        .doc(contentId)
+        .update(updates);
   }
 
-  final Map<String, dynamic> updates = {
-    'status': status.value,
-    'updatedAt': FieldValue.serverTimestamp(),
-  };
-
-  if (status == ContentStatus.published) {
-    updates['publishDate'] =
-        FieldValue.serverTimestamp();
-  } else {
-    updates['publishDate'] = null;
-  }
-
-  await _contentCollection
-      .doc(contentId)
-      .update(updates);
-}
-
-  /// İçeriğin öncelik sırasını günceller.
+  /// İçeriğin önceliğini günceller.
   Future<void> updatePriority({
     required String contentId,
     required int priority,
@@ -195,17 +235,21 @@ Future<void> updateStatus({
 
     if (priority < 0) {
       throw ArgumentError(
-        'Öncelik değeri sıfırdan küçük olamaz.',
+        'Öncelik değeri sıfırdan '
+        'küçük olamaz.',
       );
     }
 
-    await _contentCollection.doc(contentId).update({
+    await _contentCollection
+        .doc(contentId)
+        .update({
       'priority': priority,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt':
+          FieldValue.serverTimestamp(),
     });
   }
 
-  /// İçerik görüntülenme sayısını bir artırır.
+  /// Görüntülenme sayısını artırır.
   Future<void> incrementViewCount(
     String contentId,
   ) async {
@@ -213,8 +257,11 @@ Future<void> updateStatus({
       return;
     }
 
-    await _contentCollection.doc(contentId).update({
-      'viewCount': FieldValue.increment(1),
+    await _contentCollection
+        .doc(contentId)
+        .update({
+      'viewCount':
+          FieldValue.increment(1),
     });
   }
 
@@ -227,7 +274,9 @@ Future<void> updateStatus({
       );
     }
 
-    if (content.summary.trim().isEmpty) {
+    if (content.summary
+        .trim()
+        .isEmpty) {
       throw ArgumentError(
         'İçerik özeti boş bırakılamaz.',
       );
@@ -241,40 +290,55 @@ Future<void> updateStatus({
 
     if (content.priority < 0) {
       throw ArgumentError(
-        'Öncelik değeri sıfırdan küçük olamaz.',
+        'Öncelik değeri sıfırdan '
+        'küçük olamaz.',
       );
     }
 
-    if (content.type == ContentType.campaign) {
+    if (content.type ==
+        ContentType.campaign) {
       if (content.companyId == null ||
-          content.companyId!.trim().isEmpty) {
+          content.companyId!
+              .trim()
+              .isEmpty) {
         throw ArgumentError(
-          'Kampanya için firma seçilmelidir.',
+          'Kampanya için firma '
+          'seçilmelidir.',
         );
       }
 
-      if (content.companyName == null ||
-          content.companyName!.trim().isEmpty) {
+      if (content.companyName ==
+              null ||
+          content.companyName!
+              .trim()
+              .isEmpty) {
         throw ArgumentError(
-          'Kampanya firma adı bulunamadı.',
+          'Kampanya firma adı '
+          'bulunamadı.',
         );
       }
 
       if (content.startDate == null) {
         throw ArgumentError(
-          'Kampanya başlangıç tarihi seçilmelidir.',
+          'Kampanya başlangıç tarihi '
+          'seçilmelidir.',
         );
       }
 
       if (content.endDate == null) {
         throw ArgumentError(
-          'Kampanya bitiş tarihi seçilmelidir.',
+          'Kampanya bitiş tarihi '
+          'seçilmelidir.',
         );
       }
 
-      if (content.endDate!.isBefore(content.startDate!)) {
+      if (content.endDate!.isBefore(
+        content.startDate!,
+      )) {
         throw ArgumentError(
-          'Kampanya bitiş tarihi başlangıç tarihinden önce olamaz.',
+          'Kampanya bitiş tarihi '
+          'başlangıç tarihinden önce '
+          'olamaz.',
         );
       }
     }
@@ -288,15 +352,21 @@ Future<void> updateStatus({
         first.updatedAt ??
         first.createdAt ??
         first.publishDate ??
-        DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime.fromMillisecondsSinceEpoch(
+          0,
+        );
 
     final secondDate =
         second.updatedAt ??
         second.createdAt ??
         second.publishDate ??
-        DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime.fromMillisecondsSinceEpoch(
+          0,
+        );
 
-    return secondDate.compareTo(firstDate);
+    return secondDate.compareTo(
+      firstDate,
+    );
   }
 
   static int _sortForUsers(
@@ -304,7 +374,9 @@ Future<void> updateStatus({
     ContentModel second,
   ) {
     final priorityComparison =
-        first.priority.compareTo(second.priority);
+        first.priority.compareTo(
+      second.priority,
+    );
 
     if (priorityComparison != 0) {
       return priorityComparison;
@@ -313,13 +385,19 @@ Future<void> updateStatus({
     final firstDate =
         first.publishDate ??
         first.createdAt ??
-        DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime.fromMillisecondsSinceEpoch(
+          0,
+        );
 
     final secondDate =
         second.publishDate ??
         second.createdAt ??
-        DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime.fromMillisecondsSinceEpoch(
+          0,
+        );
 
-    return secondDate.compareTo(firstDate);
+    return secondDate.compareTo(
+      firstDate,
+    );
   }
 }

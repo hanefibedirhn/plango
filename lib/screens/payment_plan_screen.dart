@@ -1,13 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../engine/fp_engine.dart';
 import '../models/calculation_plan.dart';
 import '../repositories/saved_plan_repository.dart';
+import 'consultation/select_company_screen.dart';
+import '../services/plango_pdf_service.dart';
 
-class PaymentPlanScreen
-    extends StatefulWidget {
+class PaymentPlanScreen extends StatefulWidget {
   const PaymentPlanScreen({
     super.key,
     required this.plan,
@@ -22,54 +24,43 @@ class PaymentPlanScreen
       _PaymentPlanScreenState();
 }
 
-class _PaymentPlanScreenState
-    extends State<PaymentPlanScreen> {
-  static const Color _green =
-      Color(0xFF0B5D3B);
+class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
+  static const Color _green = Color(0xFF0B5D3B);
+  static const Color _dark = Color(0xFF10231B);
+  static const Color _gold = Color(0xFFD6A84F);
+  static const Color _background = Color(0xFFF4F5F1);
+  static const Color _blue = Color(0xFF3278C8);
+  static const Color _rowBorder = Color(0xFFE6E9E4);
 
-  static const Color _dark =
-      Color(0xFF10231B);
+  final ScrollController _scrollController = ScrollController();
 
-  static const Color _gold =
-      Color(0xFFD6A84F);
+  final SavedPlanRepository _savedPlanRepository =
+      SavedPlanRepository();
 
-  static const Color _background =
-      Color(0xFFF4F5F1);
-
-  final ScrollController _scrollController =
-      ScrollController();
-
-  final SavedPlanRepository
-    _savedPlanRepository =
-    SavedPlanRepository();
-
-bool _isSavingPlan = false;    
-
-  final NumberFormat _moneyFormat =
-      NumberFormat(
+  final NumberFormat _moneyFormat = NumberFormat(
     '#,##0.##',
     'tr_TR',
   );
 
-  bool _isAtBottom = false;
+  final DateFormat _paymentDateFormat = DateFormat(
+    'd MMMM yyyy',
+    'tr_TR',
+  );
+
+  bool _isSavingPlan = false;
+bool _isCreatingPdf = false;
+bool _isAtBottom = false;
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController.addListener(
-      _handleScroll,
-    );
+    _scrollController.addListener(_handleScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(
-      _handleScroll,
-    );
-
+    _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
-
     super.dispose();
   }
 
@@ -80,9 +71,7 @@ bool _isSavingPlan = false;
 
     final bool isAtBottom =
         _scrollController.position.pixels >=
-            _scrollController
-                    .position.maxScrollExtent -
-                80;
+            _scrollController.position.maxScrollExtent - 80;
 
     if (_isAtBottom != isAtBottom) {
       setState(() {
@@ -97,10 +86,8 @@ bool _isSavingPlan = false;
     }
 
     await _scrollController.animateTo(
-      _scrollController
-          .position.maxScrollExtent,
-      duration:
-          const Duration(milliseconds: 700),
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 700),
       curve: Curves.easeInOutCubic,
     );
   }
@@ -109,38 +96,228 @@ bool _isSavingPlan = false;
     return '${_moneyFormat.format(value)} ₺';
   }
 
-  Future<void> _savePlan() async {
-  if (_isSavingPlan) {
-    return;
+  PaymentPlanItem? get _deliveryItem {
+    for (final PaymentPlanItem item in widget.result.paymentPlan) {
+      if (item.isDeliveryMonth) {
+        return item;
+      }
+    }
+
+    return null;
   }
 
-  final User? user =
-      FirebaseAuth.instance.currentUser;
+  String _periodName(PaymentPlanItem item) {
+    if (item.isDeliveryMonth) {
+      return 'Tahmini Teslim';
+    }
 
-  if (user == null || user.isAnonymous) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Plan kaydetmek için kullanıcı '
-          'hesabınızla giriş yapmanız gerekir.',
+    if (item.isLastMonth) {
+      return 'Son Taksit';
+    }
+
+    if (item.month < widget.result.estimatedDelivery) {
+      return 'Tasarruf Dönemi';
+    }
+
+    return 'Finansman Dönemi';
+  }
+
+  Future<void> _openConsultationFlow() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        final UserCredential credential =
+            await FirebaseAuth.instance.signInAnonymously();
+
+        user = credential.user;
+      }
+
+      if (user == null) {
+        throw StateError(
+          'Misafir oturumu oluşturulamadı.',
+        );
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) {
+            return SelectCompanyScreen(
+              plan: widget.plan,
+            );
+          },
         ),
-      ),
-    );
+      );
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) {
+        return;
+      }
 
+      String message =
+          'Misafir oturumu başlatılamadı. '
+          'Lütfen tekrar deneyin.';
+
+      if (error.code == 'operation-not-allowed') {
+        message =
+            'Firebase anonim giriş özelliği '
+            'etkin değil.';
+      } else if (error.code == 'too-many-requests') {
+        message =
+            'Çok fazla deneme yapıldı. '
+            'Lütfen biraz sonra tekrar deneyin.';
+      }
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Danışma ekranı açılamadı. '
+              'Lütfen tekrar deneyin.',
+            ),
+          ),
+        );
+    }
+  }
+
+  Future<void> _savePlan() async {
+    if (_isSavingPlan) {
+      return;
+    }
+
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || user.isAnonymous) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Plan kaydetmek için kullanıcı '
+            'hesabınızla giriş yapmanız gerekir.',
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    setState(() {
+      _isSavingPlan = true;
+    });
+
+    try {
+      final bool wasSaved =
+          await _savedPlanRepository.savePlan(
+        userId: user.uid,
+        plan: widget.plan,
+        result: widget.result,
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            wasSaved
+                ? 'Planınız başarıyla kaydedildi.'
+                : 'Bu plan daha önce kaydedilmiş.',
+          ),
+        ),
+      );
+    } on FirebaseException catch (error) {
+      if (!mounted) {
+        return;
+      }
+
+      String message =
+          'Plan kaydedilemedi. Lütfen tekrar deneyin.';
+
+      if (error.code == 'permission-denied') {
+        message =
+            'Plan kaydetme izni bulunamadı. '
+            'Firestore güvenlik kurallarını '
+            'kontrol etmemiz gerekiyor.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Plan kaydedilirken beklenmeyen '
+            'bir hata oluştu.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSavingPlan = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveToDevice() async {
+  if (_isCreatingPdf) {
     return;
   }
 
   setState(() {
-    _isSavingPlan = true;
+    _isCreatingPdf = true;
   });
 
   try {
-    final bool wasSaved =
-        await _savedPlanRepository.savePlan(
-      userId: user.uid,
+    final DateTime createdAt = DateTime.now();
+
+    final String planNumber =
+    'PLN-${DateFormat('yyMMdd').format(createdAt)}-'
+    '${createdAt.millisecondsSinceEpoch.toString().substring(7)}';
+
+    final User? user =
+        FirebaseAuth.instance.currentUser;
+
+    String customerName = 'Değerli Kullanıcımız';
+
+    final String? displayName =
+        user?.displayName?.trim();
+
+    if (displayName != null &&
+        displayName.isNotEmpty) {
+      customerName = displayName;
+    }
+
+    await PlangoPdfService.saveToDevice(
       plan: widget.plan,
       result: widget.result,
+      customerName: customerName,
+      createdAt: createdAt,
+      planNumber: planNumber,
     );
 
     if (!mounted) {
@@ -148,82 +325,47 @@ bool _isSavingPlan = false;
     }
 
     ScaffoldMessenger.of(context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(
-          wasSaved
-              ? 'Planınız başarıyla kaydedildi.'
-              : 'Bu plan daha önce kaydedilmiş.',
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Ödeme planı PDF olarak oluşturuldu.',
+          ),
         ),
-      ),
-    );
-  } on FirebaseException catch (error) {
-    if (!mounted) {
-      return;
-    }
-
-    String message =
-        'Plan kaydedilemedi. Lütfen tekrar deneyin.';
-
-    if (error.code == 'permission-denied') {
-      message =
-          'Plan kaydetme izni bulunamadı. '
-          'Firestore güvenlik kurallarını '
-          'güncellememiz gerekiyor.';
-    }
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
-  } catch (_) {
+      );
+  } catch (error) {
     if (!mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Plan kaydedilirken beklenmeyen '
-          'bir hata oluştu.',
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            'PDF oluşturulamadı: $error',
+          ),
         ),
-      ),
-    );
+      );
   } finally {
     if (mounted) {
       setState(() {
-        _isSavingPlan = false;
+        _isCreatingPdf = false;
       });
     }
   }
 }
 
-  Future<void> _saveToDevice() async {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Cihaza Kaydet özelliğini '
-          'PDF altyapısıyla ekleyeceğiz.',
-        ),
-      ),
-    );
-  }
-
-  void _handleMenuSelection(
-    String value,
-  ) {
+  void _handleMenuSelection(String value) {
     switch (value) {
       case 'savePlan':
         _savePlan();
         break;
-
       case 'saveDevice':
-        _saveToDevice();
-        break;
+  if (!_isCreatingPdf) {
+    _saveToDevice();
+  }
+  break;
     }
   }
 
@@ -248,21 +390,16 @@ bool _isSavingPlan = false;
               Icons.more_vert_rounded,
               color: _dark,
             ),
-            onSelected:
-                _handleMenuSelection,
+            onSelected: _handleMenuSelection,
             itemBuilder: (context) {
               return const [
                 PopupMenuItem<String>(
                   value: 'savePlan',
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.bookmark_outline,
-                      ),
+                      Icon(Icons.bookmark_outline),
                       SizedBox(width: 12),
-                      Text(
-                        'Planı Kaydet',
-                      ),
+                      Text('Planı Kaydet'),
                     ],
                   ),
                 ),
@@ -270,13 +407,9 @@ bool _isSavingPlan = false;
                   value: 'saveDevice',
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.download_rounded,
-                      ),
+                      Icon(Icons.download_rounded),
                       SizedBox(width: 12),
-                      Text(
-                        'Cihaza Kaydet',
-                      ),
+                      Text('Cihaza Kaydet'),
                     ],
                   ),
                 ),
@@ -286,26 +419,21 @@ bool _isSavingPlan = false;
           const SizedBox(width: 6),
         ],
       ),
-      floatingActionButton:
-          _isAtBottom
-              ? null
-              : FloatingActionButton.small(
-                  onPressed:
-                      _scrollToBottom,
-                  backgroundColor: _dark,
-                  foregroundColor:
-                      Colors.white,
-                  tooltip:
-                      'Planın sonuna git',
-                  child: const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 30,
-                  ),
-                ),
+      floatingActionButton: _isAtBottom
+          ? null
+          : FloatingActionButton.small(
+              onPressed: _scrollToBottom,
+              backgroundColor: _dark,
+              foregroundColor: Colors.white,
+              tooltip: 'Planın sonuna git',
+              child: const Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 30,
+              ),
+            ),
       body: ListView(
         controller: _scrollController,
-        padding:
-            const EdgeInsets.fromLTRB(
+        padding: const EdgeInsets.fromLTRB(
           18,
           6,
           18,
@@ -313,17 +441,13 @@ bool _isSavingPlan = false;
         ),
         children: [
           _buildHeader(),
-
           const SizedBox(height: 18),
-
           _buildSummaryCard(),
-
           const SizedBox(height: 12),
-
           _buildOrganizationFeeInfo(),
-
+          const SizedBox(height: 18),
+          _buildExpertConsultationButton(),
           const SizedBox(height: 24),
-
           const Text(
             'Tüm Vade Ödeme Planı',
             style: TextStyle(
@@ -332,9 +456,7 @@ bool _isSavingPlan = false;
               fontWeight: FontWeight.w900,
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
             '${widget.result.estimatedTerm} aylık '
             'ödeme planının tamamı',
@@ -343,69 +465,52 @@ bool _isSavingPlan = false;
               fontSize: 13,
             ),
           ),
-
           const SizedBox(height: 14),
-
-          _buildTableHeader(),
-
-          ...widget.result.paymentPlan.map(
-            _buildPaymentRow,
-          ),
-
+          _buildPaymentTable(),
           const SizedBox(height: 24),
-
           SizedBox(
-  height: 56,
-  child: ElevatedButton.icon(
-    onPressed:
-        _isSavingPlan ? null : _savePlan,
-    icon: _isSavingPlan
-        ? const SizedBox(
-            width: 20,
-            height: 20,
-            child:
-                CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Colors.white,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed:
+                  _isSavingPlan ? null : _savePlan,
+              icon: _isSavingPlan
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child:
+                          CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.bookmark_add_outlined,
+                    ),
+              label: Text(
+                _isSavingPlan
+                    ? 'Kaydediliyor...'
+                    : 'Planı Kaydet',
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _green,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor:
+                    _green.withValues(alpha: 0.65),
+                disabledForegroundColor:
+                    Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
-          )
-        : const Icon(
-            Icons.bookmark_add_outlined,
           ),
-    label: Text(
-      _isSavingPlan
-          ? 'Kaydediliyor...'
-          : 'Planı Kaydet',
-    ),
-    style:
-        ElevatedButton.styleFrom(
-      backgroundColor: _green,
-      foregroundColor:
-          Colors.white,
-      disabledBackgroundColor:
-          _green.withOpacity(0.65),
-      disabledForegroundColor:
-          Colors.white,
-      elevation: 0,
-      shape:
-          RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.circular(
-          16,
-        ),
-      ),
-      textStyle:
-          const TextStyle(
-        fontSize: 16,
-        fontWeight:
-            FontWeight.w800,
-      ),
-    ),
-  ),
-),
-
           const SizedBox(height: 20),
-
           _buildDisclaimer(),
         ],
       ),
@@ -417,8 +522,7 @@ bool _isSavingPlan = false;
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: _dark,
-        borderRadius:
-            BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: const Column(
         children: [
@@ -456,8 +560,7 @@ bool _isSavingPlan = false;
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: Colors.black.withValues(
             alpha: 0.05,
@@ -468,29 +571,27 @@ bool _isSavingPlan = false;
         children: [
           _summaryRow(
             'Finansman Tutarı',
-            _money(
-              widget.plan.financeAmount,
-            ),
+            _money(widget.plan.financeAmount),
           ),
           _divider(),
           _summaryRow(
             'Peşinat',
-            _money(
-              widget.plan.downPayment,
-            ),
+            _money(widget.plan.downPayment),
           ),
           _divider(),
           _summaryRow(
             'Başlangıç Taksiti',
-            _money(
-              widget
-                  .plan.monthlyInstallment,
-            ),
+            _money(widget.plan.monthlyInstallment),
           ),
           _divider(),
           _summaryRow(
             'Tahmini Teslim',
-            '${widget.result.estimatedDelivery}. Ay',
+            _deliveryItem == null
+                ? '${widget.result.estimatedDelivery}. Ay'
+                : '${widget.result.estimatedDelivery}. Ay\n'
+                    '${_paymentDateFormat.format(
+                      _deliveryItem!.paymentDate,
+                    )}',
             highlight: true,
           ),
           _divider(),
@@ -518,8 +619,7 @@ bool _isSavingPlan = false;
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8E8),
-        borderRadius:
-            BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: _gold.withValues(
             alpha: 0.35,
@@ -527,8 +627,7 @@ bool _isSavingPlan = false;
         ),
       ),
       child: const Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             Icons.info_outline_rounded,
@@ -555,24 +654,120 @@ bool _isSavingPlan = false;
     );
   }
 
+  Widget _buildExpertConsultationButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _openConsultationFlow,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
+          decoration: BoxDecoration(
+            color: _green,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: _green.withValues(
+                  alpha: 0.18,
+                ),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(
+                    alpha: 0.14,
+                  ),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.support_agent_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ücretsiz Uzman Görüşü Al',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight:
+                            FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'Planınızı birlikte değerlendirelim.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12.5,
+                        height: 1.3,
+                        fontWeight:
+                            FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white,
+                size: 25,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentTable() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: 620,
+          child: Column(
+            children: [
+              _buildTableHeader(),
+              ...widget.result.paymentPlan.map(
+                _buildPaymentRow,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTableHeader() {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 14,
         vertical: 14,
       ),
-      decoration: const BoxDecoration(
-        color: _dark,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(18),
-          topRight: Radius.circular(18),
-        ),
-      ),
+      color: _dark,
       child: const Row(
         children: [
           SizedBox(
-            width: 60,
+            width: 55,
             child: Text(
               'Ay',
               style: TextStyle(
@@ -581,9 +776,20 @@ bool _isSavingPlan = false;
               ),
             ),
           ),
-          Expanded(
+          SizedBox(
+            width: 160,
             child: Text(
-              'Taksit',
+              'Taksit Tarihi',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 145,
+            child: Text(
+              'Taksit Tutarı',
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: Colors.white,
@@ -591,11 +797,11 @@ bool _isSavingPlan = false;
               ),
             ),
           ),
-          SizedBox(width: 14),
+          SizedBox(width: 20),
           Expanded(
             child: Text(
-              'Toplam Birikim',
-              textAlign: TextAlign.right,
+              'Dönem',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
@@ -607,122 +813,107 @@ bool _isSavingPlan = false;
     );
   }
 
-  Widget _buildPaymentRow(
-    PaymentPlanItem item,
-  ) {
-    final bool isDelivery =
-        item.isDeliveryMonth;
+  Widget _buildPaymentRow(PaymentPlanItem item) {
+    final bool isDelivery = item.isDeliveryMonth;
+    final bool isLast = item.isLastMonth;
 
-    final bool isLast =
-        item.isLastMonth;
+    Color accentColor = const Color(0xFF2E9B50);
+    Color backgroundColor = Colors.white;
+
+    if (isDelivery) {
+      accentColor = _gold;
+      backgroundColor = const Color(0xFFFFF7E4);
+    } else if (isLast) {
+      accentColor = _dark;
+      backgroundColor = const Color(0xFFF2F3F1);
+    } else if (item.month >
+        widget.result.estimatedDelivery) {
+      accentColor = _blue;
+    }
 
     return Container(
-      padding:
-          const EdgeInsets.symmetric(
+      constraints: const BoxConstraints(
+        minHeight: 68,
+      ),
+      padding: const EdgeInsets.symmetric(
         horizontal: 14,
-        vertical: 15,
+        vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: isDelivery
-            ? const Color(0xFFE9F7EF)
-            : Colors.white,
+        color: backgroundColor,
         border: Border(
           left: BorderSide(
-            color: isDelivery
-                ? _green
-                : const Color(0xFFE6E9E4),
+            color: accentColor,
+            width: 4,
           ),
-          right: BorderSide(
-            color: isDelivery
-                ? _green
-                : const Color(0xFFE6E9E4),
+          right: const BorderSide(
+            color: _rowBorder,
           ),
-          bottom: BorderSide(
-            color: isDelivery
-                ? _green
-                : const Color(0xFFE6E9E4),
+          bottom: const BorderSide(
+            color: _rowBorder,
           ),
         ),
       ),
       child: Row(
         children: [
           SizedBox(
-            width: 60,
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${item.month}. Ay',
-                  style: TextStyle(
-                    color: isDelivery
-                        ? _green
-                        : _dark,
-                    fontWeight:
-                        FontWeight.w800,
-                  ),
-                ),
-                if (isDelivery)
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(
-                      top: 3,
-                    ),
-                    child: Text(
-                      'Teslim',
-                      style: TextStyle(
-                        color: _green,
-                        fontSize: 10,
-                        fontWeight:
-                            FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                if (isLast &&
-                    !isDelivery)
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(
-                      top: 3,
-                    ),
-                    child: Text(
-                      'Son ödeme',
-                      style: TextStyle(
-                        color:
-                            Colors.black45,
-                        fontSize: 9,
-                        fontWeight:
-                            FontWeight.w700,
-                      ),
-                    ),
-                  ),
-              ],
+            width: 51,
+            child: Text(
+              '${item.month}',
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
-          Expanded(
+          SizedBox(
+            width: 160,
+            child: Text(
+              _paymentDateFormat.format(
+                item.paymentDate,
+              ),
+              style: const TextStyle(
+                color: _dark,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 145,
             child: Text(
               _money(item.installment),
               textAlign: TextAlign.right,
               style: const TextStyle(
                 color: _dark,
                 fontSize: 13,
-                fontWeight:
-                    FontWeight.w700,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 20),
           Expanded(
-            child: Text(
-              _money(item.totalSaving),
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                color: isDelivery
-                    ? _green
-                    : _dark,
-                fontSize: 13,
-                fontWeight:
-                    FontWeight.w900,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 7,
+              ),
+              decoration: BoxDecoration(
+                color: accentColor.withValues(
+                  alpha: 0.11,
+                ),
+                borderRadius:
+                    BorderRadius.circular(20),
+              ),
+              child: Text(
+                _periodName(item),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: accentColor,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ),
@@ -736,8 +927,7 @@ bool _isSavingPlan = false;
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: const Text(
         '* Bu ödeme planı, kullanıcı '
@@ -770,8 +960,7 @@ bool _isSavingPlan = false;
     bool highlight = false,
   }) {
     return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(
@@ -789,10 +978,9 @@ bool _isSavingPlan = false;
             value,
             textAlign: TextAlign.right,
             style: TextStyle(
-              color: highlight
-                  ? _green
-                  : _dark,
+              color: highlight ? _green : _dark,
               fontSize: 14,
+              height: 1.4,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -803,8 +991,7 @@ bool _isSavingPlan = false;
 
   Widget _divider() {
     return const Padding(
-      padding:
-          EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         vertical: 13,
       ),
       child: Divider(

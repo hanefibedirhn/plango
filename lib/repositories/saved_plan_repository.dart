@@ -41,7 +41,10 @@ class SavedPlanRepository {
     required FpResult result,
   }) async {
     final String documentId =
-        _createDocumentId(plan);
+    _createDocumentId(
+  plan,
+  result,
+);
 
     final DocumentReference<
         Map<String, dynamic>> reference =
@@ -136,22 +139,32 @@ class SavedPlanRepository {
   }
 
   String _createDocumentId(
-    CalculationPlan plan,
-  ) {
-    final String rawValue = [
-      (plan.financeAmount * 100).round(),
-      (plan.downPayment * 100).round(),
-      (plan.monthlyInstallment * 100)
-          .round(),
-      plan.increaseModel.trim(),
-      plan.estimatedDelivery,
-      plan.estimatedTerm,
-    ].join('_');
+  CalculationPlan plan,
+  FpResult result,
+) {
+  final DateTime? firstPaymentDate =
+      result.paymentPlan.isEmpty
+          ? null
+          : result
+              .paymentPlan.first.paymentDate;
 
-    return base64Url
-        .encode(
-          utf8.encode(rawValue),
-        )
-        .replaceAll('=', '');
-  }
+  final String rawValue = [
+    (plan.financeAmount * 100).round(),
+    (plan.downPayment * 100).round(),
+    (plan.monthlyInstallment * 100)
+        .round(),
+    plan.increaseModel.trim(),
+    plan.estimatedDelivery,
+    plan.estimatedTerm,
+    firstPaymentDate?.year ?? 0,
+    firstPaymentDate?.month ?? 0,
+    firstPaymentDate?.day ?? 0,
+  ].join('_');
+
+  return base64Url
+      .encode(
+        utf8.encode(rawValue),
+      )
+      .replaceAll('=', '');
+}
 }
