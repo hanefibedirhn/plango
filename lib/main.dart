@@ -8,12 +8,18 @@ import 'widgets/app_drawer.dart';
 import 'screens/account_router_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'models/content_model.dart';
+import 'repositories/content_repository.dart';
+import 'screens/featured_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('tr_TR', null);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -339,75 +345,121 @@ Widget _highlightsSection(BuildContext context) {
           ),
           TextButton(
             onPressed: () {
-              // İleride tüm duyurular sayfasına bağlanacak.
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      FeaturedScreen(),
+                ),
+              );
             },
             child: const Text('Tümünü Gör'),
           ),
         ],
       ),
       const SizedBox(height: 8),
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: const Color(0xFFE5E7EB),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.035),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
-          ],
+      StreamBuilder<List<ContentModel>>(
+        stream: ContentRepository()
+            .watchPublishedFeatured(
+          limit: 3,
         ),
-        child: Column(
-          children: [
-            _highlightRow(
-              icon: Icons.account_balance_outlined,
-              title: 'Sektörel gelişmeleri takip edin',
-              subtitle: 'Mevzuat ve sektör duyuruları',
-              onTap: () {},
+        builder: (context, snapshot) {
+          if (snapshot.connectionState ==
+              ConnectionState.waiting) {
+            return const SizedBox(
+              height: 130,
+              child: Center(
+                child:
+                    CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return _highlightMessage(
+              icon: Icons.error_outline,
+              message:
+                  'Öne çıkan içerikler yüklenemedi.',
+            );
+          }
+
+          final contents =
+              snapshot.data ?? [];
+
+          if (contents.isEmpty) {
+            return _highlightMessage(
+              icon: Icons.article_outlined,
+              message:
+                  'Şu anda yayınlanmış içerik bulunmuyor.',
+            );
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  BorderRadius.circular(22),
+              border: Border.all(
+                color:
+                    const Color(0xFFE5E7EB),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      Colors.black.withOpacity(
+                    0.035,
+                  ),
+                  blurRadius: 18,
+                  offset:
+                      const Offset(0, 8),
+                ),
+              ],
             ),
-            const Divider(
-              height: 1,
-              indent: 68,
-              color: Color(0xFFE5E7EB),
+            child: Column(
+              children: [
+                for (int index = 0;
+                    index < contents.length;
+                    index++) ...[
+                  _highlightContentRow(
+                    context: context,
+                    content: contents[index],
+                  ),
+                  if (index <
+                      contents.length - 1)
+                    const Divider(
+                      height: 1,
+                      indent: 68,
+                      color:
+                          Color(0xFFE5E7EB),
+                    ),
+                ],
+              ],
             ),
-            _highlightRow(
-              icon: Icons.campaign_outlined,
-              title: 'Plango duyuruları',
-              subtitle: 'Yeni özellikler ve güncellemeler',
-              onTap: () {},
-            ),
-            const Divider(
-              height: 1,
-              indent: 68,
-              color: Color(0xFFE5E7EB),
-            ),
-            _highlightRow(
-              icon: Icons.auto_awesome_outlined,
-              title: 'Yeni içerikleri keşfedin',
-              subtitle: 'Hesaplama, şirketler ve bilgilendirmeler',
-              onTap: () {},
-            ),
-          ],
-        ),
+          );
+        },
       ),
     ],
   );
 }
 
-Widget _highlightRow({
-  required IconData icon,
-  required String title,
-  required String subtitle,
-  required VoidCallback onTap,
+Widget _highlightContentRow({
+  required BuildContext context,
+  required ContentModel content,
 }) {
   return Material(
     color: Colors.transparent,
     child: InkWell(
-      onTap: onTap,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                FeaturedDetailScreen(
+              content: content,
+            ),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(22),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -420,11 +472,13 @@ Widget _highlightRow({
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFFEAF7F1),
-                borderRadius: BorderRadius.circular(13),
+                color:
+                    const Color(0xFFEAF7F1),
+                borderRadius:
+                    BorderRadius.circular(13),
               ),
-              child: Icon(
-                icon,
+              child: const Icon(
+                Icons.campaign_outlined,
                 color: AppColors.green,
                 size: 21,
               ),
@@ -432,22 +486,32 @@ Widget _highlightRow({
             const SizedBox(width: 13),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    content.title,
+                    maxLines: 1,
+                    overflow:
+                        TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 15.5,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF111827),
+                      fontWeight:
+                          FontWeight.w800,
+                      color:
+                          Color(0xFF111827),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subtitle,
+                    content.summary,
+                    maxLines: 2,
+                    overflow:
+                        TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13.5,
-                      color: Color(0xFF6B7280),
+                      color:
+                          Color(0xFF6B7280),
                     ),
                   ),
                 ],
@@ -460,6 +524,40 @@ Widget _highlightRow({
           ],
         ),
       ),
+    ),
+  );
+}
+
+Widget _highlightMessage({
+  required IconData icon,
+  required String message,
+}) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(22),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      border: Border.all(
+        color: const Color(0xFFE5E7EB),
+      ),
+    ),
+    child: Column(
+      children: [
+        Icon(
+          icon,
+          color: AppColors.green,
+          size: 34,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+          ),
+        ),
+      ],
     ),
   );
 }

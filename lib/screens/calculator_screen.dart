@@ -6,6 +6,7 @@ import '../engine/fp_engine.dart';
 import '../models/calculation_plan.dart';
 import 'consultation/select_company_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'payment_plan_screen.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({
@@ -107,6 +108,38 @@ class _CalculatorScreenState
     });
   }
 
+  void _openPaymentPlan() {
+  final CalculationPlan? plan =
+      calculationPlan;
+
+  final FpResult? calculatedResult =
+      result;
+
+  if (plan == null ||
+      calculatedResult == null ||
+      !calculatedResult.success) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Önce geçerli bir plan hesaplayınız.',
+        ),
+      ),
+    );
+
+    return;
+  }
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => PaymentPlanScreen(
+        plan: plan,
+        result: calculatedResult,
+      ),
+    ),
+  );
+}
+  
   Future<void> _openConsultationFlow() async {
   final CalculationPlan? plan = calculationPlan;
 
@@ -362,44 +395,70 @@ class _CalculatorScreenState
             ),
 
             if (result!.success) ...[
-              const SizedBox(height: 14),
+  const SizedBox(height: 14),
 
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed:
-                      _openConsultationFlow,
-                  icon: const Icon(
-                    Icons.support_agent_rounded,
-                    size: 22,
-                  ),
-                  label: const Text(
-                    'Ücretsiz Uzman Görüşü Al',
-                  ),
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor: _green,
-                    foregroundColor:
-                        Colors.white,
-                    elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
-                    textStyle:
-                        const TextStyle(
-                      fontSize: 15.5,
-                      fontWeight:
-                          FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+  SizedBox(
+    width: double.infinity,
+    height: 56,
+    child: ElevatedButton.icon(
+      onPressed: _openConsultationFlow,
+      icon: const Icon(
+        Icons.support_agent_rounded,
+        size: 22,
+      ),
+      label: const Text(
+        'Ücretsiz Uzman Görüşü Al',
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _green,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            16,
+          ),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 15.5,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    ),
+  ),
+
+  const SizedBox(height: 12),
+
+  SizedBox(
+    width: double.infinity,
+    height: 56,
+    child: OutlinedButton.icon(
+      onPressed: _openPaymentPlan,
+      icon: const Icon(
+        Icons.receipt_long_rounded,
+        size: 22,
+      ),
+      label: const Text(
+        'Ödeme Planını Göster',
+      ),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: _dark,
+        side: const BorderSide(
+          color: _dark,
+          width: 1.5,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            16,
+          ),
+        ),
+        textStyle: const TextStyle(
+          fontSize: 15.5,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    ),
+  ),
+],
           ],
         ],
       ),

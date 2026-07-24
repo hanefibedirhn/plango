@@ -8,6 +8,7 @@ import '../../models/company.dart';
 import '../../models/consultation_request_model.dart';
 import '../../models/expert_profile_model.dart';
 import '../../repositories/consultation_repository.dart';
+import '../register_screen.dart';
 
 class ConsultationRequestScreen extends StatefulWidget {
   const ConsultationRequestScreen({
@@ -268,6 +269,9 @@ class _ConsultationRequestScreenState
               ConsultationRequestSuccessScreen(
             requestId: requestId,
             isGuest: user.isAnonymous,
+            initialFullName:
+                _fullNameController.text.trim(),
+            initialPhone: _normalizedPhone(),
           ),
         ),
       );
@@ -1233,10 +1237,14 @@ class ConsultationRequestSuccessScreen
     super.key,
     required this.requestId,
     required this.isGuest,
+    required this.initialFullName,
+    required this.initialPhone,
   });
 
   final String requestId;
   final bool isGuest;
+  final String initialFullName;
+  final String initialPhone;
 
   static const Color _green =
       Color(0xFF0B5D3B);
@@ -1306,39 +1314,99 @@ class ConsultationRequestSuccessScreen
                 ),
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
+              if (isGuest) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final bool? completed =
+                          await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RegisterScreen(
+                            initialFullName:
+                                initialFullName,
+                            initialPhone:
+                                initialPhone,
+                            completeAnonymousAccount:
+                                true,
+                          ),
+                        ),
+                      );
+
+                      if (completed == true &&
+                          context.mounted) {
+                        Navigator.of(context).popUntil(
+                          (route) => route.isFirst,
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _green,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Hesabını Tamamla ve Takip Et',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).popUntil(
                       (route) => route.isFirst,
                     );
                   },
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor: _green,
+                  style: TextButton.styleFrom(
                     foregroundColor:
-                        Colors.white,
-                    elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
+                        const Color(0xFF6B7280),
                   ),
                   child: const Text(
-                    'Tamam',
+                    'Şimdilik Geç',
                     style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight:
-                          FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
-              ),
+              ] else
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).popUntil(
+                        (route) => route.isFirst,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _green,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Tamam',
+                      style: TextStyle(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

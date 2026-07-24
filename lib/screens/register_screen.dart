@@ -3,9 +3,19 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../repositories/user_repository.dart';
 import '../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({
+    super.key,
+    this.initialFullName,
+    this.initialPhone,
+    this.completeAnonymousAccount = false,
+  });
+
+  final String? initialFullName;
+  final String? initialPhone;
+  final bool completeAnonymousAccount;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -22,12 +32,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordAgainController =
       TextEditingController();
-      final AuthService _authService = AuthService();
-final UserRepository _userRepository = UserRepository();
+
+  final AuthService _authService = AuthService();
+  final UserRepository _userRepository = UserRepository();
 
   bool _passwordVisible = false;
   bool _passwordAgainVisible = false;
@@ -36,11 +48,39 @@ final UserRepository _userRepository = UserRepository();
   bool _privacyAccepted = false;
   bool _isSubmitting = false;
 
+  User? _authenticatedUserPendingProfile;
+  bool _shouldRollbackNewAccount = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final String fullName = widget.initialFullName?.trim() ?? '';
+
+    if (fullName.isNotEmpty) {
+      final List<String> parts = fullName
+          .split(RegExp(r'\s+'))
+          .where((part) => part.isNotEmpty)
+          .toList();
+
+      if (parts.isNotEmpty) {
+        _nameController.text = parts.first;
+
+        if (parts.length > 1) {
+          _surnameController.text = parts.sublist(1).join(' ');
+        }
+      }
+    }
+
+    _phoneController.text = widget.initialPhone?.trim() ?? '';
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
     _surnameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _passwordAgainController.dispose();
@@ -68,6 +108,21 @@ final UserRepository _userRepository = UserRepository();
 
     if (!emailPattern.hasMatch(email)) {
       return 'Geçerli bir e-posta adresi giriniz.';
+    }
+
+    return null;
+  }
+
+  String? _phoneValidator(String? value) {
+    final String phone =
+        (value ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (phone.isEmpty) {
+      return 'Telefon numaranızı giriniz.';
+    }
+
+    if (phone.length != 10 && phone.length != 11) {
+      return 'Geçerli bir telefon numarası giriniz.';
     }
 
     return null;
@@ -167,146 +222,179 @@ final UserRepository _userRepository = UserRepository();
   }
 
   Future<void> _createAccount() async {
-  FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus();
 
-  final bool isFormValid =
-      _formKey.currentState?.validate() ?? false;
+    final bool isFormValid =
+        _formKey.currentState?.validate() ?? false;
 
-  if (!isFormValid) {
-    return;
-  }
+    if (!isFormValid) {
+      return;
+    }
 
-  if (!_membershipAccepted ||
-      !_clarificationAcknowledged ||
-      !_privacyAccepted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Devam etmek için gerekli metinleri inceleyiniz.',
+    if (!_membershipAccepted ||
+        !_clarificationAcknowledged ||
+        !_privacyAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Devam etmek için gerekli metinleri inceleyiniz.',
+          ),
+          behavior: SnackBarBehavior.floating,
         ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    return;
-  }
-
-  setState(() {
-    _isSubmitting = true;
-  });
-
-  final String name = _nameController.text.trim();
-  final String surname = _surnameController.text.trim();
-  final String email =
-      _emailController.text.trim().toLowerCase();
-  final String username = _usernameController.text.trim();
-  final String normalizedUsername =
-      username.toLowerCase();
-  final String password = _passwordController.text;
-
-  bool authenticationAccountCreated = false;
-
-  try {
-    final credential =
-        await _authService.registerWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final firebaseUser = credential.user;
-
-    if (firebaseUser == null) {
-      throw const AuthServiceException(
-        code: 'user-not-created',
-        message: 'Kullanıcı hesabı oluşturulamadı.',
       );
-    }
-
-    authenticationAccountCreated = true;
-
-    final AppUser appUser = AppUser(
-      uid: firebaseUser.uid,
-      name: name,
-      surname: surname,
-      email: email,
-      username: username,
-      usernameLowercase: normalizedUsername,
-      roles: const ['user'],
-      expertStatus: 'none',
-      phone: null,
-      createdAt: DateTime.now(),
-    );
-
-    await _userRepository.createUserProfile(appUser);
-
-    if (!mounted) {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Plango hesabınız başarıyla oluşturuldu.',
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final String name = _nameController.text.trim();
+    final String surname = _surnameController.text.trim();
+    final String email =
+        _emailController.text.trim().toLowerCase();
+    final String phone = _phoneController.text
+        .replaceAll(RegExp(r'[^0-9]'), '');
+    final String username = _usernameController.text.trim();
+    final String normalizedUsername = username.toLowerCase();
+    final String password = _passwordController.text;
+
+    try {
+      User firebaseUser;
+
+      if (_authenticatedUserPendingProfile != null) {
+        firebaseUser = _authenticatedUserPendingProfile!;
+      } else {
+        final bool wasAnonymous =
+            _authService.hasAnonymousUser;
+
+        final UserCredential credential =
+            await _authService
+                .registerOrLinkWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        final User? credentialUser = credential.user;
+
+        if (credentialUser == null) {
+          throw const AuthServiceException(
+            code: 'user-not-created',
+            message: 'Kullanıcı hesabı oluşturulamadı.',
+          );
+        }
+
+        firebaseUser = credentialUser;
+        _authenticatedUserPendingProfile = firebaseUser;
+        _shouldRollbackNewAccount = !wasAnonymous;
+      }
+
+      final AppUser appUser = AppUser(
+        uid: firebaseUser.uid,
+        name: name,
+        surname: surname,
+        email: email,
+        username: username,
+        usernameLowercase: normalizedUsername,
+        roles: const ['user'],
+        expertStatus: 'none',
+        phone: phone,
+        createdAt: DateTime.now(),
+      );
+
+      await _userRepository.createUserProfile(appUser);
+
+      _authenticatedUserPendingProfile = null;
+      _shouldRollbackNewAccount = false;
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.completeAnonymousAccount
+                ? 'Hesabınız tamamlandı. Danışma talebiniz korunuyor.'
+                : 'Plango hesabınız başarıyla oluşturuldu.',
+          ),
+          behavior: SnackBarBehavior.floating,
         ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+      );
 
-    Navigator.pop(context);
-  } on UsernameAlreadyInUseException catch (error) {
-    if (authenticationAccountCreated) {
-      await _authService.rollbackNewlyCreatedUser();
-    }
+      Navigator.pop(context, true);
+    } on UsernameAlreadyInUseException catch (error) {
+      if (_shouldRollbackNewAccount) {
+        await _authService.rollbackNewlyCreatedUser();
+        _authenticatedUserPendingProfile = null;
+        _shouldRollbackNewAccount = false;
+      }
 
-    if (!mounted) {
-      return;
-    }
+      if (!mounted) {
+        return;
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.toString()),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  } on AuthServiceException catch (error) {
-    if (authenticationAccountCreated) {
-      await _authService.rollbackNewlyCreatedUser();
-    }
+      final String message =
+          _authenticatedUserPendingProfile != null
+              ? 'E-posta ve şifreniz hesabınıza bağlandı. '
+                  'Bu kullanıcı adı kullanımda; farklı bir kullanıcı adı '
+                  'seçerek tekrar deneyiniz.'
+              : error.toString();
 
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  } catch (error) {
-    if (authenticationAccountCreated) {
-      await _authService.rollbackNewlyCreatedUser();
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Hesap oluşturulurken beklenmeyen bir hata oluştu.',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
         ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  } finally {
-    if (mounted) {
-      setState(() {
-        _isSubmitting = false;
-      });
+      );
+    } on AuthServiceException catch (error) {
+      if (_shouldRollbackNewAccount) {
+        await _authService.rollbackNewlyCreatedUser();
+        _authenticatedUserPendingProfile = null;
+        _shouldRollbackNewAccount = false;
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      if (_shouldRollbackNewAccount) {
+        await _authService.rollbackNewlyCreatedUser();
+        _authenticatedUserPendingProfile = null;
+        _shouldRollbackNewAccount = false;
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      final String message =
+          _authenticatedUserPendingProfile != null
+              ? 'Hesabınız Firebase tarafında oluşturuldu ancak profil '
+                  'kaydedilemedi. Bilgilerinizi kontrol edip tekrar deneyiniz.'
+              : 'Hesap oluşturulurken beklenmeyen bir hata oluştu.';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -317,9 +405,11 @@ final UserRepository _userRepository = UserRepository();
         foregroundColor: _textDark,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
-          'Hesap Oluştur',
-          style: TextStyle(
+        title: Text(
+          widget.completeAnonymousAccount
+              ? 'Hesabınızı Tamamlayın'
+              : 'Hesap Oluştur',
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -336,7 +426,10 @@ final UserRepository _userRepository = UserRepository();
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const _RegisterHeader(),
+                _RegisterHeader(
+                  completeAnonymousAccount:
+                      widget.completeAnonymousAccount,
+                ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
@@ -420,6 +513,22 @@ final UserRepository _userRepository = UserRepository();
                             icon: Icons.mail_outline_rounded,
                           ),
                           validator: _emailValidator,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _phoneController,
+                          enabled: !_isSubmitting,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [
+                            AutofillHints.telephoneNumber,
+                          ],
+                          decoration: _inputDecoration(
+                            label: 'Telefon',
+                            hint: '05XX XXX XX XX',
+                            icon: Icons.phone_outlined,
+                          ),
+                          validator: _phoneValidator,
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -629,33 +738,39 @@ final UserRepository _userRepository = UserRepository();
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Hesap Oluştur'),
+                      : Text(
+                          widget.completeAnonymousAccount
+                              ? 'Hesabımı Tamamla'
+                              : 'Hesap Oluştur',
+                        ),
                 ),
-                const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Zaten hesabınız var mı?',
-                      style: TextStyle(
-                        color: _textMuted,
-                        fontSize: 14,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: _green,
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w900,
+                if (!widget.completeAnonymousAccount) ...[
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Zaten hesabınız var mı?',
+                        style: TextStyle(
+                          color: _textMuted,
+                          fontSize: 14,
                         ),
                       ),
-                      child: const Text('Giriş Yap'),
-                    ),
-                  ],
-                ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: _green,
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        child: const Text('Giriş Yap'),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -729,28 +844,38 @@ final UserRepository _userRepository = UserRepository();
 }
 
 class _RegisterHeader extends StatelessWidget {
-  const _RegisterHeader();
+  const _RegisterHeader({
+    required this.completeAnonymousAccount,
+  });
+
+  final bool completeAnonymousAccount;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        _RegisterIcon(),
-        SizedBox(height: 16),
+        const _RegisterIcon(),
+        const SizedBox(height: 16),
         Text(
-          'Plango Hesabınızı Oluşturun',
+          completeAnonymousAccount
+              ? 'Hesabınızı Tamamlayın'
+              : 'Plango Hesabınızı Oluşturun',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: _RegisterScreenState._textDark,
             fontSize: 24,
             fontWeight: FontWeight.w900,
           ),
         ),
-        SizedBox(height: 9),
+        const SizedBox(height: 9),
         Text(
-          'Planlarınızı kaydedin ve danışma taleplerinizi kolayca takip edin.',
+          completeAnonymousAccount
+              ? 'Danışma talebiniz aynı hesapta korunacak ve '
+                  'durumunu uygulama üzerinden takip edebileceksiniz.'
+              : 'Planlarınızı kaydedin ve danışma taleplerinizi '
+                  'kolayca takip edin.',
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: _RegisterScreenState._textMuted,
             fontSize: 14.5,
             height: 1.5,

@@ -4,6 +4,8 @@ import 'expert_application_screen.dart';
 import '../services/auth_service.dart';
 import 'admin/admin_dashboard_screen.dart';
 import 'expert_panel_screen.dart';
+import 'saved_plans_screen.dart';
+import 'my_consultation_requests_screen.dart';
 
 enum ExpertApplicationStatus {
   none,
@@ -173,28 +175,36 @@ class AccountScreen extends StatelessWidget {
 ),
 
             _AccountCard(
-              icon: Icons.bookmark_border_rounded,
-              title: 'Kayıtlı Planlarım',
-              subtitle: 'Kaydettiğiniz hesaplama planlarını görüntüleyin.',
-              onTap: () {
-                _showComingSoon(
-                  context,
-                  'Kayıtlı Planlarım ekranı daha sonra bağlanacak.',
-                );
-              },
-            ),
+  icon: Icons.bookmark_border_rounded,
+  title: 'Kayıtlı Planlarım',
+  subtitle:
+      'Kaydettiğiniz hesaplama planlarını görüntüleyin.',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const SavedPlansScreen(),
+      ),
+    );
+  },
+),
 
             _AccountCard(
-              icon: Icons.handshake_outlined,
-              title: 'Danışma Taleplerim',
-              subtitle: 'Uzmanlara gönderdiğiniz talepleri takip edin.',
-              onTap: () {
-                _showComingSoon(
-                  context,
-                  'Danışma Taleplerim ekranı daha sonra bağlanacak.',
-                );
-              },
-            ),
+  icon: Icons.handshake_outlined,
+  title: 'Danışma Taleplerim',
+  subtitle:
+      'Uzmanlara gönderdiğiniz talepleri takip edin.',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const MyConsultationRequestsScreen(),
+      ),
+    );
+  },
+),
 
             const SizedBox(height: 22),
             const _SectionTitle(

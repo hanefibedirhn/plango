@@ -154,22 +154,33 @@ class ContentRepository {
         .update(data);
   }
 
-  /// İçeriği yayına alır veya yayından kaldırır.
-  Future<void> setPublished({
-    required String contentId,
-    required bool isPublished,
-  }) async {
-    if (contentId.trim().isEmpty) {
-      throw ArgumentError(
-        'İçerik kimliği bulunamadı.',
-      );
-    }
-
-    await _contentCollection.doc(contentId).update({
-      'isPublished': isPublished,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+  /// İçeriğin durumunu Taslak, Yayında veya Arşivde olarak günceller.
+Future<void> updateStatus({
+  required String contentId,
+  required ContentStatus status,
+}) async {
+  if (contentId.trim().isEmpty) {
+    throw ArgumentError(
+      'İçerik kimliği bulunamadı.',
+    );
   }
+
+  final Map<String, dynamic> updates = {
+    'status': status.value,
+    'updatedAt': FieldValue.serverTimestamp(),
+  };
+
+  if (status == ContentStatus.published) {
+    updates['publishDate'] =
+        FieldValue.serverTimestamp();
+  } else {
+    updates['publishDate'] = null;
+  }
+
+  await _contentCollection
+      .doc(contentId)
+      .update(updates);
+}
 
   /// İçeriğin öncelik sırasını günceller.
   Future<void> updatePriority({
@@ -205,19 +216,6 @@ class ContentRepository {
     await _contentCollection.doc(contentId).update({
       'viewCount': FieldValue.increment(1),
     });
-  }
-
-  /// İçeriği kalıcı olarak siler.
-  Future<void> deleteContent(
-    String contentId,
-  ) async {
-    if (contentId.trim().isEmpty) {
-      throw ArgumentError(
-        'Silinecek içerik kimliği bulunamadı.',
-      );
-    }
-
-    await _contentCollection.doc(contentId).delete();
   }
 
   void _validateContent(

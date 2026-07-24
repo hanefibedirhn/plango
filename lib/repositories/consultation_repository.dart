@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../models/consultation_request_contact_model.dart';
 import '../models/consultation_request_model.dart';
 
 class ConsultationRepositoryException
@@ -224,6 +225,9 @@ class ConsultationRepository {
       'userId': request.userId,
       'expertId': request.expertId,
       'userPhone': normalizedPhone,
+      'expertPhone': null,
+      'expertCorporateEmail': null,
+      'contactSharedAt': null,
       'createdAt':
           FieldValue.serverTimestamp(),
       'updatedAt':
@@ -456,10 +460,9 @@ class ConsultationRepository {
     }
 
     if (request.status == 'pending' &&
-        request.expiresAt != null &&
-        !request.expiresAt!.isAfter(now)) {
-      return false;
-    }
+    !request.expiresAt.isAfter(now)) {
+  return false;
+}
 
     return true;
   },
@@ -686,22 +689,123 @@ class ConsultationRepository {
   }
 
   /// Uzman kullanıcıyla iletişime geçtiğini işaretler.
+  ///
+  /// Talep durumu ve uzmanın güvenli iletişim bilgileri
+  /// aynı transaction içinde güncellenir.
   Future<void> markAsContacted({
     required String requestId,
     required String expertId,
   }) async {
-    await _updateExpertOwnedStatus(
-      requestId: requestId,
-      expertId: expertId,
-      requiredCurrentStatuses: const [
-        'accepted',
-      ],
-      values: {
-        'status': 'contacted',
-        'contactedAt':
-            FieldValue.serverTimestamp(),
-        'updatedAt':
-            FieldValue.serverTimestamp(),
+    final DocumentReference<Map<String, dynamic>>
+        requestReference =
+        _requestsCollection.doc(requestId);
+
+    final DocumentReference<Map<String, dynamic>>
+        contactReference =
+        _requestContactsCollection.doc(requestId);
+
+    final DocumentReference<Map<String, dynamic>>
+        expertReference =
+        _expertsCollection.doc(expertId);
+
+    await _firestore.runTransaction<void>(
+      (transaction) async {
+        final DocumentSnapshot<Map<String, dynamic>>
+            requestSnapshot =
+            await transaction.get(requestReference);
+
+        final DocumentSnapshot<Map<String, dynamic>>
+            contactSnapshot =
+            await transaction.get(contactReference);
+
+        final DocumentSnapshot<Map<String, dynamic>>
+            expertSnapshot =
+            await transaction.get(expertReference);
+
+        if (!requestSnapshot.exists ||
+            requestSnapshot.data() == null) {
+          throw const ConsultationRequestNotFoundException();
+        }
+
+        if (!contactSnapshot.exists ||
+            contactSnapshot.data() == null) {
+          throw const ConsultationRepositoryException(
+            'Danışma talebinin iletişim kaydı bulunamadı.',
+          );
+        }
+
+        if (!expertSnapshot.exists ||
+            expertSnapshot.data() == null) {
+          throw const ConsultationRepositoryException(
+            'Uzman iletişim bilgileri bulunamadı.',
+          );
+        }
+
+        final Map<String, dynamic> requestData =
+            requestSnapshot.data()!;
+
+        final Map<String, dynamic> contactData =
+            contactSnapshot.data()!;
+
+        final Map<String, dynamic> expertData =
+            expertSnapshot.data()!;
+
+        if (requestData['expertId'] != expertId ||
+            contactData['expertId'] != expertId) {
+          throw const ConsultationRepositoryException(
+            'Bu danışma talebi size ait değil.',
+          );
+        }
+
+        if (requestData['status'] != 'accepted') {
+          throw const ConsultationRequestAlreadyProcessedException();
+        }
+
+        final String expertPhone =
+            (expertData['phone'] as String? ?? '').trim();
+
+        final String expertCorporateEmail =
+            (expertData['corporateEmail'] as String? ?? '')
+                .trim()
+                .toLowerCase();
+
+        if (!_isValidPhone(expertPhone)) {
+          throw const ConsultationRepositoryException(
+            'Uzman telefon bilgisi geçerli değil. '
+            'Lütfen profil bilgilerinizi kontrol ediniz.',
+          );
+        }
+
+        if (!_isValidEmail(expertCorporateEmail)) {
+          throw const ConsultationRepositoryException(
+            'Uzman kurumsal e-posta bilgisi geçerli değil. '
+            'Lütfen profil bilgilerinizi kontrol ediniz.',
+          );
+        }
+
+        transaction.update(
+          requestReference,
+          {
+            'status': 'contacted',
+            'contactedAt':
+                FieldValue.serverTimestamp(),
+            'updatedAt':
+                FieldValue.serverTimestamp(),
+          },
+        );
+
+        transaction.update(
+          contactReference,
+          {
+            'expertPhone': expertPhone,
+            'expertCorporateEmail':
+                expertCorporateEmail,
+            'contactSharedAt':
+                FieldValue.serverTimestamp(),
+            'updatedAt':
+                FieldValue.serverTimestamp(),
+          },
+        );
       },
     );
   }
@@ -751,6 +855,39 @@ Stream<List<ConsultationRequest>>
         },
       );
 }
+
+  /// Kullanıcıya paylaşılmış uzman iletişim bilgisini
+  /// gerçek zamanlı olarak takip eder.
+  Stream<ConsultationRequestContact?>
+      watchRequestContactForUser({
+    required String requestId,
+    required String userId,
+  }) {
+    return _requestContactsCollection
+        .doc(requestId)
+        .snapshots()
+        .map(
+      (document) {
+        if (!document.exists ||
+            document.data() == null) {
+          return null;
+        }
+
+        final ConsultationRequestContact contact =
+            ConsultationRequestContact.fromDocument(
+          document,
+        );
+
+        if (contact.userId != userId) {
+          throw const ConsultationRepositoryException(
+            'Bu iletişim bilgisine erişim yetkiniz yok.',
+          );
+        }
+
+        return contact;
+      },
+    );
+  }
 
   Future<String?> getRequestPhone({
   required String requestId,
@@ -1093,6 +1230,9 @@ Stream<List<ConsultationRequest>>
           'requestId': newRequestReference.id,
           'expertId': normalizedNewExpertId,
           'userPhone': userPhone,
+          'expertPhone': null,
+          'expertCorporateEmail': null,
+          'contactSharedAt': null,
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         };
@@ -1121,6 +1261,16 @@ Stream<List<ConsultationRequest>>
     );
 
     return newRequestReference.id;
+  }
+
+  bool _isValidEmail(
+    String value,
+  ) {
+    final String normalized = value.trim();
+
+    return RegExp(
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+    ).hasMatch(normalized);
   }
 
   static String _normalize(
