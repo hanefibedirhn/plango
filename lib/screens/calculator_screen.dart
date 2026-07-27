@@ -7,6 +7,7 @@ import '../models/calculation_plan.dart';
 import 'consultation/select_company_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'payment_plan_screen.dart';
+import '../repositories/last_calculated_plan_store.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({
@@ -93,19 +94,26 @@ class _CalculatorScreenState
       result = calculatedResult;
 
       if (calculatedResult.success) {
-        calculationPlan = CalculationPlan(
-          financeAmount: finance,
-          downPayment: downPayment,
-          monthlyInstallment: installment,
-          increaseModel: model!,
-          estimatedDelivery:
-              calculatedResult.estimatedDelivery,
-          estimatedTerm:
-              calculatedResult.estimatedTerm,
-        );
-      } else {
-        calculationPlan = null;
-      }
+  final CalculationPlan newPlan = CalculationPlan(
+    financeAmount: finance,
+    downPayment: downPayment,
+    monthlyInstallment: installment,
+    increaseModel: model!,
+    estimatedDelivery:
+        calculatedResult.estimatedDelivery,
+    estimatedTerm:
+        calculatedResult.estimatedTerm,
+  );
+
+  calculationPlan = newPlan;
+
+  LastCalculatedPlanStore.instance.save(
+  plan: newPlan,
+  result: calculatedResult,
+);
+} else {
+  calculationPlan = null;
+}
     });
   }
 
