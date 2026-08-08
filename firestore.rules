@@ -1,0 +1,1200 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==================================================
+    // ORTAK FONKSİYONLAR
+    // ==================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() &&
+          request.auth.uid == uid;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function expertPath(uid) {
+      return /databases/$(database)/documents/experts/$(uid);
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(userPath(request.auth.uid))
+        && get(userPath(request.auth.uid))
+            .data
+            .roles
+            .hasAny(['admin']);
+    }
+
+    function isValidExpertStatus(status) {
+      return status in [
+        'none',
+        'pending',
+        'approved',
+        'rejected'
+      ];
+    }
+
+    function isValidApplicationType(type) {
+      return type in [
+        'initial',
+        'profileUpdate'
+      ];
+    }
+
+    function isValidApplicationStatus(status) {
+      return status in [
+        'pending',
+        'approved',
+        'rejected'
+      ];
+    }
+
+    function isValidExpertProfileStatus(status) {
+      return status in [
+        'active',
+        'suspended',
+        'inactive'
+      ];
+    }
+
+    function isValidVerificationStatus(status) {
+      return status in [
+        'approved',
+        'pendingUpdate',
+        'rejected'
+      ];
+    }
+
+    // ==================================================
+    // USERS
+    // ==================================================
+
+    match /users/{uid} {
+
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'name',
+          'surname',
+          'email',
+          'username',
+          'usernameLowercase',
+          'roles',
+          'expertStatus',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.surname is string
+        && request.resource.data.email is string
+        && request.resource.data.username is string
+        && request.resource.data.usernameLowercase is string
+        && request.resource.data.roles == ['user']
+        && request.resource.data.expertStatus == 'none'
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Normal kullanıcı profil güncellemesi.
+      allow update: if isOwner(uid)
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data.email ==
+            resource.data.email
+        && request.resource.data.username ==
+            resource.data.username
+        && request.resource.data.usernameLowercase ==
+            resource.data.usernameLowercase
+        && request.resource.data.roles ==
+            resource.data.roles
+        && request.resource.data.expertStatus ==
+            resource.data.expertStatus
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'name',
+              'surname',
+              'phone',
+              'updatedAt'
+            ]);
+
+      // Uzman başvurusu oluşturulurken pending durumuna geçiş.
+      allow update: if isOwner(uid)
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data.email ==
+            resource.data.email
+        && request.resource.data.username ==
+            resource.data.username
+        && request.resource.data.usernameLowercase ==
+            resource.data.usernameLowercase
+        && request.resource.data.roles ==
+            resource.data.roles
+        && resource.data.expertStatus in [
+          'none',
+          'rejected',
+          'approved'
+        ]
+        && request.resource.data.expertStatus ==
+            'pending'
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'phone',
+              'expertStatus',
+              'updatedAt'
+            ]);
+
+      // Uzman onayı, reddi ve rol işlemleri.
+      allow update: if isAdmin()
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data.expertStatus is string
+        && isValidExpertStatus(
+          request.resource.data.expertStatus
+        );
+
+      allow delete: if isOwner(uid) || isAdmin();
+    
+          // ==================================================
+      // SAVED PLANS
+      // ==================================================
+
+      match /savedPlans/{planId} {
+
+        function isRealAccountOwner() {
+          return isOwner(uid)
+            && request.auth.token.firebase
+                .sign_in_provider != 'anonymous';
+        }
+
+        allow create: if isRealAccountOwner()
+          && request.resource.data.keys().hasAll([
+            'userId',
+            'financeAmount',
+            'downPayment',
+            'monthlyInstallment',
+            'increaseModel',
+            'estimatedDelivery',
+            'estimatedTerm',
+            'lastInstallment',
+            'totalPayment',
+            'paymentPlan',
+            'createdAt',
+            'updatedAt'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'userId',
+            'financeAmount',
+            'downPayment',
+            'monthlyInstallment',
+            'increaseModel',
+            'estimatedDelivery',
+            'estimatedTerm',
+            'lastInstallment',
+            'totalPayment',
+            'paymentPlan',
+            'createdAt',
+            'updatedAt'
+          ])
+          && request.resource.data.userId == uid
+          && request.resource.data.financeAmount is number
+          && request.resource.data.financeAmount > 0
+          && request.resource.data.downPayment is number
+          && request.resource.data.downPayment >= 0
+          && request.resource.data.monthlyInstallment is number
+          && request.resource.data.monthlyInstallment > 0
+          && request.resource.data.increaseModel is string
+          && request.resource.data.estimatedDelivery is int
+          && request.resource.data.estimatedDelivery > 0
+          && request.resource.data.estimatedTerm is int
+          && request.resource.data.estimatedTerm > 0
+          && request.resource.data.lastInstallment is number
+          && request.resource.data.lastInstallment > 0
+          && request.resource.data.totalPayment is number
+          && request.resource.data.totalPayment > 0
+          && request.resource.data.paymentPlan is list
+          && request.resource.data.paymentPlan.size() > 0
+          && request.resource.data.paymentPlan.size() <= 240
+          && request.resource.data.createdAt is timestamp
+          && request.resource.data.updatedAt is timestamp;
+
+        allow read: if isRealAccountOwner() || isAdmin();
+
+        // Şimdilik kayıtlı plan değiştirilmez.
+        // Plan silinip yeniden kaydedilebilir.
+        allow update: if false;
+
+        allow delete: if isRealAccountOwner() || isAdmin();
+      }
+    
+    }
+
+    // ==================================================
+    // USERNAMES
+    // ==================================================
+
+    match /usernames/{username} {
+
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'createdAt'
+        ])
+        && request.resource.data.uid ==
+            request.auth.uid
+        && request.resource.data.createdAt is timestamp
+        && !exists(
+          /databases/$(database)/documents/usernames/$(username)
+        );
+
+      allow read: if false;
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && resource.data.uid == request.auth.uid;
+
+      allow delete: if isAdmin();
+    }
+
+    // ==================================================
+    // EXPERT APPLICATIONS
+    // ==================================================
+
+    match /expertApplications/{applicationId} {
+
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll([
+          'applicationId',
+          'uid',
+          'type',
+          'companyName',
+          'branch',
+          'position',
+          'corporateEmail',
+          'phone',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'applicationId',
+          'uid',
+          'type',
+          'companyName',
+          'branch',
+          'position',
+          'corporateEmail',
+          'phone',
+          'status',
+          'reviewNote',
+          'createdAt',
+          'updatedAt',
+          'reviewedAt',
+          'reviewedBy',
+          'previousCompanyName',
+          'previousBranch',
+          'previousPosition',
+          'previousCorporateEmail'
+        ])
+        && request.resource.data.applicationId ==
+            applicationId
+        && request.resource.data.uid ==
+            request.auth.uid
+        && isValidApplicationType(
+          request.resource.data.type
+        )
+        && request.resource.data.companyName is string
+        && request.resource.data.branch is string
+        && request.resource.data.position is string
+        && request.resource.data.corporateEmail is string
+        && request.resource.data.phone is string
+        && request.resource.data.status == 'pending'
+        && request.resource.data.reviewNote == null
+        && request.resource.data.reviewedAt == null
+        && request.resource.data.reviewedBy == null
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      allow read: if isSignedIn()
+        && (
+          resource.data.uid == request.auth.uid ||
+          isAdmin()
+        );
+
+      allow update: if isAdmin()
+        && request.resource.data.applicationId ==
+            resource.data.applicationId
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data.type ==
+            resource.data.type
+        && isValidApplicationStatus(
+          request.resource.data.status
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    // ==================================================
+    // PRIVATE EXPERT RECORDS
+    // ==================================================
+
+    match /experts/{uid} {
+
+      allow create: if isAdmin()
+        && request.resource.data.uid == uid
+        && isValidExpertProfileStatus(
+          request.resource.data.status
+        )
+        && isValidVerificationStatus(
+          request.resource.data.verificationStatus
+        )
+        && request.resource.data.acceptsNewRequests is bool;
+
+      allow read: if isOwner(uid) || isAdmin();
+
+      // Uzman danışma talebi alma tercihini değiştirebilir.
+      allow update: if isOwner(uid)
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'acceptsNewRequests',
+              'updatedAt'
+            ])
+        && request.resource.data.acceptsNewRequests is bool
+        && (
+          request.resource.data.acceptsNewRequests == false ||
+          (
+            resource.data.status == 'active' &&
+            resource.data.verificationStatus == 'approved'
+          )
+        );
+
+      // Şirket veya pozisyon değişikliği başvurusu.
+      allow update: if isOwner(uid)
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'verificationStatus',
+              'acceptsNewRequests',
+              'suspendedAt',
+              'suspensionReason',
+              'updatedAt'
+            ])
+        && request.resource.data.status == 'suspended'
+        && request.resource.data.verificationStatus ==
+            'pendingUpdate'
+        && request.resource.data.acceptsNewRequests == false;
+
+      allow update: if isAdmin()
+        && request.resource.data.uid ==
+            resource.data.uid
+        && isValidExpertProfileStatus(
+          request.resource.data.status
+        )
+        && isValidVerificationStatus(
+          request.resource.data.verificationStatus
+        )
+        && request.resource.data.acceptsNewRequests is bool;
+
+      allow delete: if isAdmin();
+    }
+
+    // ==================================================
+    // PUBLIC EXPERT PROFILES
+    // ==================================================
+
+    match /expertProfiles/{uid} {
+
+      function hasValidPublicProfileFields() {
+        return request.resource.data.keys().hasAll([
+          'uid',
+          'firstName',
+          'lastName',
+          'companyName',
+          'branch',
+          'position',
+          'status',
+          'acceptsNewRequests',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'firstName',
+          'lastName',
+          'companyName',
+          'branch',
+          'position',
+          'status',
+          'acceptsNewRequests',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string
+        && request.resource.data.companyName is string
+        && request.resource.data.branch is string
+        && request.resource.data.position is string
+        && isValidExpertProfileStatus(
+          request.resource.data.status
+        )
+        && request.resource.data.acceptsNewRequests is bool
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+      }
+
+      function matchesExpertAfterTransaction() {
+        return exists(expertPath(uid))
+          && request.resource.data.uid ==
+              getAfter(expertPath(uid)).data.uid
+          && request.resource.data.firstName ==
+              getAfter(expertPath(uid)).data.firstName
+          && request.resource.data.lastName ==
+              getAfter(expertPath(uid)).data.lastName
+          && request.resource.data.companyName ==
+              getAfter(expertPath(uid)).data.companyName
+          && request.resource.data.branch ==
+              getAfter(expertPath(uid)).data.branch
+          && request.resource.data.position ==
+              getAfter(expertPath(uid)).data.position
+          && request.resource.data.status ==
+              getAfter(expertPath(uid)).data.status
+          && request.resource.data.acceptsNewRequests ==
+              getAfter(expertPath(uid))
+                  .data
+                  .acceptsNewRequests;
+      }
+
+      // Telefon ve kurumsal e-posta bu koleksiyonda bulunmaz.
+      allow read: if isSignedIn();
+
+      // Yönetici onay ve yeniden doğrulamada yönetebilir.
+      allow create, update: if isAdmin()
+        && hasValidPublicProfileFields();
+
+      // Uzman kendi açık profilini private uzman kaydıyla
+      // aynı transaction içinde oluşturabilir.
+      allow create: if isOwner(uid)
+        && hasValidPublicProfileFields()
+        && matchesExpertAfterTransaction();
+
+      // Uzman yalnızca danışma durumunu değiştirebilir.
+      allow update: if isOwner(uid)
+        && hasValidPublicProfileFields()
+        && matchesExpertAfterTransaction()
+        && request.resource.data.uid ==
+            resource.data.uid
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'acceptsNewRequests',
+              'updatedAt'
+            ]);
+
+      allow delete: if isAdmin();
+    }
+
+    // ==================================================
+    // CONSULTATION REQUESTS
+    // ==================================================
+
+    match /consultationRequests/{requestId} {
+
+      function requestContactPath() {
+        return /databases/$(database)/documents/consultationRequestContacts/$(requestId);
+      }
+
+      function expertProfilePath(expertId) {
+        return /databases/$(database)/documents/expertProfiles/$(expertId);
+      }
+
+      function isRequestUser() {
+        return isSignedIn()
+          && resource.data.userId == request.auth.uid;
+      }
+
+      function isRequestExpert() {
+        return isSignedIn()
+          && resource.data.expertId is string
+          && resource.data.expertId != ''
+          && resource.data.expertId == request.auth.uid;
+      }
+
+      function isValidRequestStatus(status) {
+        return status in [
+          'waiting_assignment',
+          'waiting_for_admin',
+          'pending',
+          'accepted',
+          'contacted',
+          'completed',
+          'rejected',
+          'expired',
+          'cancelled'
+        ];
+      }
+
+      function hasValidRequestFields() {
+        return request.resource.data.keys().hasAll([
+          'requestId',
+          'userId',
+          'isGuest',
+          'userFullName',
+          'companyName',
+          'financeAmount',
+          'downPayment',
+          'monthlyInstallment',
+          'increaseModel',
+          'estimatedDelivery',
+          'estimatedTerm',
+          'userNote',
+          'status',
+          'expertId',
+          'assignmentType',
+          'assignedAt',
+          'assignedBy',
+          'createdAt',
+          'updatedAt',
+          'expiresAt',
+          'acceptedAt',
+          'contactedAt',
+          'completedAt',
+          'rejectedAt',
+          'cancelledAt',
+          'rejectionReason',
+          'adminQueueReason',
+          'waitingForAdminAt',
+          'reassignedFromExpertId'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'requestId',
+          'userId',
+          'isGuest',
+          'userFullName',
+          'companyName',
+          'financeAmount',
+          'downPayment',
+          'monthlyInstallment',
+          'increaseModel',
+          'estimatedDelivery',
+          'estimatedTerm',
+          'userNote',
+          'status',
+          'expertId',
+          'assignmentType',
+          'assignedAt',
+          'assignedBy',
+          'createdAt',
+          'updatedAt',
+          'expiresAt',
+          'acceptedAt',
+          'contactedAt',
+          'completedAt',
+          'rejectedAt',
+          'cancelledAt',
+          'rejectionReason',
+          'adminQueueReason',
+          'waitingForAdminAt',
+          'reassignedFromExpertId'
+        ])
+        && request.resource.data.requestId == requestId
+        && request.resource.data.userId is string
+        && request.resource.data.isGuest is bool
+        && request.resource.data.userFullName is string
+        && request.resource.data.userFullName.size() >= 3
+        && request.resource.data.companyName is string
+        && request.resource.data.companyName.size() > 0
+        && request.resource.data.financeAmount is number
+        && request.resource.data.financeAmount > 0
+        && request.resource.data.downPayment is number
+        && request.resource.data.downPayment >= 0
+        && request.resource.data.monthlyInstallment is number
+        && request.resource.data.monthlyInstallment > 0
+        && request.resource.data.increaseModel is string
+        && request.resource.data.estimatedDelivery is int
+        && request.resource.data.estimatedDelivery > 0
+        && request.resource.data.estimatedTerm is int
+        && request.resource.data.estimatedTerm > 0
+        && (
+          request.resource.data.userNote == null ||
+          (
+            request.resource.data.userNote is string &&
+            request.resource.data.userNote.size() <= 500
+          )
+        )
+        && isValidRequestStatus(
+          request.resource.data.status
+        )
+        && request.resource.data.expertId is string
+        && (
+          request.resource.data.assignmentType == null ||
+          request.resource.data.assignmentType in [
+            'auto',
+            'admin'
+          ]
+        )
+        && (
+          request.resource.data.assignedAt == null ||
+          request.resource.data.assignedAt is timestamp
+        )
+        && (
+          request.resource.data.assignedBy == null ||
+          request.resource.data.assignedBy is string
+        )
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && (
+          request.resource.data.expiresAt == null ||
+          request.resource.data.expiresAt is timestamp
+        )
+        && (
+          request.resource.data.acceptedAt == null ||
+          request.resource.data.acceptedAt is timestamp
+        )
+        && (
+          request.resource.data.contactedAt == null ||
+          request.resource.data.contactedAt is timestamp
+        )
+        && (
+          request.resource.data.completedAt == null ||
+          request.resource.data.completedAt is timestamp
+        )
+        && (
+          request.resource.data.rejectedAt == null ||
+          request.resource.data.rejectedAt is timestamp
+        )
+        && (
+          request.resource.data.cancelledAt == null ||
+          request.resource.data.cancelledAt is timestamp
+        )
+        && (
+          request.resource.data.rejectionReason == null ||
+          request.resource.data.rejectionReason is string
+        )
+        && (
+          request.resource.data.adminQueueReason == null ||
+          request.resource.data.adminQueueReason is string
+        )
+        && (
+          request.resource.data.waitingForAdminAt == null ||
+          request.resource.data.waitingForAdminAt is timestamp
+        )
+        && (
+          request.resource.data.reassignedFromExpertId == null ||
+          request.resource.data.reassignedFromExpertId is string
+        );
+      }
+
+      function expertCanReceive(expertId, companyName) {
+        return expertId is string
+          && expertId != ''
+          && exists(expertProfilePath(expertId))
+          && get(expertProfilePath(expertId)).data.status == 'active'
+          && get(expertProfilePath(expertId))
+              .data
+              .acceptsNewRequests == true
+          && get(expertProfilePath(expertId))
+              .data
+              .companyName == companyName;
+      }
+
+      function matchingContactExistsAfterWrite() {
+        return existsAfter(requestContactPath())
+          && getAfter(requestContactPath()).data.requestId ==
+              requestId
+          && getAfter(requestContactPath()).data.userId ==
+              request.resource.data.userId
+          && getAfter(requestContactPath()).data.expertId ==
+              request.resource.data.expertId;
+      }
+
+      allow read: if isSignedIn()
+        && (
+          resource.data.userId == request.auth.uid ||
+          resource.data.expertId == request.auth.uid ||
+          isAdmin()
+        );
+
+      // Kullanıcı talebi önce uzman atanmadan şirket kuyruğuna bırakır.
+      allow create: if isSignedIn()
+        && hasValidRequestFields()
+        && request.resource.data.userId ==
+            request.auth.uid
+        && request.resource.data.status ==
+            'waiting_assignment'
+        && request.resource.data.expertId == ''
+        && request.resource.data.assignmentType == null
+        && request.resource.data.assignedAt == null
+        && request.resource.data.assignedBy == null
+        && request.resource.data.expiresAt == null
+        && request.resource.data.acceptedAt == null
+        && request.resource.data.contactedAt == null
+        && request.resource.data.completedAt == null
+        && request.resource.data.rejectedAt == null
+        && request.resource.data.cancelledAt == null
+        && request.resource.data.rejectionReason == null
+        && request.resource.data.adminQueueReason == null
+        && request.resource.data.waitingForAdminAt == null
+        && request.resource.data.reassignedFromExpertId == null
+        && matchingContactExistsAfterWrite();
+
+      // Uygulama, yalnızca talep sahibinin henüz atanmamış talebini
+      // aynı şirketteki aktif bir uzmana bir kez otomatik atayabilir.
+      allow update: if isRequestUser()
+        && resource.data.status == 'waiting_assignment'
+        && resource.data.expertId == ''
+        && request.resource.data.status == 'pending'
+        && request.resource.data.assignmentType == 'auto'
+        && request.resource.data.assignedBy == 'system'
+        && request.resource.data.assignedAt is timestamp
+        && request.resource.data.expiresAt is timestamp
+        && expertCanReceive(
+          request.resource.data.expertId,
+          resource.data.companyName
+        )
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'expertId',
+              'status',
+              'assignmentType',
+              'assignedAt',
+              'assignedBy',
+              'expiresAt',
+              'updatedAt',
+              'acceptedAt',
+              'contactedAt',
+              'completedAt',
+              'rejectedAt',
+              'cancelledAt',
+              'rejectionReason',
+              'adminQueueReason',
+              'waitingForAdminAt',
+              'reassignedFromExpertId'
+            ])
+        && request.resource.data.acceptedAt == null
+        && request.resource.data.contactedAt == null
+        && request.resource.data.completedAt == null
+        && request.resource.data.rejectedAt == null
+        && request.resource.data.cancelledAt == null
+        && request.resource.data.rejectionReason == null
+        && request.resource.data.adminQueueReason == null
+        && request.resource.data.waitingForAdminAt == null
+        && matchingContactExistsAfterWrite();
+
+      // Uzman talebi kabul eder.
+      allow update: if isRequestExpert()
+        && resource.data.status == 'pending'
+        && request.resource.data.status == 'accepted'
+        && request.resource.data.acceptedAt is timestamp
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'acceptedAt',
+              'updatedAt',
+              'rejectedAt',
+              'rejectionReason'
+            ]);
+
+      // Uzman reddettiğinde talep silinmez; yönetici kuyruğuna döner.
+      allow update: if isRequestExpert()
+        && resource.data.status == 'pending'
+        && request.resource.data.status ==
+            'waiting_for_admin'
+        && request.resource.data.rejectedAt is timestamp
+        && request.resource.data.rejectionReason is string
+        && request.resource.data.rejectionReason.size() >= 3
+        && request.resource.data.waitingForAdminAt is timestamp
+        && request.resource.data.adminQueueReason ==
+            'expert_rejected'
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'rejectedAt',
+              'rejectionReason',
+              'waitingForAdminAt',
+              'adminQueueReason',
+              'updatedAt'
+            ]);
+
+      // Uzman, kabul ettiği talepte iletişime geçildi durumuna geçer.
+      allow update: if isRequestExpert()
+        && resource.data.status == 'accepted'
+        && request.resource.data.status == 'contacted'
+        && request.resource.data.contactedAt is timestamp
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'contactedAt',
+              'updatedAt'
+            ]);
+
+      // Uzman danışmayı tamamlar.
+      allow update: if isRequestExpert()
+        && resource.data.status in [
+          'accepted',
+          'contacted'
+        ]
+        && request.resource.data.status == 'completed'
+        && request.resource.data.completedAt is timestamp
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'completedAt',
+              'updatedAt'
+            ]);
+
+      // Kullanıcı açık talebini iptal edebilir.
+      allow update: if isRequestUser()
+        && resource.data.status in [
+          'waiting_assignment',
+          'pending',
+          'accepted'
+        ]
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.cancelledAt is timestamp
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'cancelledAt',
+              'updatedAt'
+            ]);
+
+      // Yönetici atama, yeniden atama ve durum yönetimini yapabilir.
+      allow update: if isAdmin()
+        && hasValidRequestFields();
+
+      allow delete: if false;
+    }
+
+    // ==================================================
+    // CONSULTATION REQUEST CONTACTS
+    // ==================================================
+
+    match /consultationRequestContacts/{requestId} {
+
+      function linkedRequestPath() {
+        return /databases/$(database)/documents/consultationRequests/$(requestId);
+      }
+
+      function isContactOwner() {
+        return isSignedIn()
+          && resource.data.userId == request.auth.uid;
+      }
+
+      function isAcceptedRequestExpert() {
+        return isSignedIn()
+          && resource.data.expertId == request.auth.uid
+          && resource.data.expertId != ''
+          && exists(linkedRequestPath())
+          && get(linkedRequestPath()).data.expertId ==
+              request.auth.uid
+          && get(linkedRequestPath()).data.status in [
+            'accepted',
+            'contacted',
+            'completed'
+          ];
+      }
+
+      function hasValidContactFields() {
+        return request.resource.data.keys().hasAll([
+          'requestId',
+          'userId',
+          'expertId',
+          'userPhone',
+          'expertPhone',
+          'expertCorporateEmail',
+          'contactSharedAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'requestId',
+          'userId',
+          'expertId',
+          'userPhone',
+          'expertPhone',
+          'expertCorporateEmail',
+          'contactSharedAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.requestId == requestId
+        && request.resource.data.userId is string
+        && request.resource.data.expertId is string
+        && request.resource.data.userPhone is string
+        && request.resource.data.userPhone.size() >= 10
+        && request.resource.data.userPhone.size() <= 11
+        && (
+          request.resource.data.expertPhone == null ||
+          request.resource.data.expertPhone is string
+        )
+        && (
+          request.resource.data.expertCorporateEmail == null ||
+          request.resource.data.expertCorporateEmail is string
+        )
+        && (
+          request.resource.data.contactSharedAt == null ||
+          request.resource.data.contactSharedAt is timestamp
+        )
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+      }
+
+      // İlk kayıtta uzman alanı boş bırakılır.
+      allow create: if isSignedIn()
+        && hasValidContactFields()
+        && request.resource.data.userId ==
+            request.auth.uid
+        && request.resource.data.expertId == ''
+        && request.resource.data.expertPhone == null
+        && request.resource.data.expertCorporateEmail == null
+        && request.resource.data.contactSharedAt == null
+        && existsAfter(linkedRequestPath())
+        && getAfter(linkedRequestPath()).data.requestId ==
+            requestId
+        && getAfter(linkedRequestPath()).data.userId ==
+            request.auth.uid
+        && getAfter(linkedRequestPath()).data.expertId == ''
+        && getAfter(linkedRequestPath()).data.status ==
+            'waiting_assignment';
+
+      allow read: if isContactOwner()
+        || isAcceptedRequestExpert()
+        || isAdmin();
+
+      // Otomatik atamada talep sahibi yalnızca expertId alanını,
+      // aynı transaction içindeki talep atamasıyla eşleşecek şekilde değiştirir.
+      allow update: if isContactOwner()
+        && resource.data.expertId == ''
+        && request.resource.data.requestId ==
+            resource.data.requestId
+        && request.resource.data.userId ==
+            resource.data.userId
+        && request.resource.data.userPhone ==
+            resource.data.userPhone
+        && request.resource.data.createdAt ==
+            resource.data.createdAt
+        && request.resource.data.expertPhone == null
+        && request.resource.data.expertCorporateEmail == null
+        && request.resource.data.contactSharedAt == null
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'expertId',
+              'updatedAt'
+            ])
+        && existsAfter(linkedRequestPath())
+        && getAfter(linkedRequestPath()).data.userId ==
+            request.auth.uid
+        && getAfter(linkedRequestPath()).data.status ==
+            'pending'
+        && getAfter(linkedRequestPath()).data.assignmentType ==
+            'auto'
+        && getAfter(linkedRequestPath()).data.expertId ==
+            request.resource.data.expertId;
+
+      // Uzman yalnızca kabul edilmiş talepte, contacted geçişiyle
+      // kendi private kaydındaki iletişim bilgilerini paylaşabilir.
+      allow update: if isSignedIn()
+        && resource.data.expertId ==
+            request.auth.uid
+        && request.resource.data.requestId ==
+            resource.data.requestId
+        && request.resource.data.userId ==
+            resource.data.userId
+        && request.resource.data.expertId ==
+            resource.data.expertId
+        && request.resource.data.userPhone ==
+            resource.data.userPhone
+        && request.resource.data.createdAt ==
+            resource.data.createdAt
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'expertPhone',
+              'expertCorporateEmail',
+              'contactSharedAt',
+              'updatedAt'
+            ])
+        && request.resource.data.expertPhone is string
+        && request.resource.data.expertPhone.size() >= 10
+        && request.resource.data.expertPhone.size() <= 11
+        && request.resource.data.expertCorporateEmail is string
+        && request.resource.data.expertCorporateEmail.size() >= 5
+        && request.resource.data.contactSharedAt is timestamp
+        && exists(expertPath(request.auth.uid))
+        && request.resource.data.expertPhone ==
+            get(expertPath(request.auth.uid)).data.phone
+        && request.resource.data.expertCorporateEmail ==
+            get(expertPath(request.auth.uid))
+                .data
+                .corporateEmail
+        && existsAfter(linkedRequestPath())
+        && getAfter(linkedRequestPath()).data.expertId ==
+            request.auth.uid
+        && getAfter(linkedRequestPath()).data.status ==
+            'contacted';
+
+      // Yönetici uzman ataması sırasında expertId alanını,
+      // gerektiğinde iletişim paylaşım alanlarını yönetebilir.
+      allow update: if isAdmin()
+        && hasValidContactFields();
+
+      allow delete: if false;
+    }
+
+// ==================================================
+// CONTENT
+// ==================================================
+
+match /content/{contentId} {
+
+  // Yayındaki içerikleri herkes okuyabilir.
+  allow read: if (
+      resource.data.status == 'published'
+    ) || isAdmin();
+
+  // Sadece admin içerik oluşturabilir.
+  allow create: if isAdmin();
+
+  // Sadece admin güncelleyebilir.
+  allow update: if isAdmin();
+
+  // Fiziksel silme yok.
+  allow delete: if false;
+}
+
+  // ==================================================
+// NOTIFICATIONS
+// ==================================================
+
+match /notifications/{notificationId} {
+  function linkedConsultationPath() {
+    return /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId);
+  }
+
+  allow read: if isSignedIn()
+    && resource.data.userId == request.auth.uid;
+
+  allow create: if isSignedIn()
+    && request.resource.data.keys().hasAll([
+      'notificationId',
+      'userId',
+      'title',
+      'message',
+      'type',
+      'status',
+      'targetScreen',
+      'createdAt',
+      'readAt'
+    ])
+    && request.resource.data.keys().hasOnly([
+      'notificationId',
+      'userId',
+      'title',
+      'message',
+      'type',
+      'status',
+      'targetScreen',
+      'targetId',
+      'actorId',
+      'createdAt',
+      'readAt'
+    ])
+    && request.resource.data.notificationId == notificationId
+    && request.resource.data.userId is string
+    && request.resource.data.title is string
+    && request.resource.data.message is string
+    && request.resource.data.type in [
+      'consultation',
+      'expert',
+      'system',
+      'announcement'
+    ]
+    && request.resource.data.status == 'unread'
+    && request.resource.data.targetScreen is string
+    && request.resource.data.createdAt is timestamp
+    && request.resource.data.readAt == null
+    && (
+      request.resource.data.targetId == null ||
+      request.resource.data.targetId is string
+    )
+    && (
+      request.resource.data.actorId == null ||
+      request.resource.data.actorId is string
+    )
+    && (
+      request.resource.data.userId == request.auth.uid ||
+      isAdmin() ||
+      (
+        request.resource.data.type == 'consultation' &&
+        request.resource.data.targetId is string &&
+        exists(linkedConsultationPath()) &&
+        get(linkedConsultationPath()).data.expertId ==
+            request.auth.uid &&
+        get(linkedConsultationPath()).data.userId ==
+            request.resource.data.userId
+      )
+    );
+
+  allow update: if isSignedIn()
+    && resource.data.userId == request.auth.uid
+    && request.resource.data
+        .diff(resource.data)
+        .affectedKeys()
+        .hasOnly([
+          'status',
+          'readAt'
+        ])
+    && request.resource.data.status == 'read'
+    && request.resource.data.readAt is timestamp;
+
+  allow delete: if isSignedIn()
+    && resource.data.userId == request.auth.uid;
+}
+    // ==================================================
+    // VARSAYILAN
+    // ==================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

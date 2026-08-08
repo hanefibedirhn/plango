@@ -5,7 +5,7 @@ import '../../models/calculation_plan.dart';
 import '../../models/company.dart';
 import 'company_experts_screen.dart';
 
-class SelectCompanyScreen extends StatelessWidget {
+class SelectCompanyScreen extends StatefulWidget {
   const SelectCompanyScreen({
     super.key,
     required this.plan,
@@ -13,23 +13,66 @@ class SelectCompanyScreen extends StatelessWidget {
 
   final CalculationPlan plan;
 
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _softGreen = Color(0xFFE8F1EC);
+  @override
+  State<SelectCompanyScreen> createState() =>
+      _SelectCompanyScreenState();
+}
 
-  void _selectCompany(
-    BuildContext context,
-    Company company,
-  ) {
+class _SelectCompanyScreenState
+    extends State<SelectCompanyScreen> {
+  static const Color _background =
+      Color(0xFFF7F9FB);
+  static const Color _navy =
+      Color(0xFF0B2239);
+  static const Color _petrol =
+      Color(0xFF052F3D);
+  static const Color _teal =
+      Color(0xFF087C72);
+  static const Color _turquoise =
+      Color(0xFF16C7B0);
+  static const Color _muted =
+      Color(0xFF748193);
+  static const Color _border =
+      Color(0xFFE4EAF0);
+  static const Color _softTeal =
+      Color(0xFFEAF8F5);
+
+  final TextEditingController _searchController =
+      TextEditingController();
+
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Company> get _filteredCompanies {
+    final String normalizedQuery =
+        _query.trim().toLowerCase();
+
+    if (normalizedQuery.isEmpty) {
+      return companies;
+    }
+
+    return companies.where((company) {
+      return company.name
+              .toLowerCase()
+              .contains(normalizedQuery) ||
+          company.fullName
+              .toLowerCase()
+              .contains(normalizedQuery);
+    }).toList();
+  }
+
+  void _selectCompany(Company company) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => CompanyExpertsScreen(
           company: company,
-          plan: plan,
+          plan: widget.plan,
         ),
       ),
     );
@@ -37,94 +80,217 @@ class SelectCompanyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<Company> filteredCompanies =
+        _filteredCompanies;
+
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        foregroundColor: _textDark,
+        surfaceTintColor: _background,
+        foregroundColor: _navy,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
-          'Ücretsiz Uzman Görüşü Al',
+          'Şirket Seç',
           style: TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.w900,
           ),
         ),
       ),
       body: SafeArea(
         child: ListView(
+          keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.fromLTRB(
             18,
-            10,
+            6,
             18,
-            32,
+            36,
           ),
           children: [
             const _ConsultationProgress(
-              currentStep: 0,
+              currentStep: 1,
             ),
             const SizedBox(height: 22),
             const Text(
-              'Şirket Seçiniz',
+              'Hangi şirket için görüşmek istiyorsunuz?',
               style: TextStyle(
-                color: _textDark,
-                fontSize: 22,
+                color: _navy,
+                fontSize: 23,
+                height: 1.15,
+                letterSpacing: -0.4,
                 fontWeight: FontWeight.w900,
               ),
             ),
-            const SizedBox(height: 14),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: _border,
+            const SizedBox(height: 8),
+            const Text(
+              'Talebiniz, seçtiğiniz şirkette görev yapan '
+              'uygun bir uzmana otomatik olarak yönlendirilir.',
+              style: TextStyle(
+                color: _muted,
+                fontSize: 13.5,
+                height: 1.5,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _query = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Şirket ara',
+                hintStyle: const TextStyle(
+                  color: _muted,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: 0.035,
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: _teal,
+                ),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _query = '';
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: _muted,
+                        ),
+                      ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 15,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: _border,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: _border,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(18),
+                  borderSide: const BorderSide(
+                    color: _teal,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            if (filteredCompanies.isEmpty)
+              const _EmptyCompanyView()
+            else
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.circular(24),
+                  border: Border.all(
+                    color: _border,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _navy.withOpacity(0.035),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
                     ),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(24),
+                  child: Column(
+                    children: List.generate(
+                      filteredCompanies.length,
+                      (index) {
+                        final Company company =
+                            filteredCompanies[index];
+                        final bool isLast =
+                            index ==
+                                filteredCompanies.length -
+                                    1;
+
+                        return Column(
+                          children: [
+                            _CompanySelectionRow(
+                              company: company,
+                              onTap: () =>
+                                  _selectCompany(
+                                company,
+                              ),
+                            ),
+                            if (!isLast)
+                              const Divider(
+                                height: 1,
+                                thickness: 1,
+                                indent: 78,
+                                color: _border,
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: _petrol.withOpacity(0.045),
+                borderRadius:
+                    BorderRadius.circular(17),
+                border: Border.all(
+                  color: _petrol.withOpacity(0.08),
+                ),
+              ),
+              child: const Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: _teal,
+                    size: 20,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Plango herhangi bir şirketi '
+                      'tavsiye etmez veya öne çıkarmaz. '
+                      'Seçim yalnızca danışma talebinizin '
+                      'hangi şirketteki uzmana '
+                      'yönlendirileceğini belirler.',
+                      style: TextStyle(
+                        color: Color(0xFF5E6D7E),
+                        fontSize: 11.5,
+                        height: 1.55,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Column(
-                  children: List.generate(
-                    companies.length,
-                    (index) {
-                      final Company company =
-                          companies[index];
-
-                      final bool isLast =
-                          index == companies.length - 1;
-
-                      return Column(
-                        children: [
-                          _CompanySelectionRow(
-                            company: company,
-                            onTap: () {
-                              _selectCompany(
-                                context,
-                                company,
-                              );
-                            },
-                          ),
-                          if (!isLast)
-                            const Divider(
-                              height: 1,
-                              thickness: 1,
-                              indent: 72,
-                              color: _border,
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
               ),
             ),
           ],
@@ -143,116 +309,102 @@ class _ConsultationProgress extends StatelessWidget {
 
   static const List<String> _steps = [
     'Şirket',
-    'Uzman',
-    'Görüş Talebi',
+    'Talep',
+    'Onay',
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        18,
-        16,
-        14,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: SelectCompanyScreen._border,
-        ),
-      ),
-      child: Row(
-        children: List.generate(
-          _steps.length,
-          (index) {
-            final bool isCompleted =
-                index < currentStep;
+    return Row(
+      children: List.generate(
+        _steps.length,
+        (index) {
+          final int step = index + 1;
+          final bool isCompleted =
+              step < currentStep;
+          final bool isCurrent =
+              step == currentStep;
+          final bool isActive =
+              step <= currentStep;
 
-            final bool isCurrent =
-                index == currentStep;
-
-            return Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(
-                            milliseconds: 180,
+          return Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 31,
+                        height: 31,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? _SelectCompanyScreenState
+                                  ._teal
+                              : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isActive
+                                ? _SelectCompanyScreenState
+                                    ._teal
+                                : _SelectCompanyScreenState
+                                    ._border,
                           ),
-                          width: 34,
-                          height: 34,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isCurrent || isCompleted
-                                ? SelectCompanyScreen._green
-                                : const Color(0xFFF3F4F6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: isCompleted
-                              ? const Icon(
-                                  Icons.check_rounded,
-                                  color: Colors.white,
-                                  size: 19,
-                                )
-                              : Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    color: isCurrent
-                                        ? Colors.white
-                                        : SelectCompanyScreen
-                                            ._textMuted,
-                                    fontSize: 13,
-                                    fontWeight:
-                                        FontWeight.w900,
-                                  ),
+                        ),
+                        child: isCompleted
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              )
+                            : Text(
+                                '$step',
+                                style: TextStyle(
+                                  color: isActive
+                                      ? Colors.white
+                                      : _SelectCompanyScreenState
+                                          ._muted,
+                                  fontWeight:
+                                      FontWeight.w900,
                                 ),
+                              ),
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        _steps[index],
+                        style: TextStyle(
+                          color: isCurrent
+                              ? _SelectCompanyScreenState
+                                  ._navy
+                              : _SelectCompanyScreenState
+                                  ._muted,
+                          fontSize: 12,
+                          fontWeight: isCurrent
+                              ? FontWeight.w900
+                              : FontWeight.w600,
                         ),
-                        const SizedBox(height: 7),
-                        Text(
-                          _steps[index],
-                          maxLines: 1,
-                          overflow:
-                              TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isCurrent || isCompleted
-                                ? SelectCompanyScreen._green
-                                : SelectCompanyScreen
-                                    ._textMuted,
-                            fontSize: 11.5,
-                            fontWeight: isCurrent
-                                ? FontWeight.w900
-                                : FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  if (index < _steps.length - 1)
-                    Container(
-                      width: 20,
-                      height: 2,
-                      margin: const EdgeInsets.only(
-                        left: 3,
-                        right: 3,
-                        bottom: 22,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? SelectCompanyScreen._green
-                            : SelectCompanyScreen._border,
-                        borderRadius:
-                            BorderRadius.circular(999),
-                      ),
+                ),
+                if (index < _steps.length - 1)
+                  Container(
+                    width: 24,
+                    height: 2,
+                    margin:
+                        const EdgeInsets.only(
+                      bottom: 25,
                     ),
-                ],
-              ),
-            );
-          },
-        ),
+                    color: step < currentStep
+                        ? _SelectCompanyScreenState
+                            ._teal
+                        : _SelectCompanyScreenState
+                            ._border,
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -276,57 +428,141 @@ class _CompanySelectionRow extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 17,
+            vertical: 15,
           ),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
-                alignment: Alignment.center,
+                width: 48,
+                height: 48,
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: SelectCompanyScreen._softGreen,
-                  borderRadius: BorderRadius.circular(13),
+                  color:
+                      _SelectCompanyScreenState
+                          ._softTeal,
+                  borderRadius:
+                      BorderRadius.circular(15),
                 ),
-                child: Text(
-                  company.name.characters.first
-                      .toUpperCase(),
-                  style: const TextStyle(
-                    color: SelectCompanyScreen._green,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
+                child: Image.asset(
+                  company.logoAsset,
+                  fit: BoxFit.contain,
+                  errorBuilder:
+                      (context, error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        company.name.characters.first
+                            .toUpperCase(),
+                        style: const TextStyle(
+                          color:
+                              _SelectCompanyScreenState
+                                  ._teal,
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.w900,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Text(
-                  company.name,
-                  style: const TextStyle(
-                    color:
-                        SelectCompanyScreen._textDark,
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      company.name,
+                      style: const TextStyle(
+                        color:
+                            _SelectCompanyScreenState
+                                ._navy,
+                        fontSize: 15.5,
+                        fontWeight:
+                            FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Uygun uzmana yönlendir',
+                      style: TextStyle(
+                        color:
+                            _SelectCompanyScreenState
+                                ._muted,
+                        fontSize: 12,
+                        fontWeight:
+                            FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(
-                width: 32,
-                height: 32,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F4F6),
-                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFFF2F6F7),
+                  borderRadius:
+                      BorderRadius.circular(11),
                 ),
                 child: const Icon(
                   Icons.chevron_right_rounded,
                   color:
-                      SelectCompanyScreen._textMuted,
-                  size: 21,
+                      _SelectCompanyScreenState
+                          ._teal,
+                  size: 22,
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EmptyCompanyView extends StatelessWidget {
+  const _EmptyCompanyView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 34,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color:
+              _SelectCompanyScreenState
+                  ._border,
+        ),
+      ),
+      child: const Column(
+        children: [
+          Icon(
+            Icons.search_off_rounded,
+            color:
+                _SelectCompanyScreenState
+                    ._muted,
+            size: 38,
+          ),
+          SizedBox(height: 12),
+          Text(
+            'Aramanızla eşleşen şirket bulunamadı.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color:
+                  _SelectCompanyScreenState
+                      ._navy,
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }

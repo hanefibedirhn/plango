@@ -1,26 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-import '../../models/consultation_request_model.dart';
-import '../../repositories/consultation_repository.dart';
-import 'package:plango/screens/expert_request_detail_screen.dart';
+import '../models/consultation_request_model.dart';
+import '../repositories/consultation_repository.dart';
+import 'expert_request_detail_screen.dart';
 
-class ExpertConsultationRequestsScreen
-    extends StatelessWidget {
-  ExpertConsultationRequestsScreen({
+class ExpertConsultationRequestsScreen extends StatefulWidget {
+  const ExpertConsultationRequestsScreen({
     super.key,
     required this.expertId,
   });
 
   final String expertId;
 
-  final ConsultationRepository _repository =
-      ConsultationRepository();
+  @override
+  State<ExpertConsultationRequestsScreen> createState() =>
+      _ExpertConsultationRequestsScreenState();
+}
 
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
+class _ExpertConsultationRequestsScreenState
+    extends State<ExpertConsultationRequestsScreen> {
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _muted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EAF0);
+
+  final ConsultationRepository _repository = ConsultationRepository();
+  final NumberFormat _currencyFormatter = NumberFormat.currency(
+    locale: 'tr_TR',
+    symbol: '₺',
+    decimalDigits: 0,
+  );
+
+  String _selectedFilter = 'active';
+
+  static const List<_ExpertFilter> _filters = [
+    _ExpertFilter(key: 'active', label: 'Aktif'),
+    _ExpertFilter(key: 'pending', label: 'Yeni'),
+    _ExpertFilter(key: 'accepted', label: 'Kabul'),
+    _ExpertFilter(key: 'contacted', label: 'İletişim'),
+    _ExpertFilter(key: 'completed', label: 'Tamamlanan'),
+    _ExpertFilter(key: 'rejected', label: 'Reddedilen'),
+    _ExpertFilter(key: 'expired', label: 'Süresi Dolan'),
+    _ExpertFilter(key: 'all', label: 'Tümü'),
+  ];
+
+  List<ConsultationRequest> _filtered(List<ConsultationRequest> requests) {
+    switch (_selectedFilter) {
+      case 'active':
+        return requests
+            .where((request) => const {
+                  'pending',
+                  'accepted',
+                  'contacted',
+                }.contains(request.status))
+            .toList();
+      case 'pending':
+      case 'accepted':
+      case 'contacted':
+      case 'completed':
+      case 'rejected':
+      case 'expired':
+        return requests
+            .where((request) => request.status == _selectedFilter)
+            .toList();
+      case 'all':
+      default:
+        return requests;
+    }
+  }
+
+  int _countStatus(List<ConsultationRequest> requests, String status) {
+    return requests.where((request) => request.status == status).length;
+  }
+
+  String _formatCurrency(double value) => _currencyFormatter.format(value);
 
   @override
   Widget build(BuildContext context) {
@@ -28,494 +84,648 @@ class ExpertConsultationRequestsScreen
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        foregroundColor: _textDark,
+        surfaceTintColor: _background,
+        foregroundColor: _navy,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
           'Danışma Taleplerim',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
-      body: StreamBuilder<List<ConsultationRequest>>(
-        stream: _repository.watchExpertRequests(
-          expertId,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-                  ConnectionState.waiting &&
-              !snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: _green,
-              ),
-            );
-          }
+      body: SafeArea(
+        child: StreamBuilder<List<ConsultationRequest>>(
+          stream: _repository.watchExpertRequests(widget.expertId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                !snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(color: _teal),
+              );
+            }
 
-          if (snapshot.hasError) {
-  debugPrint('Danışma talepleri hatası: ${snapshot.error}');
+            if (snapshot.hasError) {
+              return _MessageView(
+                icon: Icons.error_outline_rounded,
+                title: 'Talepler Yüklenemedi',
+                message: snapshot.error.toString(),
+              );
+            }
 
-  return _RequestMessage(
-    icon: Icons.error_outline_rounded,
-    title: 'Talepler Yüklenemedi',
-    message: snapshot.error.toString(),
-  );
-}
+            final allRequests = snapshot.data ?? <ConsultationRequest>[];
+            final requests = _filtered(allRequests);
 
-          final List<ConsultationRequest> requests =
-    (snapshot.data ?? [])
-        .where(
-          (request) => request.status != 'expired',
-        )
-        .toList();
-          if (requests.isEmpty) {
-            return const _RequestMessage(
-              icon: Icons.inbox_outlined,
-              title: 'Henüz Talep Yok',
-              message:
-                  'Size gönderilen danışma talepleri burada görüntülenecek.',
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(
-              18,
-              12,
-              18,
-              30,
-            ),
-            itemCount: requests.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              return _RequestCard(
-  request: requests[index],
-  repository: _repository,
-  expertId: expertId,
-);
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _RequestCard extends StatelessWidget {
-  const _RequestCard({
-    required this.request,
-    required this.repository,
-    required this.expertId,
-  });
-
-  final ConsultationRequest request;
-  final ConsultationRepository repository;
-  final String expertId;
-
-  @override
-  Widget build(BuildContext context) {
-    final _StatusInformation status =
-        _statusInformation(request.status);
-
-    return Container(
-      padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color:
-              ExpertConsultationRequestsScreen._border,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F1EC),
-                  borderRadius: BorderRadius.circular(14),
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+              children: [
+                _ExpertSummary(
+                  newCount: _countStatus(allRequests, 'pending'),
+                  acceptedCount: _countStatus(allRequests, 'accepted'),
+                  contactedCount: _countStatus(allRequests, 'contacted'),
+                  completedCount: _countStatus(allRequests, 'completed'),
                 ),
-                child: const Icon(
-                  Icons.person_outline_rounded,
-                  color:
-                      ExpertConsultationRequestsScreen
-                          ._green,
+                const SizedBox(height: 17),
+                SizedBox(
+                  height: 40,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _filters.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final filter = _filters[index];
+                      final selected = filter.key == _selectedFilter;
+
+                      return ChoiceChip(
+                        selected: selected,
+                        showCheckmark: false,
+                        onSelected: (_) {
+                          setState(() => _selectedFilter = filter.key);
+                        },
+                        label: Text(filter.label),
+                        labelStyle: TextStyle(
+                          color: selected ? Colors.white : _petrol,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        selectedColor: _teal,
+                        backgroundColor: Colors.white,
+                        side: BorderSide(color: selected ? _teal : _border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                const SizedBox(height: 16),
+                Row(
                   children: [
-                    Text(
-                      request.userFullName,
-                      style: const TextStyle(
-                        color:
-                            ExpertConsultationRequestsScreen
-                                ._textDark,
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w900,
+                    const Expanded(
+                      child: Text(
+                        'Talepler',
+                        style: TextStyle(
+                          color: _navy,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 4),
                     Text(
-                      request.companyName,
+                      '${requests.length} kayıt',
                       style: const TextStyle(
-                        color:
-                            ExpertConsultationRequestsScreen
-                                ._textMuted,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
+                        color: _muted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: status.backgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  status.label,
-                  style: TextStyle(
-                    color: status.textColor,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
+                const SizedBox(height: 10),
+                if (requests.isEmpty)
+                  const _MessageView(
+                    icon: Icons.inbox_outlined,
+                    title: 'Talep Bulunmuyor',
+                    message:
+                        'Seçtiğiniz filtreye ait danışma talebi bulunmuyor.',
+                    embedded: true,
+                  )
+                else
+                  ...requests.map(
+                    (request) => _ExpertRequestCard(
+                      request: request,
+                      financeText:
+                          _formatCurrency(request.plan.financeAmount),
+                      installmentText:
+                          _formatCurrency(request.plan.monthlyInstallment),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ExpertRequestDetailScreen(
+                              request: request,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ExpertSummary extends StatelessWidget {
+  const _ExpertSummary({
+    required this.newCount,
+    required this.acceptedCount,
+    required this.contactedCount,
+    required this.completedCount,
+  });
+
+  final int newCount;
+  final int acceptedCount;
+  final int contactedCount;
+  final int completedCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF052F3D), Color(0xFF087C72)],
+        ),
+        borderRadius: BorderRadius.circular(23),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF052F3D).withOpacity(0.15),
+            blurRadius: 22,
+            offset: const Offset(0, 9),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Danışma Özeti',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _SummaryItem(label: 'Yeni', value: newCount),
+              const _SummaryDivider(),
+              _SummaryItem(label: 'Kabul', value: acceptedCount),
+              const _SummaryDivider(),
+              _SummaryItem(label: 'İletişim', value: contactedCount),
+              const _SummaryDivider(),
+              _SummaryItem(label: 'Biten', value: completedCount),
             ],
           ),
-          const SizedBox(height: 15),
-          _InformationRow(
-            label: 'Finansman',
-            value: _formatCurrency(
-              request.financeAmount,
-            ),
-          ),
-          const SizedBox(height: 8),
-          _InformationRow(
-            label: 'İlk Taksit',
-            value: _formatCurrency(
-              request.monthlyInstallment,
-            ),
-          ),
-          const SizedBox(height: 8),
-          _InformationRow(
-            label: 'Tahmini Teslimat',
-            value:
-                '${request.estimatedDelivery}. ay',
-          ),
-          const SizedBox(height: 8),
-          _InformationRow(
-            label: 'Talep Tarihi',
-            value: _formatDate(request.createdAt),
-          ),
-          if (request.userNote?.trim().isNotEmpty ==
-              true) ...[
-            const SizedBox(height: 14),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(13),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                request.userNote!,
-                style: const TextStyle(
-                  color:
-                      ExpertConsultationRequestsScreen
-                          ._textMuted,
-                  fontSize: 12.5,
-                  height: 1.45,
-                ),
-              ),
-            ),
-          ],
-          if (request.status == 'pending') ...[
-  const SizedBox(height: 18),
-  Row(
-    children: [
-      Expanded(
-        child: OutlinedButton(
-          onPressed: () async {
-            try {
-              await repository.rejectRequest(
-                requestId: request.requestId!,
-                expertId: expertId,
-                rejectionReason: "Uzman tarafından reddedildi",
-              );
-            } catch (e) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.toString()),
-                  ),
-                );
-              }
-            }
-          },
-          child: const Text("Reddet"),
-        ),
-      ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: FilledButton(
-          onPressed: () async {
-            try {
-              await repository.acceptRequest(
-                requestId: request.requestId!,
-                expertId: expertId,
-              );
-            } catch (e) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.toString()),
-                  ),
-                );
-              }
-            }
-          },
-          child: const Text("Kabul Et"),
-        ),
-      ),
-    ],
-  ),
-],
-
-if (request.status == 'accepted' ||
-    request.status == 'contacted' ||
-    request.status == 'completed') ...[
-  const SizedBox(height: 18),
-  SizedBox(
-    width: double.infinity,
-    child: FilledButton.icon(
-      icon: const Icon(Icons.visibility_outlined),
-      label: const Text("Talep Detayını Gör"),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ExpertRequestDetailScreen(
-              request: request,
-            ),
-          ),
-        );
-      },
-    ),
-  ),
-],
         ],
       ),
     );
   }
+}
 
-  static String _formatCurrency(double value) {
-    final String digits = value
-        .round()
-        .toString()
-        .replaceAllMapped(
-          RegExp(r'\B(?=(\d{3})+(?!\d))'),
-          (_) => '.',
-        );
+class _SummaryItem extends StatelessWidget {
+  const _SummaryItem({required this.label, required this.value});
 
-    return '$digits ₺';
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              height: 1,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFFD8F6F0),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryDivider extends StatelessWidget {
+  const _SummaryDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 34,
+      color: Colors.white.withOpacity(0.16),
+    );
+  }
+}
+
+class _ExpertRequestCard extends StatelessWidget {
+  const _ExpertRequestCard({
+    required this.request,
+    required this.financeText,
+    required this.installmentText,
+    required this.onTap,
+  });
+
+  final ConsultationRequest request;
+  final String financeText;
+  final String installmentText;
+  final VoidCallback onTap;
+
+  String _formatDate(DateTime value) {
+    return DateFormat('dd MMM yyyy • HH:mm', 'tr_TR').format(value);
   }
 
-  static String _formatDate(DateTime value) {
-    final String day =
-        value.day.toString().padLeft(2, '0');
-    final String month =
-        value.month.toString().padLeft(2, '0');
-    final String hour =
-        value.hour.toString().padLeft(2, '0');
-    final String minute =
-        value.minute.toString().padLeft(2, '0');
+  @override
+  Widget build(BuildContext context) {
+    final status = _statusStyle(request.status);
 
-    return '$day.$month.${value.year} $hour:$minute';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 11),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(color: _ExpertConsultationRequestsScreenState._border),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0B2239).withOpacity(0.035),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(21),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(21),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 45,
+                      height: 45,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF8F5),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        _initials(request.userFullName),
+                        style: const TextStyle(
+                          color: _ExpertConsultationRequestsScreenState._teal,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            request.userFullName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: _ExpertConsultationRequestsScreenState._navy,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            request.companyName,
+                            style: const TextStyle(
+                              color: _ExpertConsultationRequestsScreenState._muted,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: status.background,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        status.label,
+                        style: TextStyle(
+                          color: status.foreground,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricBox(label: 'Finansman', value: financeText),
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: _MetricBox(
+                        label: 'İlk Taksit',
+                        value: installmentText,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 9),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricBox(
+                        label: 'Teslim',
+                        value: '${request.plan.estimatedDelivery}. ay',
+                      ),
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: _MetricBox(
+                        label: 'Vade',
+                        value: '${request.plan.estimatedTerm} ay',
+                      ),
+                    ),
+                  ],
+                ),
+                if ((request.userNote ?? '').trim().isNotEmpty) ...[
+                  const SizedBox(height: 11),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF7F9FB),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Text(
+                      request.userNote!.trim(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _ExpertConsultationRequestsScreenState._muted,
+                        fontSize: 12,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                const Divider(
+                  height: 1,
+                  color: _ExpertConsultationRequestsScreenState._border,
+                ),
+                const SizedBox(height: 11),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.schedule_rounded,
+                      color: _ExpertConsultationRequestsScreenState._muted,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _formatDate(request.createdAt),
+                      style: const TextStyle(
+                        color: _ExpertConsultationRequestsScreenState._muted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'Detayı Gör',
+                      style: TextStyle(
+                        color: _ExpertConsultationRequestsScreenState._teal,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: _ExpertConsultationRequestsScreenState._teal,
+                      size: 19,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  static _StatusInformation _statusInformation(
-    String status,
-  ) {
+  static String _initials(String fullName) {
+    final parts = fullName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+
+    if (parts.isEmpty) return 'K';
+    if (parts.length == 1) {
+      return parts.first.characters.first.toUpperCase();
+    }
+
+    return '${parts.first.characters.first}${parts.last.characters.first}'
+        .toUpperCase();
+  }
+
+  static _RequestStatusStyle _statusStyle(String status) {
     switch (status) {
-      case 'accepted':
-        return const _StatusInformation(
-          label: 'Kabul Edildi',
-          backgroundColor: Color(0xFFE8F1EC),
-          textColor: Color(0xFF0B5D3B),
-        );
-
-      case 'contacted':
-        return const _StatusInformation(
-          label: 'İletişime Geçildi',
-          backgroundColor: Color(0xFFEFF6FF),
-          textColor: Color(0xFF1D4ED8),
-        );
-
-      case 'completed':
-        return const _StatusInformation(
-          label: 'Tamamlandı',
-          backgroundColor: Color(0xFFF3F4F6),
-          textColor: Color(0xFF4B5563),
-        );
-
-      case 'cancelled':
-        return const _StatusInformation(
-          label: 'İptal Edildi',
-          backgroundColor: Color(0xFFFEE2E2),
-          textColor: Color(0xFFB91C1C),
-        );
-
-      case 'reassigned':
-        return const _StatusInformation(
-          label: 'Yönlendirildi',
-          backgroundColor: Color(0xFFF3F4F6),
-          textColor: Color(0xFF6B7280),
-        );
-
-      case 'rejected':
-        return const _StatusInformation(
-          label: 'Reddedildi',
-          backgroundColor: Color(0xFFFEE2E2),
-          textColor: Color(0xFFB91C1C),
-        );
-
-      case 'expired':
-        return const _StatusInformation(
-          label: 'Süresi Doldu',
-          backgroundColor: Color(0xFFF3F4F6),
-          textColor: Color(0xFF6B7280),
-        );
-
-      default:
-        return const _StatusInformation(
+      case 'pending':
+        return const _RequestStatusStyle(
           label: 'Yeni Talep',
-          backgroundColor: Color(0xFFFFF4E5),
-          textColor: Color(0xFFB54708),
+          foreground: Color(0xFF175CD3),
+          background: Color(0xFFEFF4FF),
+        );
+      case 'accepted':
+        return const _RequestStatusStyle(
+          label: 'Kabul Edildi',
+          foreground: Color(0xFF087C72),
+          background: Color(0xFFEAF8F5),
+        );
+      case 'contacted':
+        return const _RequestStatusStyle(
+          label: 'İletişime Geçildi',
+          foreground: Color(0xFF087C72),
+          background: Color(0xFFEAF8F5),
+        );
+      case 'completed':
+        return const _RequestStatusStyle(
+          label: 'Tamamlandı',
+          foreground: Color(0xFF067647),
+          background: Color(0xFFECFDF3),
+        );
+      case 'rejected':
+        return const _RequestStatusStyle(
+          label: 'Reddedildi',
+          foreground: Color(0xFFB42318),
+          background: Color(0xFFFEF3F2),
+        );
+      case 'expired':
+        return const _RequestStatusStyle(
+          label: 'Süresi Doldu',
+          foreground: Color(0xFFB42318),
+          background: Color(0xFFFEF3F2),
+        );
+      default:
+        return const _RequestStatusStyle(
+          label: 'Bilinmiyor',
+          foreground: Color(0xFF667085),
+          background: Color(0xFFF2F4F7),
         );
     }
   }
 }
 
-class _InformationRow extends StatelessWidget {
-  const _InformationRow({
-    required this.label,
-    required this.value,
-  });
+class _MetricBox extends StatelessWidget {
+  const _MetricBox({required this.label, required this.value});
 
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7F9FB),
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             label,
             style: const TextStyle(
-              color:
-                  ExpertConsultationRequestsScreen
-                      ._textMuted,
-              fontSize: 12.5,
+              color: _ExpertConsultationRequestsScreenState._muted,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            color:
-                ExpertConsultationRequestsScreen
-                    ._textDark,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w800,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: _ExpertConsultationRequestsScreenState._petrol,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _StatusInformation {
-  const _StatusInformation({
-    required this.label,
-    required this.backgroundColor,
-    required this.textColor,
-  });
-
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-}
-
-class _RequestMessage extends StatelessWidget {
-  const _RequestMessage({
+class _MessageView extends StatelessWidget {
+  const _MessageView({
     required this.icon,
     required this.title,
     required this.message,
+    this.embedded = false,
   });
 
   final IconData icon;
   final String title;
   final String message;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color:
-                  ExpertConsultationRequestsScreen
-                      ._green,
-              size: 48,
+    final content = Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: _ExpertConsultationRequestsScreenState._muted,
+            size: 42,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _ExpertConsultationRequestsScreenState._navy,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
             ),
-            const SizedBox(height: 15),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color:
-                    ExpertConsultationRequestsScreen
-                        ._textDark,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-              ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: _ExpertConsultationRequestsScreenState._muted,
+              fontSize: 12.5,
+              height: 1.5,
             ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color:
-                    ExpertConsultationRequestsScreen
-                        ._textMuted,
-                fontSize: 13.5,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+
+    if (!embedded) return Center(child: content);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(
+          color: _ExpertConsultationRequestsScreenState._border,
+        ),
+      ),
+      child: content,
+    );
   }
+}
+
+class _ExpertFilter {
+  const _ExpertFilter({required this.key, required this.label});
+
+  final String key;
+  final String label;
+}
+
+class _RequestStatusStyle {
+  const _RequestStatusStyle({
+    required this.label,
+    required this.foreground,
+    required this.background,
+  });
+
+  final String label;
+  final Color foreground;
+  final Color background;
 }

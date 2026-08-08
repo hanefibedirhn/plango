@@ -3,11 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/consultation_request_contact_model.dart';
 import '../models/consultation_request_model.dart';
 
-class ConsultationRepositoryException
-    implements Exception {
-  const ConsultationRepositoryException(
-    this.message,
-  );
+class ConsultationRepositoryException implements Exception {
+  const ConsultationRepositoryException(this.message);
 
   final String message;
 
@@ -24,240 +21,155 @@ class ConsultationRequestNotFoundException
 class ConsultationRequestAlreadyProcessedException
     extends ConsultationRepositoryException {
   const ConsultationRequestAlreadyProcessedException()
-      : super(
-          'Bu danışma talebi daha önce sonuçlandırılmış.',
-        );
+      : super('Bu danışma talebi daha önce sonuçlandırılmış.');
 }
 
 class ConsultationExpertUnavailableException
     extends ConsultationRepositoryException {
   const ConsultationExpertUnavailableException()
-      : super(
-          'Seçtiğiniz uzman şu anda yeni danışma talebi almıyor.',
-        );
-}
-
-class ConsultationDifferentExpertActiveException
-    extends ConsultationRepositoryException {
-  const ConsultationDifferentExpertActiveException()
-      : super(
-          'Devam eden danışma süreciniz tamamlanmadan farklı bir uzmana talep gönderemezsiniz.',
-        );
+      : super('Uygun uzman şu anda yeni danışma talebi almıyor.');
 }
 
 class ConsultationRequestExpiredException
     extends ConsultationRepositoryException {
   const ConsultationRequestExpiredException()
-      : super(
-          'Bu danışma talebinin yanıt süresi dolmuş.',
-        );
+      : super('Bu danışma talebinin yanıt süresi dolmuş.');
 }
 
 class ConsultationRepository {
   ConsultationRepository({
     FirebaseFirestore? firestore,
-  }) : _firestore =
-            firestore ?? FirebaseFirestore.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
-  static const Duration responseDuration =
-      Duration(hours: 3);
+  static const Duration responseDuration = Duration(hours: 3);
 
-  CollectionReference<Map<String, dynamic>>
-      get _requestsCollection {
-    return _firestore.collection(
-      'consultationRequests',
-    );
-  }
+  CollectionReference<Map<String, dynamic>> get _requestsCollection =>
+      _firestore.collection('consultationRequests');
 
-  CollectionReference<Map<String, dynamic>>
-      get _requestContactsCollection {
-    return _firestore.collection(
-      'consultationRequestContacts',
-    );
-  }
+  CollectionReference<Map<String, dynamic>> get _requestContactsCollection =>
+      _firestore.collection('consultationRequestContacts');
 
-  CollectionReference<Map<String, dynamic>>
-      get _expertsCollection {
-    return _firestore.collection('experts');
-  }
+  CollectionReference<Map<String, dynamic>> get _expertsCollection =>
+      _firestore.collection('experts');
 
-  CollectionReference<Map<String, dynamic>>
-    get _expertProfilesCollection {
-  return _firestore.collection(
-    'expertProfiles',
-  );
-  }
-  /// Yeni danışma talebi oluşturur.
+  CollectionReference<Map<String, dynamic>> get _expertProfilesCollection =>
+      _firestore.collection('expertProfiles');
+
+  /// Talebi önce şirket kuyruğunda oluşturur.
   ///
-  /// Kayıtlı veya anonim kullanıcının UID değeri
-  /// request.userId alanında bulunmalıdır.
-  ///
-  /// Kullanıcının farklı bir uzmanla açık danışma
-  /// süreci varsa yeni talep oluşturulmaz.
+  /// Ardından aynı şirkette aktif ve yeni talep kabul eden bir uzmanı
+  /// otomatik olarak atamayı dener. Uygun uzman bulunamazsa talep
+  /// waiting_assignment durumunda kalır ve yönetici panelinde görünür.
   Future<String> createConsultationRequest(
-  ConsultationRequest request, {
-  required String userPhone,
-}) async {
-  _validateRequest(request);
+    ConsultationRequest request, {
+    required String userPhone,
+  }) async {
+    _validateRequest(request);
 
-  final String normalizedPhone =
-      userPhone.replaceAll(
-    RegExp(r'[^0-9]'),
-    '',
-  );
+    final String normalizedPhone =
+        userPhone.replaceAll(RegExp(r'[^0-9]'), '');
 
-  if (!_isValidPhone(normalizedPhone)) {
-    throw const ConsultationRepositoryException(
-      'Lütfen geçerli bir telefon numarası giriniz.',
+    if (!_isValidPhone(normalizedPhone)) {
+      throw const ConsultationRepositoryException(
+        'Lütfen geçerli bir telefon numarası giriniz.',
+      );
+    }
+
+    final bool hasOpenRequest = await _hasOpenRequest(
+      userId: request.userId,
     );
-  }
 
-  final DocumentSnapshot<Map<String, dynamic>>
-    expertSnapshot =
-    await _expertProfilesCollection
-        .doc(request.expertId)
-        .get();
+    if (hasOpenRequest) {
+      throw const ConsultationRepositoryException(
+        'Devam eden danışma talebiniz tamamlanmadan yeni bir talep oluşturamazsınız.',
+      );
+    }
 
-  if (!expertSnapshot.exists ||
-      expertSnapshot.data() == null) {
-    throw const ConsultationExpertUnavailableException();
-  }
+    final DocumentReference<Map<String, dynamic>> requestReference =
+        _requestsCollection.doc();
 
-  final Map<String, dynamic> expertData =
-      expertSnapshot.data()!;
+    final DocumentReference<Map<String, dynamic>> contactReference =
+        _requestContactsCollection.doc(requestReference.id);
 
-  final String expertStatus =
-      expertData['status'] as String? ??
-          'inactive';
+    final DateTime now = DateTime.now();
 
-  final bool acceptsNewRequests =
-      expertData['acceptsNewRequests']
-              as bool? ??
-          false;
-
-  final String expertCompanyName =
-      expertData['companyName']
-              as String? ??
-          '';
-
-  if (expertStatus != 'active' ||
-      !acceptsNewRequests) {
-    throw const ConsultationExpertUnavailableException();
-  }
-
-  if (_normalize(expertCompanyName) !=
-      _normalize(request.companyName)) {
-    throw const ConsultationRepositoryException(
-      'Seçilen uzman ile şirket bilgisi eşleşmiyor.',
+    final ConsultationRequest preparedRequest = request.copyWith(
+      requestId: requestReference.id,
+      status: 'waiting_assignment',
+      createdAt: now,
+      updatedAt: now,
+      clearExpertId: true,
+      clearAssignmentType: true,
+      clearAssignedAt: true,
+      clearAssignedBy: true,
+      clearExpiresAt: true,
+      clearAcceptedAt: true,
+      clearContactedAt: true,
+      clearCompletedAt: true,
+      clearRejectedAt: true,
+      clearCancelledAt: true,
+      clearRejectionReason: true,
+      clearAdminQueueReason: true,
+      clearWaitingForAdminAt: true,
+      clearReassignedFromExpertId: true,
     );
+
+    final WriteBatch batch = _firestore.batch();
+
+    batch.set(
+      requestReference,
+      {
+        ...preparedRequest.toMap(),
+        'requestId': requestReference.id,
+        'expertId': '',
+        'status': 'waiting_assignment',
+        'assignmentType': null,
+        'assignedAt': null,
+        'assignedBy': null,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'expiresAt': null,
+      },
+    );
+
+    batch.set(
+      contactReference,
+      {
+        'requestId': requestReference.id,
+        'userId': request.userId,
+        'expertId': '',
+        'userPhone': normalizedPhone,
+        'expertPhone': null,
+        'expertCorporateEmail': null,
+        'contactSharedAt': null,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+    );
+
+    await batch.commit();
+    // Talebin kaydedilmesi uzman bulunamamasına bağlı değildir.
+    // Otomatik atama başarısız olursa yönetici kuyruğunda kalır.
+    try {
+      await tryAutomaticAssignment(
+        requestId: requestReference.id,
+        companyName: request.companyName,
+      );
+    } on FirebaseException {
+      // Rules veya index henüz güncellenmediyse kullanıcı talebi kaybolmaz.
+    } on ConsultationRepositoryException {
+      // Uygun uzman bulunamaması normal bir kuyruk senaryosudur.
+    }
+
+    return requestReference.id;
   }
 
-  final bool hasDifferentExpertRequest =
-      await _hasActiveRequestWithDifferentExpert(
-    userId: request.userId,
-    expertId: request.expertId,
-  );
-
-  if (hasDifferentExpertRequest) {
-    throw const ConsultationDifferentExpertActiveException();
-  }
-
-  final DocumentReference<Map<String, dynamic>>
-      requestReference =
-      _requestsCollection.doc();
-
-  final DocumentReference<Map<String, dynamic>>
-      contactReference =
-      _requestContactsCollection.doc(
-    requestReference.id,
-  );
-
-  final DateTime now = DateTime.now();
-
-  final DateTime expiresAt =
-      now.add(responseDuration);
-
-  final ConsultationRequest preparedRequest =
-      request.copyWith(
-    requestId: requestReference.id,
-    status: 'pending',
-    createdAt: now,
-    updatedAt: now,
-    expiresAt: expiresAt,
-    clearAcceptedAt: true,
-    clearContactedAt: true,
-    clearCompletedAt: true,
-    clearRejectedAt: true,
-    clearCancelledAt: true,
-    clearRejectionReason: true,
-  );
-
-  final WriteBatch batch =
-      _firestore.batch();
-
-  batch.set(
-    requestReference,
-    {
-      ...preparedRequest.toMap(),
-      'requestId': requestReference.id,
-      'createdAt':
-          FieldValue.serverTimestamp(),
-      'updatedAt':
-          FieldValue.serverTimestamp(),
-      'expiresAt':
-          Timestamp.fromDate(expiresAt),
-      'status': 'pending',
-      'acceptedAt': null,
-      'contactedAt': null,
-      'completedAt': null,
-      'rejectedAt': null,
-      'cancelledAt': null,
-      'rejectionReason': null,
-    },
-  );
-
-  batch.set(
-    contactReference,
-    {
-      'requestId': requestReference.id,
-      'userId': request.userId,
-      'expertId': request.expertId,
-      'userPhone': normalizedPhone,
-      'expertPhone': null,
-      'expertCorporateEmail': null,
-      'contactSharedAt': null,
-      'createdAt':
-          FieldValue.serverTimestamp(),
-      'updatedAt':
-          FieldValue.serverTimestamp(),
-    },
-  );
-
-  await batch.commit();
-
-  return requestReference.id;
-}
-
-  void _validateRequest(
-    ConsultationRequest request,
-  ) {
+  void _validateRequest(ConsultationRequest request) {
     if (request.userId.trim().isEmpty) {
       throw const ConsultationRepositoryException(
         'Kullanıcı kimliği bulunamadı.',
-      );
-    }
-
-    if (request.expertId.trim().isEmpty) {
-      throw const ConsultationRepositoryException(
-        'Uzman kimliği bulunamadı.',
-      );
-    }
-
-    if (request.userId == request.expertId) {
-      throw const ConsultationRepositoryException(
-        'Kendinize danışma talebi gönderemezsiniz.',
       );
     }
 
@@ -279,6 +191,12 @@ class ConsultationRepository {
       );
     }
 
+    if (request.plan.downPayment < 0) {
+      throw const ConsultationRepositoryException(
+        'Peşinat tutarı geçerli değil.',
+      );
+    }
+
     if (request.plan.monthlyInstallment <= 0) {
       throw const ConsultationRepositoryException(
         'İlk taksit tutarı geçerli değil.',
@@ -292,8 +210,7 @@ class ConsultationRepository {
       );
     }
 
-    final String note =
-        request.userNote?.trim() ?? '';
+    final String note = request.userNote?.trim() ?? '';
 
     if (note.length > 500) {
       throw const ConsultationRepositoryException(
@@ -302,284 +219,375 @@ class ConsultationRepository {
     }
   }
 
-  bool _isValidPhone(
-    String value,
-  ) {
-    final String digits =
-        value.replaceAll(
-      RegExp(r'[^0-9]'),
-      '',
-    );
-
-    return digits.length == 10 ||
-        digits.length == 11;
-  }
-
-  /// Kullanıcının farklı bir uzmanla açık talebi var mı?
-  Future<bool> _hasActiveRequestWithDifferentExpert({
+  Future<bool> _hasOpenRequest({
     required String userId,
-    required String expertId,
   }) async {
-    final QuerySnapshot<Map<String, dynamic>>
-        snapshot =
+    final QuerySnapshot<Map<String, dynamic>> snapshot =
         await _requestsCollection
-            .where(
-              'userId',
-              isEqualTo: userId,
-            )
+            .where('userId', isEqualTo: userId)
             .where(
               'status',
               whereIn: const [
+                'waiting_assignment',
                 'pending',
                 'accepted',
                 'contacted',
+                'waiting_for_admin',
               ],
             )
+            .limit(1)
             .get();
 
-    for (final QueryDocumentSnapshot<
-        Map<String, dynamic>> document
-        in snapshot.docs) {
-      final String existingExpertId =
-          document.data()['expertId']
-                  as String? ??
-              '';
-
-      if (existingExpertId.isNotEmpty &&
-          existingExpertId != expertId) {
-        return true;
-      }
-    }
-
-    return false;
+    return snapshot.docs.isNotEmpty;
   }
 
-  /// Belge kimliğiyle danışma talebini getirir.
-  Future<ConsultationRequest> getRequestById(
-    String requestId,
-  ) async {
-    final DocumentSnapshot<Map<String, dynamic>>
-        document =
-        await _requestsCollection
-            .doc(requestId)
+  /// Aynı şirketteki uygun uzmanlar arasından en düşük iş yüküne sahip
+  /// uzmanı seçer. İş yükü eşitse en uzun süredir atama almayan uzman
+  /// önceliklendirilir.
+  Future<bool> tryAutomaticAssignment({
+    required String requestId,
+    required String companyName,
+  }) async {
+    final QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _expertProfilesCollection
+            .where('companyName', isEqualTo: companyName.trim())
+            .where('status', isEqualTo: 'active')
+            .where('acceptsNewRequests', isEqualTo: true)
             .get();
 
-    if (!document.exists ||
-        document.data() == null) {
-      throw const ConsultationRequestNotFoundException();
-    }
-
-    return ConsultationRequest.fromDocument(
-      document,
-    );
-  }
-
-  /// Tek bir talebi gerçek zamanlı takip eder.
-  Stream<ConsultationRequest?> watchRequestById(
-    String requestId,
-  ) {
-    return _requestsCollection
-        .doc(requestId)
-        .snapshots()
-        .map(
-      (document) {
-        if (!document.exists ||
-            document.data() == null) {
-          return null;
-        }
-
-        return ConsultationRequest.fromDocument(
-          document,
-        );
-      },
-    );
-  }
-
-  /// Kullanıcının bütün danışma taleplerini dinler.
-  Stream<List<ConsultationRequest>>
-      watchUserRequests(
-    String userId,
-  ) {
-    return _requestsCollection
-        .where(
-          'userId',
-          isEqualTo: userId,
-        )
-        .orderBy(
-          'createdAt',
-          descending: true,
-        )
-        .snapshots()
-        .map(
-      (snapshot) {
-        return snapshot.docs
-            .map(
-              ConsultationRequest.fromDocument,
-            )
-            .toList();
-      },
-    );
-  }
-
-  /// Uzmanın bütün danışma taleplerini dinler.
-  Stream<List<ConsultationRequest>>
-      watchExpertRequests(
-    String expertId,
-  ) {
-    return _requestsCollection
-        .where(
-          'expertId',
-          isEqualTo: expertId,
-        )
-        .orderBy(
-          'createdAt',
-          descending: true,
-        )
-        .snapshots()
-        .map(
-  (snapshot) {
-    final DateTime now = DateTime.now();
-
-    return snapshot.docs
-        .map(
-          ConsultationRequest.fromDocument,
-        )
-        .where(
-  (request) {
-    const visibleStatuses = {
-      'pending',
-      'accepted',
-      'contacted',
-      'completed',
-    };
-
-    if (!visibleStatuses.contains(
-      request.status,
-    )) {
+    if (snapshot.docs.isEmpty) {
       return false;
     }
 
-    if (request.status == 'pending' &&
-    !request.expiresAt.isAfter(now)) {
-  return false;
-}
+    final List<QueryDocumentSnapshot<Map<String, dynamic>>> candidates =
+        snapshot.docs.toList()
+          ..sort((a, b) {
+            final Map<String, dynamic> aData = a.data();
+            final Map<String, dynamic> bData = b.data();
+
+            final int aCount =
+                (aData['activeRequestCount'] as num?)?.toInt() ?? 0;
+            final int bCount =
+                (bData['activeRequestCount'] as num?)?.toInt() ?? 0;
+
+            final int countComparison = aCount.compareTo(bCount);
+            if (countComparison != 0) {
+              return countComparison;
+            }
+
+            final DateTime? aLast = _readNullableDate(
+              aData['lastAssignedAt'],
+            );
+            final DateTime? bLast = _readNullableDate(
+              bData['lastAssignedAt'],
+            );
+
+            if (aLast == null && bLast == null) {
+              return a.id.compareTo(b.id);
+            }
+            if (aLast == null) return -1;
+            if (bLast == null) return 1;
+
+            return aLast.compareTo(bLast);
+          });
+
+    await assignExpert(
+      requestId: requestId,
+      expertId: candidates.first.id,
+      assignmentType: 'auto',
+      assignedBy: 'system',
+    );
 
     return true;
-  },
-)
-        .toList();
-  },
-);
   }
 
-  /// Uzmanın yalnızca yanıt bekleyen taleplerini dinler.
-  Stream<List<ConsultationRequest>>
-      watchPendingExpertRequests(
-    String expertId,
+  /// Yönetici veya otomatik atama sistemi tarafından mevcut talebe
+  /// uzman atar. Yeni talep belgesi oluşturulmaz; süreç tek belge
+  /// üzerinden devam eder.
+  Future<void> assignExpert({
+    required String requestId,
+    required String expertId,
+    required String assignmentType,
+    required String assignedBy,
+  }) async {
+    final String normalizedExpertId = expertId.trim();
+
+    if (normalizedExpertId.isEmpty) {
+      throw const ConsultationRepositoryException(
+        'Uzman kimliği bulunamadı.',
+      );
+    }
+
+    if (assignmentType != 'auto' && assignmentType != 'admin') {
+      throw const ConsultationRepositoryException(
+        'Atama türü geçerli değil.',
+      );
+    }
+
+    final DocumentReference<Map<String, dynamic>> requestReference =
+        _requestsCollection.doc(requestId);
+
+    final DocumentReference<Map<String, dynamic>> contactReference =
+        _requestContactsCollection.doc(requestId);
+
+    final DocumentReference<Map<String, dynamic>> expertReference =
+        _expertProfilesCollection.doc(normalizedExpertId);
+
+    final DateTime expiresAt = DateTime.now().add(responseDuration);
+
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> requestSnapshot =
+          await transaction.get(requestReference);
+      final DocumentSnapshot<Map<String, dynamic>> contactSnapshot =
+          await transaction.get(contactReference);
+      final DocumentSnapshot<Map<String, dynamic>> expertSnapshot =
+          await transaction.get(expertReference);
+
+      if (!requestSnapshot.exists || requestSnapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
+
+      if (!contactSnapshot.exists || contactSnapshot.data() == null) {
+        throw const ConsultationRepositoryException(
+          'Danışma talebinin iletişim kaydı bulunamadı.',
+        );
+      }
+
+      if (!expertSnapshot.exists || expertSnapshot.data() == null) {
+        throw const ConsultationExpertUnavailableException();
+      }
+
+      final Map<String, dynamic> requestData = requestSnapshot.data()!;
+      final Map<String, dynamic> expertData = expertSnapshot.data()!;
+
+      final String currentStatus =
+          requestData['status'] as String? ?? '';
+
+      if (currentStatus != 'waiting_assignment' &&
+          currentStatus != 'waiting_for_admin') {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
+
+      final String expertStatus =
+          expertData['status'] as String? ?? 'inactive';
+      final bool acceptsNewRequests =
+          expertData['acceptsNewRequests'] as bool? ?? false;
+      final String expertCompanyName =
+          expertData['companyName'] as String? ?? '';
+      final String requestCompanyName =
+          requestData['companyName'] as String? ?? '';
+
+      if (expertStatus != 'active' || !acceptsNewRequests) {
+        throw const ConsultationExpertUnavailableException();
+      }
+
+      if (_normalize(expertCompanyName) !=
+          _normalize(requestCompanyName)) {
+        throw const ConsultationRepositoryException(
+          'Seçilen uzman ile şirket bilgisi eşleşmiyor.',
+        );
+      }
+
+      final String previousExpertId =
+          requestData['expertId'] as String? ?? '';
+
+      transaction.update(
+        requestReference,
+        {
+          'expertId': normalizedExpertId,
+          'status': 'pending',
+          'assignmentType': assignmentType,
+          'assignedAt': FieldValue.serverTimestamp(),
+          'assignedBy': assignedBy.trim(),
+          'expiresAt': Timestamp.fromDate(expiresAt),
+          'updatedAt': FieldValue.serverTimestamp(),
+          'acceptedAt': null,
+          'contactedAt': null,
+          'completedAt': null,
+          'rejectedAt': null,
+          'cancelledAt': null,
+          'rejectionReason': null,
+          'adminQueueReason': null,
+          'waitingForAdminAt': null,
+          'reassignedFromExpertId':
+              previousExpertId.isEmpty ? null : previousExpertId,
+        },
+      );
+
+      transaction.update(
+        contactReference,
+        {
+          'expertId': normalizedExpertId,
+          'expertPhone': null,
+          'expertCorporateEmail': null,
+          'contactSharedAt': null,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+    });
+  }
+
+  Future<ConsultationRequest> getRequestById(
+    String requestId,
+  ) async {
+    final DocumentSnapshot<Map<String, dynamic>> document =
+        await _requestsCollection.doc(requestId).get();
+
+    if (!document.exists || document.data() == null) {
+      throw const ConsultationRequestNotFoundException();
+    }
+
+    return ConsultationRequest.fromDocument(document);
+  }
+
+  Stream<ConsultationRequest?> watchRequestById(
+    String requestId,
   ) {
-    return _requestsCollection
-        .where(
-          'expertId',
-          isEqualTo: expertId,
-        )
-        .where(
-          'status',
-          isEqualTo: 'pending',
-        )
-        .orderBy(
-          'createdAt',
-          descending: false,
-        )
-        .snapshots()
-        .map(
-      (snapshot) {
-        return snapshot.docs
-            .map(
-              ConsultationRequest.fromDocument,
-            )
-            .toList();
+    return _requestsCollection.doc(requestId).snapshots().map(
+      (document) {
+        if (!document.exists || document.data() == null) {
+          return null;
+        }
+
+        return ConsultationRequest.fromDocument(document);
       },
     );
   }
 
-  /// Uzman danışma talebini kabul eder.
+  Stream<List<ConsultationRequest>> watchUserRequests(
+    String userId,
+  ) {
+    return _requestsCollection
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(ConsultationRequest.fromDocument)
+              .toList(),
+        );
+  }
+
+  Stream<List<ConsultationRequest>> watchExpertRequests(
+    String expertId,
+  ) {
+    return _requestsCollection
+        .where('expertId', isEqualTo: expertId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(ConsultationRequest.fromDocument)
+              .where(
+                (request) => const {
+                  'pending',
+                  'accepted',
+                  'contacted',
+                  'completed',
+                  'rejected',
+                  'expired',
+                }.contains(request.status),
+              )
+              .toList(),
+        );
+  }
+
+  Stream<List<ConsultationRequest>> watchPendingExpertRequests(
+    String expertId,
+  ) {
+    return _requestsCollection
+        .where('expertId', isEqualTo: expertId)
+        .where('status', isEqualTo: 'pending')
+        .orderBy('createdAt')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(ConsultationRequest.fromDocument)
+              .toList(),
+        );
+  }
+
+  Stream<List<ConsultationRequest>> watchAllRequests() {
+    return _requestsCollection
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(ConsultationRequest.fromDocument)
+              .toList(),
+        );
+  }
+
+  Stream<List<ConsultationRequest>>
+      watchWaitingForAdminRequests() {
+    return _requestsCollection
+        .where(
+          'status',
+          whereIn: const [
+            'waiting_assignment',
+            'waiting_for_admin',
+          ],
+        )
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map(ConsultationRequest.fromDocument)
+              .toList(),
+        );
+  }
+
   Future<void> acceptRequest({
     required String requestId,
     required String expertId,
   }) async {
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
+    final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
 
-    await _firestore.runTransaction<void>(
-  (transaction) async {
-    print("1- Transaction başladı");
 
-    final requestSnapshot =
-        await transaction.get(requestReference);
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await transaction.get(requestReference);
 
-    print("2- Snapshot alındı");
+      if (!snapshot.exists || snapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
 
-    if (!requestSnapshot.exists ||
-        requestSnapshot.data() == null) {
-      print("3- Talep bulunamadı");
-      throw const ConsultationRequestNotFoundException();
-    }
+      final Map<String, dynamic> data = snapshot.data()!;
 
-    final data = requestSnapshot.data()!;
-    print("4- Data okundu");
+      _validateExpertOwnership(data, expertId);
 
-    if (data['expertId'] != expertId) {
-      print("5- Expert uyuşmuyor");
-      throw const ConsultationRepositoryException(
-        'Bu danışma talebi size ait değil.',
+      if (data['status'] != 'pending') {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
+
+      final DateTime? expiresAt =
+          _readNullableDate(data['expiresAt']);
+
+      if (expiresAt == null ||
+          !DateTime.now().isBefore(expiresAt)) {
+        throw const ConsultationRequestExpiredException();
+      }
+
+      transaction.update(
+        requestReference,
+        {
+          'status': 'accepted',
+          'acceptedAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+          'rejectedAt': null,
+          'rejectionReason': null,
+        },
       );
-    }
-
-    if (data['status'] != 'pending') {
-      print("6- Status pending değil");
-      throw const ConsultationRequestAlreadyProcessedException();
-    }
-
-    final expiresAt =
-        _readNullableDate(data['expiresAt']);
-
-    print("7- Expires okundu");
-
-    if (expiresAt == null ||
-        !DateTime.now().isBefore(expiresAt)) {
-      print("8- Süresi dolmuş");
-      throw const ConsultationRequestExpiredException();
-    }
-
-    print("9- Update başlıyor");
-
-    transaction.update(
-      requestReference,
-      {
-        'status': 'accepted',
-        'acceptedAt':
-            FieldValue.serverTimestamp(),
-        'updatedAt':
-            FieldValue.serverTimestamp(),
-        'rejectedAt': null,
-        'rejectionReason': null,
-      },
-    );
-
-    print("10- Update tamam");
-  },
-);
+    });
   }
 
-  /// Uzman danışma talebini reddeder.
   Future<void> rejectRequest({
     required String requestId,
     required String expertId,
     required String rejectionReason,
   }) async {
-    final String normalizedReason =
-        rejectionReason.trim();
+    final String normalizedReason = rejectionReason.trim();
 
     if (normalizedReason.length < 3) {
       throw const ConsultationRepositoryException(
@@ -587,230 +595,182 @@ class ConsultationRepository {
       );
     }
 
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
+    final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
 
-    await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(
-          requestReference,
-        );
 
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await transaction.get(requestReference);
 
-        final Map<String, dynamic> data =
-            requestSnapshot.data()!;
+      if (!snapshot.exists || snapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
 
-        if (data['expertId'] != expertId) {
-          throw const ConsultationRepositoryException(
-            'Bu danışma talebi size ait değil.',
-          );
-        }
+      final Map<String, dynamic> data = snapshot.data()!;
 
-        if (data['status'] != 'pending') {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
+      _validateExpertOwnership(data, expertId);
 
-        transaction.update(
-  requestReference,
-  {
-    'status': 'waiting_for_admin',
-    'rejectionReason': normalizedReason,
-    'rejectedAt':
-        FieldValue.serverTimestamp(),
-    'waitingForAdminAt':
-        FieldValue.serverTimestamp(),
-    'adminQueueReason': 'expert_rejected',
-    'updatedAt':
-        FieldValue.serverTimestamp(),
-  },
-);
-      },
-    );
+      if (data['status'] != 'pending') {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
+
+      transaction.update(
+        requestReference,
+        {
+          'status': 'waiting_for_admin',
+          'rejectedAt': FieldValue.serverTimestamp(),
+          'rejectionReason': normalizedReason,
+          'waitingForAdminAt': FieldValue.serverTimestamp(),
+          'adminQueueReason': 'expert_rejected',
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+    });
   }
 
-  /// Kullanıcı kendi açık talebini iptal eder.
   Future<void> cancelRequest({
     required String requestId,
     required String userId,
   }) async {
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
+    final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
 
-    await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(
-          requestReference,
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await transaction.get(requestReference);
+
+      if (!snapshot.exists || snapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
+
+      final Map<String, dynamic> data = snapshot.data()!;
+
+      if (data['userId'] != userId) {
+        throw const ConsultationRepositoryException(
+          'Bu danışma talebini iptal etme yetkiniz bulunmuyor.',
         );
+      }
 
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
+      final String status = data['status'] as String? ?? '';
 
-        final Map<String, dynamic> data =
-            requestSnapshot.data()!;
+      if (!const {
+        'waiting_assignment',
+        'pending',
+        'accepted',
+      }.contains(status)) {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
 
-        if (data['userId'] != userId) {
-          throw const ConsultationRepositoryException(
-            'Bu danışma talebini iptal etme yetkiniz bulunmuyor.',
-          );
-        }
-
-        final String status =
-            data['status'] as String? ?? '';
-
-        if (status != 'pending' &&
-            status != 'accepted') {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
-
-        transaction.update(
-          requestReference,
-          {
-            'status': 'cancelled',
-            'cancelledAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
-        );
-      },
-    );
+      transaction.update(
+        requestReference,
+        {
+          'status': 'cancelled',
+          'cancelledAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+    });
   }
 
-  /// Uzman kullanıcıyla iletişime geçtiğini işaretler.
-  ///
-  /// Talep durumu ve uzmanın güvenli iletişim bilgileri
-  /// aynı transaction içinde güncellenir.
   Future<void> markAsContacted({
     required String requestId,
     required String expertId,
   }) async {
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
+    final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
-
-    final DocumentReference<Map<String, dynamic>>
-        contactReference =
+    final DocumentReference<Map<String, dynamic>> contactReference =
         _requestContactsCollection.doc(requestId);
-
-    final DocumentReference<Map<String, dynamic>>
-        expertReference =
+    final DocumentReference<Map<String, dynamic>> expertReference =
         _expertsCollection.doc(expertId);
 
-    await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(requestReference);
 
-        final DocumentSnapshot<Map<String, dynamic>>
-            contactSnapshot =
-            await transaction.get(contactReference);
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> requestSnapshot =
+          await transaction.get(requestReference);
+      final DocumentSnapshot<Map<String, dynamic>> contactSnapshot =
+          await transaction.get(contactReference);
+      final DocumentSnapshot<Map<String, dynamic>> expertSnapshot =
+        await transaction.get(expertReference);
 
-        final DocumentSnapshot<Map<String, dynamic>>
-            expertSnapshot =
-            await transaction.get(expertReference);
+      if (!requestSnapshot.exists ||
+          requestSnapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
 
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
-
-        if (!contactSnapshot.exists ||
-            contactSnapshot.data() == null) {
-          throw const ConsultationRepositoryException(
-            'Danışma talebinin iletişim kaydı bulunamadı.',
-          );
-        }
-
-        if (!expertSnapshot.exists ||
-            expertSnapshot.data() == null) {
-          throw const ConsultationRepositoryException(
-            'Uzman iletişim bilgileri bulunamadı.',
-          );
-        }
-
-        final Map<String, dynamic> requestData =
-            requestSnapshot.data()!;
-
-        final Map<String, dynamic> contactData =
-            contactSnapshot.data()!;
-
-        final Map<String, dynamic> expertData =
-            expertSnapshot.data()!;
-
-        if (requestData['expertId'] != expertId ||
-            contactData['expertId'] != expertId) {
-          throw const ConsultationRepositoryException(
-            'Bu danışma talebi size ait değil.',
-          );
-        }
-
-        if (requestData['status'] != 'accepted') {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
-
-        final String expertPhone =
-            (expertData['phone'] as String? ?? '').trim();
-
-        final String expertCorporateEmail =
-            (expertData['corporateEmail'] as String? ?? '')
-                .trim()
-                .toLowerCase();
-
-        if (!_isValidPhone(expertPhone)) {
-          throw const ConsultationRepositoryException(
-            'Uzman telefon bilgisi geçerli değil. '
-            'Lütfen profil bilgilerinizi kontrol ediniz.',
-          );
-        }
-
-        if (!_isValidEmail(expertCorporateEmail)) {
-          throw const ConsultationRepositoryException(
-            'Uzman kurumsal e-posta bilgisi geçerli değil. '
-            'Lütfen profil bilgilerinizi kontrol ediniz.',
-          );
-        }
-
-        transaction.update(
-          requestReference,
-          {
-            'status': 'contacted',
-            'contactedAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
+      if (!contactSnapshot.exists ||
+          contactSnapshot.data() == null) {
+        throw const ConsultationRepositoryException(
+          'Danışma talebinin iletişim kaydı bulunamadı.',
         );
+      }
 
-        transaction.update(
-          contactReference,
-          {
-            'expertPhone': expertPhone,
-            'expertCorporateEmail':
-                expertCorporateEmail,
-            'contactSharedAt':
-                FieldValue.serverTimestamp(),
-            'updatedAt':
-                FieldValue.serverTimestamp(),
-          },
+      if (!expertSnapshot.exists || expertSnapshot.data() == null) {
+        throw const ConsultationRepositoryException(
+          'Uzman iletişim bilgileri bulunamadı.',
         );
-      },
-    );
+      }
+
+      final Map<String, dynamic> requestData =
+          requestSnapshot.data()!;
+
+      final Map<String, dynamic> contactData =
+          contactSnapshot.data()!;
+      final Map<String, dynamic> expertData =
+          expertSnapshot.data()!;
+
+      _validateExpertOwnership(requestData, expertId);
+
+      if (contactData['expertId'] != expertId) {
+        throw const ConsultationRepositoryException(
+          'Bu danışma talebinin iletişim bilgisi size ait değil.',
+        );
+      }
+
+      if (requestData['status'] != 'accepted') {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
+
+      final String expertPhone =
+          (expertData['phone'] as String? ?? '').trim();
+      final String expertCorporateEmail =
+          (expertData['corporateEmail'] as String? ?? '')
+              .trim()
+              .toLowerCase();
+
+      if (!_isValidPhone(expertPhone)) {
+        throw const ConsultationRepositoryException(
+          'Uzman telefon bilgisi geçerli değil.',
+        );
+      }
+
+      if (!_isValidEmail(expertCorporateEmail)) {
+        throw const ConsultationRepositoryException(
+          'Uzman kurumsal e-posta bilgisi geçerli değil.',
+        );
+      }
+
+      transaction.update(
+        requestReference,
+        {
+          'status': 'contacted',
+          'contactedAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+
+      transaction.update(
+        contactReference,
+        {
+          'expertPhone': expertPhone,
+          'expertCorporateEmail': expertCorporateEmail,
+          'contactSharedAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+    });
   }
 
-  /// Uzman danışma sürecini tamamlar.
   Future<void> completeRequest({
     required String requestId,
     required String expertId,
@@ -824,40 +784,13 @@ class ConsultationRepository {
       ],
       values: {
         'status': 'completed',
-        'completedAt':
-            FieldValue.serverTimestamp(),
-        'updatedAt':
-            FieldValue.serverTimestamp(),
+        'completedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       },
+      decreaseActiveCount: false,
     );
   }
 
-  /// Yönetici tarafından yeniden atanmayı bekleyen talepleri dinler.
-Stream<List<ConsultationRequest>>
-    watchWaitingForAdminRequests() {
-  return _requestsCollection
-      .where(
-        'status',
-        isEqualTo: 'waiting_for_admin',
-      )
-      .orderBy(
-        'updatedAt',
-        descending: true,
-      )
-      .snapshots()
-      .map(
-        (snapshot) {
-          return snapshot.docs
-              .map(
-                ConsultationRequest.fromDocument,
-              )
-              .toList();
-        },
-      );
-}
-
-  /// Kullanıcıya paylaşılmış uzman iletişim bilgisini
-  /// gerçek zamanlı olarak takip eder.
   Stream<ConsultationRequestContact?>
       watchRequestContactForUser({
     required String requestId,
@@ -866,422 +799,204 @@ Stream<List<ConsultationRequest>>
     return _requestContactsCollection
         .doc(requestId)
         .snapshots()
-        .map(
-      (document) {
-        if (!document.exists ||
-            document.data() == null) {
-          return null;
-        }
+        .map((document) {
+      if (!document.exists || document.data() == null) {
+        return null;
+      }
 
-        final ConsultationRequestContact contact =
-            ConsultationRequestContact.fromDocument(
-          document,
+      final ConsultationRequestContact contact =
+          ConsultationRequestContact.fromDocument(document);
+
+      if (contact.userId != userId) {
+        throw const ConsultationRepositoryException(
+          'Bu iletişim bilgisine erişim yetkiniz yok.',
         );
+      }
 
-        if (contact.userId != userId) {
-          throw const ConsultationRepositoryException(
-            'Bu iletişim bilgisine erişim yetkiniz yok.',
-          );
-        }
-
-        return contact;
-      },
-    );
+      return contact;
+    });
   }
 
   Future<String?> getRequestPhone({
-  required String requestId,
-  required String expertId,
-}) async {
-  final contactSnapshot =
-      await _requestContactsCollection
-          .doc(requestId)
-          .get();
+    required String requestId,
+    required String expertId,
+  }) async {
+    final DocumentSnapshot<Map<String, dynamic>> contactSnapshot =
+        await _requestContactsCollection.doc(requestId).get();
 
-  if (!contactSnapshot.exists ||
-      contactSnapshot.data() == null) {
-    return null;
+    if (!contactSnapshot.exists || contactSnapshot.data() == null) {
+      return null;
+    }
+
+    final Map<String, dynamic> data = contactSnapshot.data()!;
+
+    if (data['expertId'] != expertId) {
+      throw const ConsultationRepositoryException(
+        'Bu iletişim bilgisine erişim yetkiniz yok.',
+      );
+    }
+
+    final String phone =
+        data['userPhone'] as String? ?? '';
+
+    return phone.trim().isEmpty ? null : phone.trim();
   }
 
-  final data = contactSnapshot.data()!;
+  /// Yönetici talep detayında telefon numarasını güvenli koleksiyondan okur.
+  Future<String?> getRequestPhoneForAdmin({
+    required String requestId,
+  }) async {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await _requestContactsCollection.doc(requestId).get();
 
-  if (data['expertId'] != expertId) {
-    throw ConsultationRepositoryException(
-      'Bu iletişim bilgisine erişim yetkiniz yok.',
+    if (!snapshot.exists || snapshot.data() == null) {
+      return null;
+    }
+
+    final String phone =
+        snapshot.data()!['userPhone'] as String? ?? '';
+
+    return phone.trim().isEmpty ? null : phone.trim();
+  }
+
+  Future<bool> expireRequestIfNeeded(
+    String requestId,
+  ) async {
+    final DocumentReference<Map<String, dynamic>> requestReference =
+        _requestsCollection.doc(requestId);
+
+    return _firestore.runTransaction<bool>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await transaction.get(requestReference);
+
+      if (!snapshot.exists || snapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
+
+      final Map<String, dynamic> data = snapshot.data()!;
+
+      if (data['status'] != 'pending') {
+        return false;
+      }
+
+      final DateTime? expiresAt =
+          _readNullableDate(data['expiresAt']);
+
+      if (expiresAt == null ||
+          DateTime.now().isBefore(expiresAt)) {
+        return false;
+      }
+
+      transaction.update(
+        requestReference,
+        {
+          'status': 'waiting_for_admin',
+          'waitingForAdminAt': FieldValue.serverTimestamp(),
+          'adminQueueReason': 'response_expired',
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+      );
+
+      return true;
+    });
+  }
+
+  /// Eski ekranlarla geçici uyumluluk için aynı talep belgesini
+  /// yeni uzmana geçirir. Yeni belge oluşturulmaz.
+  Future<String> reassignRequest({
+    required ConsultationRequest previousRequest,
+    required String newExpertId,
+    String assignedBy = 'admin',
+  }) async {
+    final String? requestId = previousRequest.requestId;
+
+    if (requestId == null || requestId.trim().isEmpty) {
+      throw const ConsultationRequestNotFoundException();
+    }
+
+    await assignExpert(
+      requestId: requestId,
+      expertId: newExpertId,
+      assignmentType: 'admin',
+      assignedBy: assignedBy,
     );
+
+    return requestId;
   }
-
-  final String phone =
-      data['userPhone'] as String? ?? '';
-
-  return phone.isEmpty ? null : phone;
-}
 
   Future<void> _updateExpertOwnedStatus({
     required String requestId,
     required String expertId,
-    required List<String>
-        requiredCurrentStatuses,
+    required List<String> requiredCurrentStatuses,
     required Map<String, dynamic> values,
+    bool decreaseActiveCount = false,
   }) async {
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
+    final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
+    final DocumentReference<Map<String, dynamic>> expertReference =
+        _expertProfilesCollection.doc(expertId);
 
-    await _firestore.runTransaction<void>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(
-          requestReference,
-        );
+    await _firestore.runTransaction<void>((transaction) async {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await transaction.get(requestReference);
 
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
+      if (!snapshot.exists || snapshot.data() == null) {
+        throw const ConsultationRequestNotFoundException();
+      }
 
-        final Map<String, dynamic> data =
-            requestSnapshot.data()!;
+      final Map<String, dynamic> data = snapshot.data()!;
 
-        if (data['expertId'] != expertId) {
-          throw const ConsultationRepositoryException(
-            'Bu danışma talebi size ait değil.',
-          );
-        }
+      _validateExpertOwnership(data, expertId);
 
-        final String currentStatus =
-            data['status'] as String? ?? '';
+      final String currentStatus =
+          data['status'] as String? ?? '';
 
-        if (!requiredCurrentStatuses.contains(
-          currentStatus,
-        )) {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
+      if (!requiredCurrentStatuses.contains(currentStatus)) {
+        throw const ConsultationRequestAlreadyProcessedException();
+      }
 
+      transaction.update(requestReference, values);
+
+      if (decreaseActiveCount) {
         transaction.update(
-          requestReference,
-          values,
-        );
-      },
-    );
-  }
-
-  /// Süresi geçen pending talebi expired yapar.
-  ///
-  /// Tam otomatik süre kontrolü daha sonra güvenli
-  /// backend göreviyle çalıştırılacaktır.
-  Future<bool> expireRequestIfNeeded(
-    String requestId,
-  ) async {
-    final DocumentReference<Map<String, dynamic>>
-        requestReference =
-        _requestsCollection.doc(requestId);
-
-    return _firestore.runTransaction<bool>(
-      (transaction) async {
-        final DocumentSnapshot<Map<String, dynamic>>
-            requestSnapshot =
-            await transaction.get(
-          requestReference,
-        );
-
-        if (!requestSnapshot.exists ||
-            requestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
-
-        final Map<String, dynamic> data =
-            requestSnapshot.data()!;
-
-        if (data['status'] != 'pending') {
-          return false;
-        }
-
-        final DateTime? expiresAt =
-            _readNullableDate(
-          data['expiresAt'],
-        );
-
-        if (expiresAt == null ||
-            DateTime.now()
-                .isBefore(expiresAt)) {
-          return false;
-        }
-
-        transaction.update(
-  requestReference,
-  {
-    'status': 'waiting_for_admin',
-    'waitingForAdminAt':
-        FieldValue.serverTimestamp(),
-    'adminQueueReason': 'response_expired',
-    'updatedAt':
-        FieldValue.serverTimestamp(),
-  },
-);
-
-        return true;
-      },
-    );
-  }
-  
-  /// Reddedilen veya yanıt süresi dolan talebi
-  /// yönetici tarafından başka bir uzmana atar.
-  ///
-  /// Eski talep reassigned durumuna geçirilir.
-  /// Yeni uzman için yeni bir pending talep oluşturulur.
-  /// Kullanıcının iletişim bilgisi yeni talebe kopyalanır.
-  Future<String> reassignRequest({
-    required ConsultationRequest previousRequest,
-    required String newExpertId,
-  }) async {
-    final String? previousRequestId =
-        previousRequest.requestId;
-
-    final String normalizedNewExpertId =
-        newExpertId.trim();
-
-    if (previousRequestId == null ||
-        previousRequestId.trim().isEmpty) {
-      throw const ConsultationRequestNotFoundException();
-    }
-
-    if (normalizedNewExpertId.isEmpty) {
-      throw const ConsultationRepositoryException(
-        'Yeni uzman kimliği bulunamadı.',
-      );
-    }
-
-    if (normalizedNewExpertId ==
-        previousRequest.expertId) {
-      throw const ConsultationRepositoryException(
-        'Talep aynı uzmana yeniden yönlendirilemez.',
-      );
-    }
-
-    final DocumentReference<Map<String, dynamic>>
-        previousRequestReference =
-        _requestsCollection.doc(previousRequestId);
-
-    final DocumentReference<Map<String, dynamic>>
-        previousContactReference =
-        _requestContactsCollection.doc(
-      previousRequestId,
-    );
-
-    final DocumentReference<Map<String, dynamic>>
-        newExpertReference =
-        _expertProfilesCollection.doc(
-      normalizedNewExpertId,
-    );
-
-    final DocumentReference<Map<String, dynamic>>
-        newRequestReference =
-        _requestsCollection.doc();
-
-    final DocumentReference<Map<String, dynamic>>
-        newContactReference =
-        _requestContactsCollection.doc(
-      newRequestReference.id,
-    );
-
-    final DateTime expiresAt =
-        DateTime.now().add(responseDuration);
-
-    await _firestore.runTransaction<void>(
-      (transaction) async {
-        // Transaction içinde önce bütün okumalar yapılır.
-        final DocumentSnapshot<Map<String, dynamic>>
-            previousRequestSnapshot =
-            await transaction.get(
-          previousRequestReference,
-        );
-
-        final DocumentSnapshot<Map<String, dynamic>>
-            previousContactSnapshot =
-            await transaction.get(
-          previousContactReference,
-        );
-
-        final DocumentSnapshot<Map<String, dynamic>>
-            newExpertSnapshot =
-            await transaction.get(
-          newExpertReference,
-        );
-
-        if (!previousRequestSnapshot.exists ||
-            previousRequestSnapshot.data() == null) {
-          throw const ConsultationRequestNotFoundException();
-        }
-
-        if (!previousContactSnapshot.exists ||
-            previousContactSnapshot.data() == null) {
-          throw const ConsultationRepositoryException(
-            'Danışma talebinin iletişim bilgisi bulunamadı.',
-          );
-        }
-
-        if (!newExpertSnapshot.exists ||
-            newExpertSnapshot.data() == null) {
-          throw const ConsultationExpertUnavailableException();
-        }
-
-        final Map<String, dynamic> previousRequestData =
-            previousRequestSnapshot.data()!;
-
-        final Map<String, dynamic> previousContactData =
-            previousContactSnapshot.data()!;
-
-        final Map<String, dynamic> newExpertData =
-            newExpertSnapshot.data()!;
-
-        final String previousStatus =
-            previousRequestData['status']
-                    as String? ??
-                '';
-
-        if (previousStatus != 'waiting_for_admin') {
-          throw const ConsultationRequestAlreadyProcessedException();
-        }
-
-        final String currentExpertId =
-            previousRequestData['expertId']
-                    as String? ??
-                '';
-
-        if (currentExpertId.isEmpty) {
-          throw const ConsultationRepositoryException(
-            'Talebin önceki uzman bilgisi bulunamadı.',
-          );
-        }
-
-        if (currentExpertId ==
-            normalizedNewExpertId) {
-          throw const ConsultationRepositoryException(
-            'Talep aynı uzmana yeniden yönlendirilemez.',
-          );
-        }
-
-        final String newExpertStatus =
-            newExpertData['status'] as String? ??
-                'inactive';
-
-        final bool acceptsNewRequests =
-            newExpertData['acceptsNewRequests']
-                    as bool? ??
-                false;
-
-        final String newExpertCompanyName =
-            newExpertData['companyName']
-                    as String? ??
-                '';
-
-        final String requestCompanyName =
-            previousRequestData['companyName']
-                    as String? ??
-                previousRequest.companyName;
-
-        if (newExpertStatus != 'active' ||
-            !acceptsNewRequests) {
-          throw const ConsultationExpertUnavailableException();
-        }
-
-        if (_normalize(newExpertCompanyName) !=
-            _normalize(requestCompanyName)) {
-          throw const ConsultationRepositoryException(
-            'Seçilen uzman ile şirket bilgisi eşleşmiyor.',
-          );
-        }
-
-        final String userPhone =
-            previousContactData['userPhone']
-                    as String? ??
-                '';
-
-        if (!_isValidPhone(userPhone)) {
-          throw const ConsultationRepositoryException(
-            'Danışma talebinin telefon bilgisi geçerli değil.',
-          );
-        }
-
-        final Map<String, dynamic> newRequestData = {
-          ...previousRequestData,
-          'requestId': newRequestReference.id,
-          'expertId': normalizedNewExpertId,
-          'status': 'pending',
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-          'expiresAt': Timestamp.fromDate(expiresAt),
-          'acceptedAt': null,
-          'contactedAt': null,
-          'completedAt': null,
-          'rejectedAt': null,
-          'cancelledAt': null,
-          'rejectionReason': null,
-          'waitingForAdminAt': null,
-          'adminQueueReason': null,
-          'reassignedFromExpertId':
-              currentExpertId,
-        };
-
-        final Map<String, dynamic> newContactData = {
-          ...previousContactData,
-          'requestId': newRequestReference.id,
-          'expertId': normalizedNewExpertId,
-          'userPhone': userPhone,
-          'expertPhone': null,
-          'expertCorporateEmail': null,
-          'contactSharedAt': null,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        };
-
-        // Bütün kontroller tamamlandıktan sonra
-        // yazma işlemleri gerçekleştirilir.
-        transaction.update(
-          previousRequestReference,
+          expertReference,
           {
-            'status': 'reassigned',
-            'updatedAt':
-                FieldValue.serverTimestamp(),
+            'activeRequestCount': FieldValue.increment(-1),
+            'updatedAt': FieldValue.serverTimestamp(),
           },
         );
-
-        transaction.set(
-          newRequestReference,
-          newRequestData,
-        );
-
-        transaction.set(
-          newContactReference,
-          newContactData,
-        );
-      },
-    );
-
-    return newRequestReference.id;
+      }
+    });
   }
 
-  bool _isValidEmail(
-    String value,
+  void _validateExpertOwnership(
+    Map<String, dynamic> data,
+    String expertId,
   ) {
-    final String normalized = value.trim();
+    if ((data['expertId'] as String? ?? '') != expertId) {
+      throw const ConsultationRepositoryException(
+        'Bu danışma talebi size ait değil.',
+      );
+    }
+  }
 
+  bool _isValidPhone(String value) {
+    final String digits =
+        value.replaceAll(RegExp(r'[^0-9]'), '');
+
+    return digits.length == 10 || digits.length == 11;
+  }
+
+  bool _isValidEmail(String value) {
     return RegExp(
       r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-    ).hasMatch(normalized);
+    ).hasMatch(value.trim());
   }
 
-  static String _normalize(
-    String value,
-  ) {
-    return value.trim().toLowerCase();
-  }
+  static String _normalize(String value) =>
+      value.trim().toLowerCase();
 
-  static DateTime? _readNullableDate(
-    dynamic value,
-  ) {
+  static DateTime? _readNullableDate(dynamic value) {
     if (value is Timestamp) {
       return value.toDate();
     }

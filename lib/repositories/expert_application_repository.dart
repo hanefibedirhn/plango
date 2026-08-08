@@ -289,7 +289,7 @@ class ExpertApplicationRepository {
         );
       },
     );
-
+    
     return applicationReference.id;
   }
 

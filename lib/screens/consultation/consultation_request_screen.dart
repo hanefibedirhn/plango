@@ -6,20 +6,18 @@ import 'package:intl/intl.dart';
 import '../../models/calculation_plan.dart';
 import '../../models/company.dart';
 import '../../models/consultation_request_model.dart';
-import '../../models/expert_profile_model.dart';
 import '../../repositories/consultation_repository.dart';
+import '../my_consultation_requests_screen.dart';
 import '../register_screen.dart';
 
 class ConsultationRequestScreen extends StatefulWidget {
   const ConsultationRequestScreen({
     super.key,
     required this.company,
-    required this.expert,
     required this.plan,
   });
 
   final Company company;
-  final ExpertProfile expert;
   final CalculationPlan plan;
 
   @override
@@ -29,22 +27,23 @@ class ConsultationRequestScreen extends StatefulWidget {
 
 class _ConsultationRequestScreenState
     extends State<ConsultationRequestScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _softGreen = Color(0xFFE8F1EC);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+  static const Color _muted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EAF0);
+  static const Color _softTeal = Color(0xFFEAF8F5);
+  static const Color _error = Color(0xFFB42318);
 
   final ConsultationRepository _repository =
       ConsultationRepository();
 
   final TextEditingController _fullNameController =
       TextEditingController();
-
   final TextEditingController _phoneController =
       TextEditingController();
-
   final TextEditingController _noteController =
       TextEditingController();
 
@@ -58,6 +57,7 @@ class _ConsultationRequestScreenState
   bool _isLoadingRequester = true;
   bool _isSubmitting = false;
   bool _isGuest = true;
+  bool _consentAccepted = false;
   String? _requesterError;
 
   @override
@@ -72,10 +72,6 @@ class _ConsultationRequestScreenState
     _phoneController.dispose();
     _noteController.dispose();
     super.dispose();
-  }
-
-  String _formatCurrency(double value) {
-    return _currencyFormatter.format(value);
   }
 
   Future<User> _ensureAuthenticatedUser() async {
@@ -101,21 +97,22 @@ class _ConsultationRequestScreenState
   }
 
   Future<void> _loadRequester() async {
+    setState(() {
+      _isLoadingRequester = true;
+      _requesterError = null;
+    });
+
     try {
       final User user =
           await _ensureAuthenticatedUser();
 
       if (user.isAnonymous) {
-        if (!mounted) {
-          return;
-        }
+        if (!mounted) return;
 
         setState(() {
           _isGuest = true;
           _isLoadingRequester = false;
-          _requesterError = null;
         });
-
         return;
       }
 
@@ -131,31 +128,23 @@ class _ConsultationRequestScreenState
 
       final String name =
           userData?['name'] as String? ?? '';
-
       final String surname =
           userData?['surname'] as String? ?? '';
-
       final String phone =
           userData?['phone'] as String? ?? '';
 
       _fullNameController.text =
           '$name $surname'.trim();
-
       _phoneController.text = phone.trim();
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       setState(() {
         _isGuest = false;
         _isLoadingRequester = false;
-        _requesterError = null;
       });
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       setState(() {
         _isLoadingRequester = false;
@@ -164,6 +153,10 @@ class _ConsultationRequestScreenState
             'Lütfen tekrar deneyin.';
       });
     }
+  }
+
+  String _formatCurrency(double value) {
+    return _currencyFormatter.format(value);
   }
 
   String _normalizedPhone() {
@@ -176,7 +169,6 @@ class _ConsultationRequestScreenState
   bool _validateForm() {
     final String fullName =
         _fullNameController.text.trim();
-
     final String phone = _normalizedPhone();
 
     if (fullName.length < 3) {
@@ -194,28 +186,33 @@ class _ConsultationRequestScreenState
       return false;
     }
 
+    if (!_consentAccepted) {
+      _showMessage(
+        'Danışma talebini göndermek için '
+        'iletişim paylaşım onayını vermelisiniz.',
+      );
+      return false;
+    }
+
     return true;
   }
 
-  void _showMessage(
-    String message, {
-    bool isError = true,
-  }) {
+  void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor:
-            isError ? const Color(0xFF991B1B) : _green,
+        backgroundColor: _error,
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
   Future<void> _submitRequest() async {
-    if (_isSubmitting ||
-        _isLoadingRequester) {
+    if (_isSubmitting || _isLoadingRequester) {
       return;
     }
+
+    FocusScope.of(context).unfocus();
 
     if (!_validateForm()) {
       return;
@@ -228,7 +225,6 @@ class _ConsultationRequestScreenState
     try {
       final User user =
           await _ensureAuthenticatedUser();
-
       final DateTime now = DateTime.now();
 
       final ConsultationRequest request =
@@ -237,30 +233,24 @@ class _ConsultationRequestScreenState
         isGuest: user.isAnonymous,
         userFullName:
             _fullNameController.text.trim(),
-        expertId: widget.expert.uid,
         companyName: widget.company.name,
         plan: widget.plan,
         userNote: _noteController.text.trim().isEmpty
             ? null
             : _noteController.text.trim(),
-        status: 'pending',
+        status: 'waiting_assignment',
         createdAt: now,
         updatedAt: now,
-        expiresAt: now.add(
-          ConsultationRepository.responseDuration,
-        ),
       );
 
       final String requestId =
-    await _repository
-        .createConsultationRequest(
-  request,
-  userPhone: _normalizedPhone(),
-);
+          await _repository
+              .createConsultationRequest(
+        request,
+        userPhone: _normalizedPhone(),
+      );
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       await Navigator.pushReplacement(
         context,
@@ -268,6 +258,7 @@ class _ConsultationRequestScreenState
           builder: (_) =>
               ConsultationRequestSuccessScreen(
             requestId: requestId,
+            companyName: widget.company.name,
             isGuest: user.isAnonymous,
             initialFullName:
                 _fullNameController.text.trim(),
@@ -276,47 +267,28 @@ class _ConsultationRequestScreenState
         ),
       );
     } on ConsultationRepositoryException catch (error) {
-      if (!mounted) {
-        return;
-      }
-
+      if (!mounted) return;
       _showMessage(error.message);
     } on FirebaseAuthException catch (error) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
-      final String message =
-          error.code == 'operation-not-allowed'
-              ? 'Firebase anonim giriş özelliği etkin değil.'
-              : 'Oturum başlatılamadı. Lütfen tekrar deneyin.';
+      _showMessage(
+        error.code == 'operation-not-allowed'
+            ? 'Firebase anonim giriş özelliği etkin değil.'
+            : 'Oturum başlatılamadı. Lütfen tekrar deneyin.',
+      );
+    } on FirebaseException catch (error) {
+      if (!mounted) return;
 
-      _showMessage(message);
-    } on FirebaseException catch (error, stackTrace) {
-  debugPrint('==========================');
-  debugPrint('FIREBASE ERROR');
-  debugPrint('Code: ${error.code}');
-  debugPrint('Message: ${error.message}');
-  debugPrint('Exception: $error');
-  debugPrintStack(stackTrace: stackTrace);
-  debugPrint('==========================');
-
-  if (!mounted) {
-    return;
-  }
-
-  final String message =
-      error.code == 'permission-denied'
-          ? 'Danışma talebi için Firestore erişim '
-              'kurallarının güncellenmesi gerekiyor.'
-          : 'Danışma talebi kaydedilemedi. '
-              'Lütfen tekrar deneyin.';
-
-  _showMessage(message);
-} catch (_) {
-      if (!mounted) {
-        return;
-      }
+      _showMessage(
+        error.code == 'permission-denied'
+            ? 'Danışma talebi için Firestore erişim '
+                'kurallarının güncellenmesi gerekiyor.'
+            : 'Danışma talebi kaydedilemedi. '
+                'Lütfen tekrar deneyin.',
+      );
+    } catch (_) {
+      if (!mounted) return;
 
       _showMessage(
         'Danışma talebi gönderilemedi. '
@@ -337,7 +309,7 @@ class _ConsultationRequestScreenState
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        foregroundColor: _textDark,
+        foregroundColor: _navy,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
@@ -351,7 +323,7 @@ class _ConsultationRequestScreenState
         child: _isLoadingRequester
             ? const Center(
                 child: CircularProgressIndicator(
-                  color: _green,
+                  color: _teal,
                 ),
               )
             : _requesterError != null
@@ -359,176 +331,471 @@ class _ConsultationRequestScreenState
                     message: _requesterError!,
                     onRetry: _loadRequester,
                   )
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      18,
-                      10,
-                      18,
-                      34,
-                    ),
-                    children: [
-                      const _ConsultationProgress(
-                        currentStep: 2,
+                : GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior
+                              .onDrag,
+                      padding: const EdgeInsets.fromLTRB(
+                        18,
+                        8,
+                        18,
+                        36,
                       ),
-                      const SizedBox(height: 20),
-                      _ExpertSummaryCard(
-                        company: widget.company,
-                        expert: widget.expert,
-                      ),
-                      const SizedBox(height: 22),
-                      const _SectionTitle(
-                        title: 'Plan Özeti',
-                      ),
-                      const SizedBox(height: 10),
-                      _PlanSummaryCard(
-                        plan: widget.plan,
-                        formatCurrency:
-                            _formatCurrency,
-                      ),
-                      const SizedBox(height: 22),
-                      const _SectionTitle(
-                        title: 'İletişim Bilgileri',
-                      ),
-                      const SizedBox(height: 10),
-                      if (_isGuest)
-                        _GuestContactForm(
-                          fullNameController:
-                              _fullNameController,
-                          phoneController:
-                              _phoneController,
-                        )
-                      else
-                        _RegisteredContactCard(
-                          fullName:
-                              _fullNameController.text,
-                          phone:
-                              _phoneController.text,
+                      children: [
+                        const _ConsultationProgress(
+                          currentStep: 2,
                         ),
-                      const SizedBox(height: 22),
-                      const _SectionTitle(
-                        title: 'Notunuz',
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _noteController,
-                        minLines: 5,
-                        maxLines: 7,
-                        maxLength: 500,
-                        textCapitalization:
-                            TextCapitalization
-                                .sentences,
-                        decoration: InputDecoration(
-                          hintText:
-                              'Uzmanınıza iletmek istediğiniz '
-                              'notu yazabilirsiniz.\n\n'
-                              'Örneğin;\n'
-                              '• Akşam saatlerinde aranmak istiyorum.\n'
-                              '• Çekilişsiz sistem düşünüyorum.\n'
-                              '• Teslim sürem benim için önemli.',
-                          hintStyle: const TextStyle(
-                            color: _textMuted,
-                            fontSize: 13.5,
-                            height: 1.45,
+                        const SizedBox(height: 18),
+                        _CompanyAssignmentCard(
+                          companyName:
+                              widget.company.name,
+                        ),
+                        const SizedBox(height: 22),
+                        const _SectionTitle(
+                          title: 'Plan Özeti',
+                        ),
+                        const SizedBox(height: 10),
+                        _PlanSummaryCard(
+                          plan: widget.plan,
+                          formatCurrency:
+                              _formatCurrency,
+                        ),
+                        const SizedBox(height: 22),
+                        const _SectionTitle(
+                          title: 'İletişim Bilgileri',
+                        ),
+                        const SizedBox(height: 10),
+                        if (_isGuest)
+                          _GuestContactForm(
+                            fullNameController:
+                                _fullNameController,
+                            phoneController:
+                                _phoneController,
+                          )
+                        else
+                          _RegisteredContactCard(
+                            fullName:
+                                _fullNameController.text,
+                            phone:
+                                _phoneController.text,
                           ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding:
-                              const EdgeInsets.all(17),
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              20,
-                            ),
-                            borderSide:
-                                const BorderSide(
-                              color: _border,
-                            ),
-                          ),
-                          enabledBorder:
-                              OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              20,
-                            ),
-                            borderSide:
-                                const BorderSide(
-                              color: _border,
-                            ),
-                          ),
-                          focusedBorder:
-                              OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                              20,
-                            ),
-                            borderSide:
-                                const BorderSide(
-                              color: _green,
-                              width: 1.5,
-                            ),
+                        const SizedBox(height: 22),
+                        const _SectionTitle(
+                          title: 'Notunuz',
+                          optional: true,
+                        ),
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: _noteController,
+                          minLines: 4,
+                          maxLines: 6,
+                          maxLength: 500,
+                          textCapitalization:
+                              TextCapitalization
+                                  .sentences,
+                          decoration: _inputDecoration(
+                            hint:
+                                'Aranmak istediğiniz saat, '
+                                'düşündüğünüz sistem veya '
+                                'özellikle konuşmak istediğiniz '
+                                'konuları yazabilirsiniz.',
+                            icon: Icons
+                                .chat_bubble_outline_rounded,
+                            alignIconTop: true,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      const _PrivacyNotice(),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 57,
-                        child: ElevatedButton.icon(
-                          onPressed: _isSubmitting
-                              ? null
-                              : _submitRequest,
-                          icon: _isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child:
-                                      CircularProgressIndicator(
-                                    strokeWidth: 2.2,
-                                    color: Colors.white,
+                        const SizedBox(height: 6),
+                        _ConsentCard(
+                          value: _consentAccepted,
+                          onChanged: (value) {
+                            setState(() {
+                              _consentAccepted =
+                                  value ?? false;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 57,
+                          child: ElevatedButton.icon(
+                            onPressed: _isSubmitting
+                                ? null
+                                : _submitRequest,
+                            icon: _isSubmitting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child:
+                                        CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons
+                                        .arrow_forward_rounded,
                                   ),
-                                )
-                              : const Icon(
-                                  Icons.send_rounded,
-                                  size: 21,
-                                ),
-                          label: Text(
-                            _isSubmitting
-                                ? 'Gönderiliyor'
-                                : 'Danışma Talebi Gönder',
-                          ),
-                          style:
-                              ElevatedButton.styleFrom(
-                            backgroundColor: _green,
-                            foregroundColor:
-                                Colors.white,
-                            disabledBackgroundColor:
-                                _green.withValues(
-                              alpha: 0.65,
+                            label: Text(
+                              _isSubmitting
+                                  ? 'Talep Gönderiliyor'
+                                  : 'Danışma Talebini Gönder',
                             ),
-                            disabledForegroundColor:
-                                Colors.white,
-                            elevation: 0,
-                            shape:
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                16,
+                            style:
+                                ElevatedButton.styleFrom(
+                              backgroundColor: _teal,
+                              foregroundColor:
+                                  Colors.white,
+                              disabledBackgroundColor:
+                                  _teal.withOpacity(0.55),
+                              disabledForegroundColor:
+                                  Colors.white,
+                              elevation: 0,
+                              shape:
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  17,
+                                ),
+                              ),
+                              textStyle:
+                                  const TextStyle(
+                                fontSize: 15.5,
+                                fontWeight:
+                                    FontWeight.w900,
                               ),
                             ),
-                            textStyle:
-                                const TextStyle(
-                              fontSize: 15.5,
-                              fontWeight:
-                                  FontWeight.w900,
-                            ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+      ),
+    );
+  }
+
+  static InputDecoration _inputDecoration({
+    String? label,
+    required String hint,
+    required IconData icon,
+    bool alignIconTop = false,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: _muted,
+        fontSize: 13.5,
+        height: 1.4,
+      ),
+      prefixIcon: Padding(
+        padding: EdgeInsets.only(
+          top: alignIconTop ? 14 : 0,
+        ),
+        child: Icon(
+          icon,
+          color: _teal,
+        ),
+      ),
+      prefixIconConstraints:
+          const BoxConstraints(
+        minWidth: 48,
+      ),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding:
+          const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(
+          color: _border,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(
+          color: _border,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(
+          color: _teal,
+          width: 1.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _ConsultationProgress extends StatelessWidget {
+  const _ConsultationProgress({
+    required this.currentStep,
+  });
+
+  final int currentStep;
+
+  @override
+  Widget build(BuildContext context) {
+    const List<String> labels = [
+      'Şirket',
+      'Talep',
+      'Onay',
+    ];
+
+    return Row(
+      children: List.generate(
+        labels.length,
+        (index) {
+          final int step = index + 1;
+          final bool isCompleted =
+              step < currentStep;
+          final bool isCurrent =
+              step == currentStep;
+          final bool isActive =
+              step <= currentStep;
+
+          return Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 31,
+                        height: 31,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? _ConsultationRequestScreenState
+                                  ._teal
+                              : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isActive
+                                ? _ConsultationRequestScreenState
+                                    ._teal
+                                : _ConsultationRequestScreenState
+                                    ._border,
+                          ),
+                        ),
+                        child: isCompleted
+                            ? const Icon(
+                                Icons.check_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              )
+                            : Text(
+                                '$step',
+                                style: TextStyle(
+                                  color: isActive
+                                      ? Colors.white
+                                      : _ConsultationRequestScreenState
+                                          ._muted,
+                                  fontWeight:
+                                      FontWeight.w900,
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        labels[index],
+                        style: TextStyle(
+                          color: isCurrent
+                              ? _ConsultationRequestScreenState
+                                  ._navy
+                              : _ConsultationRequestScreenState
+                                  ._muted,
+                          fontSize: 12,
+                          fontWeight: isCurrent
+                              ? FontWeight.w900
+                              : FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
+                ),
+                if (index < labels.length - 1)
+                  Container(
+                    width: 24,
+                    height: 2,
+                    margin:
+                        const EdgeInsets.only(
+                      bottom: 25,
+                    ),
+                    color: step < currentStep
+                        ? _ConsultationRequestScreenState
+                            ._teal
+                        : _ConsultationRequestScreenState
+                            ._border,
+                  ),
+              ],
+            ),
+          );
+        },
       ),
+    );
+  }
+}
+
+class _CompanyAssignmentCard extends StatelessWidget {
+  const _CompanyAssignmentCard({
+    required this.companyName,
+  });
+
+  final String companyName;
+
+  @override
+  Widget build(BuildContext context) {
+    final String initial = companyName.trim().isEmpty
+        ? 'P'
+        : companyName.trim()[0].toUpperCase();
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF052F3D),
+            Color(0xFF087C72),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF052F3D)
+                .withOpacity(0.14),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.14),
+              borderRadius:
+                  BorderRadius.circular(18),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.18),
+              ),
+            ),
+            child: Text(
+              initial,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 21,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  companyName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                const Text(
+                  'Talebiniz bu şirkette görev yapan '
+                  'uygun bir uzmana yönlendirilecektir.',
+                  style: TextStyle(
+                    color: Color(0xFFD9F7F1),
+                    fontSize: 13.5,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 11),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.12),
+                    borderRadius:
+                        BorderRadius.circular(999),
+                  ),
+                  child: const Text(
+                    'Uzman seçmeniz gerekmez',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.title,
+    this.optional = false,
+  });
+
+  final String title;
+  final bool optional;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color:
+                _ConsultationRequestScreenState
+                    ._navy,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        if (optional) ...[
+          const SizedBox(width: 7),
+          const Text(
+            'İsteğe bağlı',
+            style: TextStyle(
+              color:
+                  _ConsultationRequestScreenState
+                      ._muted,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -551,8 +818,17 @@ class _PlanSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color:
-              _ConsultationRequestScreenState._border,
+              _ConsultationRequestScreenState
+                  ._border,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0B2239)
+                .withOpacity(0.035),
+            blurRadius: 16,
+            offset: const Offset(0, 7),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -562,58 +838,103 @@ class _PlanSummaryCard extends StatelessWidget {
               plan.financeAmount,
             ),
           ),
-          const Divider(
-            height: 1,
-            color:
-                _ConsultationRequestScreenState._border,
-          ),
+          const _CardDivider(),
           _PlanRow(
             label: 'Peşinat',
             value: formatCurrency(
               plan.downPayment,
             ),
           ),
-          const Divider(
-            height: 1,
-            color:
-                _ConsultationRequestScreenState._border,
-          ),
+          const _CardDivider(),
           _PlanRow(
             label: 'İlk Taksit',
             value: formatCurrency(
               plan.monthlyInstallment,
             ),
           ),
-          const Divider(
-            height: 1,
-            color:
-                _ConsultationRequestScreenState._border,
-          ),
+          const _CardDivider(),
           _PlanRow(
             label: 'Ödeme Modeli',
             value: plan.increaseModel,
           ),
-          const Divider(
-            height: 1,
-            color:
-                _ConsultationRequestScreenState._border,
-          ),
+          const _CardDivider(),
           _PlanRow(
             label: 'Tahmini Teslim',
             value: '${plan.estimatedDelivery} Ay',
-            isHighlighted: true,
+            highlighted: true,
           ),
-          const Divider(
-            height: 1,
-            color:
-                _ConsultationRequestScreenState._border,
-          ),
+          const _CardDivider(),
           _PlanRow(
             label: 'Tahmini Vade',
             value: '${plan.estimatedTerm} Ay',
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PlanRow extends StatelessWidget {
+  const _PlanRow({
+    required this.label,
+    required this.value,
+    this.highlighted = false,
+  });
+
+  final String label;
+  final String value;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 17,
+        vertical: 15,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color:
+                    _ConsultationRequestScreenState
+                        ._muted,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              color: highlighted
+                  ? _ConsultationRequestScreenState
+                      ._teal
+                  : _ConsultationRequestScreenState
+                      ._navy,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardDivider extends StatelessWidget {
+  const _CardDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Divider(
+      height: 1,
+      color:
+          _ConsultationRequestScreenState
+              ._border,
     );
   }
 }
@@ -636,7 +957,9 @@ class _GuestContactForm extends StatelessWidget {
           textCapitalization:
               TextCapitalization.words,
           textInputAction: TextInputAction.next,
-          decoration: _inputDecoration(
+          decoration:
+              _ConsultationRequestScreenState
+                  ._inputDecoration(
             label: 'Ad Soyad',
             hint: 'Adınızı ve soyadınızı yazınız',
             icon: Icons.person_outline_rounded,
@@ -647,53 +970,15 @@ class _GuestContactForm extends StatelessWidget {
           controller: phoneController,
           keyboardType: TextInputType.phone,
           textInputAction: TextInputAction.next,
-          decoration: _inputDecoration(
+          decoration:
+              _ConsultationRequestScreenState
+                  ._inputDecoration(
             label: 'Telefon Numarası',
             hint: '05XX XXX XX XX',
             icon: Icons.phone_outlined,
           ),
         ),
       ],
-    );
-  }
-
-  static InputDecoration _inputDecoration({
-    required String label,
-    required String hint,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      prefixIcon: Icon(
-        icon,
-        color:
-            _ConsultationRequestScreenState._green,
-      ),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color:
-              _ConsultationRequestScreenState._border,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color:
-              _ConsultationRequestScreenState._border,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(
-          color:
-              _ConsultationRequestScreenState._green,
-          width: 1.5,
-        ),
-      ),
     );
   }
 }
@@ -718,7 +1003,8 @@ class _RegisteredContactCard
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color:
-              _ConsultationRequestScreenState._border,
+              _ConsultationRequestScreenState
+                  ._border,
         ),
       ),
       child: Column(
@@ -744,7 +1030,7 @@ class _RegisteredContactCard
             style: TextStyle(
               color:
                   _ConsultationRequestScreenState
-                      ._textMuted,
+                      ._muted,
               fontSize: 12,
             ),
           ),
@@ -769,13 +1055,25 @@ class _ContactRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color:
-              _ConsultationRequestScreenState._green,
-          size: 21,
+        Container(
+          width: 38,
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color:
+                _ConsultationRequestScreenState
+                    ._softTeal,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color:
+                _ConsultationRequestScreenState
+                    ._teal,
+            size: 20,
+          ),
         ),
-        const SizedBox(width: 11),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment:
@@ -786,8 +1084,8 @@ class _ContactRow extends StatelessWidget {
                 style: const TextStyle(
                   color:
                       _ConsultationRequestScreenState
-                          ._textMuted,
-                  fontSize: 12,
+                          ._muted,
+                  fontSize: 11.5,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -797,8 +1095,8 @@ class _ContactRow extends StatelessWidget {
                 style: const TextStyle(
                   color:
                       _ConsultationRequestScreenState
-                          ._textDark,
-                  fontSize: 14,
+                          ._navy,
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -810,37 +1108,72 @@ class _ContactRow extends StatelessWidget {
   }
 }
 
-class _PrivacyNotice extends StatelessWidget {
-  const _PrivacyNotice();
+class _ConsentCard extends StatelessWidget {
+  const _ConsentCard({
+    required this.value,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final ValueChanged<bool?> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          Icons.lock_outline_rounded,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        8,
+        10,
+        14,
+        10,
+      ),
+      decoration: BoxDecoration(
+        color:
+            _ConsultationRequestScreenState
+                ._softTeal,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
           color:
               _ConsultationRequestScreenState
-                  ._textMuted,
-          size: 18,
+                  ._turquoise
+                  .withOpacity(0.24),
         ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            'Telefon numaranız yalnızca seçtiğiniz uzman '
-            'talebinizi kabul ettiğinde paylaşılır.',
-            style: TextStyle(
-              color:
-                  _ConsultationRequestScreenState
-                      ._textMuted,
-              fontSize: 12.5,
-              height: 1.45,
-              fontWeight: FontWeight.w500,
+      ),
+      child: Row(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor:
+                _ConsultationRequestScreenState
+                    ._teal,
+            shape: RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(5),
             ),
           ),
-        ),
-      ],
+          const Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: 7),
+              child: Text(
+                'İletişim bilgilerimin, danışma '
+                'talebimin yürütülmesi amacıyla '
+                'atanacak doğrulanmış uzmanla '
+                'paylaşılmasını kabul ediyorum.',
+                style: TextStyle(
+                  color:
+                      _ConsultationRequestScreenState
+                          ._petrol,
+                  fontSize: 12.5,
+                  height: 1.45,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -864,8 +1197,10 @@ class _RequesterErrorView extends StatelessWidget {
           children: [
             const Icon(
               Icons.error_outline_rounded,
-              color: Color(0xFFB42318),
-              size: 45,
+              color:
+                  _ConsultationRequestScreenState
+                      ._error,
+              size: 48,
             ),
             const SizedBox(height: 14),
             Text(
@@ -874,7 +1209,7 @@ class _RequesterErrorView extends StatelessWidget {
               style: const TextStyle(
                 color:
                     _ConsultationRequestScreenState
-                        ._textDark,
+                        ._navy,
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -885,346 +1220,12 @@ class _RequesterErrorView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     _ConsultationRequestScreenState
-                        ._green,
+                        ._teal,
                 foregroundColor: Colors.white,
               ),
-              child: const Text(
-                'Tekrar Dene',
-              ),
+              child: const Text('Tekrar Dene'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ExpertSummaryCard extends StatelessWidget {
-  const _ExpertSummaryCard({
-    required this.company,
-    required this.expert,
-  });
-
-  final Company company;
-  final ExpertProfile expert;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: _ConsultationRequestScreenState
-            ._softGreen,
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(17),
-            ),
-            child: Text(
-              _initials(expert),
-              style: const TextStyle(
-                color:
-                    _ConsultationRequestScreenState
-                        ._green,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Text(
-                  expert.fullName,
-                  style: const TextStyle(
-                    color:
-                        _ConsultationRequestScreenState
-                            ._textDark,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 7),
-                Text(
-                  company.name,
-                  style: const TextStyle(
-                    color:
-                        _ConsultationRequestScreenState
-                            ._green,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  expert.position,
-                  style: const TextStyle(
-                    color:
-                        _ConsultationRequestScreenState
-                            ._textMuted,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  expert.branch,
-                  style: const TextStyle(
-                    color:
-                        _ConsultationRequestScreenState
-                            ._textMuted,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static String _initials(
-    ExpertProfile expert,
-  ) {
-    final String first =
-        expert.firstName.trim().isEmpty
-            ? ''
-            : expert.firstName
-                .trim()
-                .characters
-                .first
-                .toUpperCase();
-
-    final String last =
-        expert.lastName.trim().isEmpty
-            ? ''
-            : expert.lastName
-                .trim()
-                .characters
-                .first
-                .toUpperCase();
-
-    final String result = '$first$last';
-
-    return result.isEmpty ? 'U' : result;
-  }
-}
-
-class _PlanRow extends StatelessWidget {
-  const _PlanRow({
-    required this.label,
-    required this.value,
-    this.isHighlighted = false,
-  });
-
-  final String label;
-  final String value;
-  final bool isHighlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 17,
-        vertical: 16,
-      ),
-      child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color:
-                    _ConsultationRequestScreenState
-                        ._textMuted,
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                color: isHighlighted
-                    ? _ConsultationRequestScreenState
-                        ._green
-                    : _ConsultationRequestScreenState
-                        ._textDark,
-                fontSize: 14.5,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
-    required this.title,
-  });
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color:
-            _ConsultationRequestScreenState._textDark,
-        fontSize: 16,
-        fontWeight: FontWeight.w900,
-      ),
-    );
-  }
-}
-
-class _ConsultationProgress
-    extends StatelessWidget {
-  const _ConsultationProgress({
-    required this.currentStep,
-  });
-
-  final int currentStep;
-
-  static const List<String> _steps = [
-    'Şirket',
-    'Uzman',
-    'Görüş Talebi',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        18,
-        16,
-        14,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color:
-              _ConsultationRequestScreenState
-                  ._border,
-        ),
-      ),
-      child: Row(
-        children: List.generate(
-          _steps.length,
-          (index) {
-            final bool isCompleted =
-                index < currentStep;
-
-            final bool isCurrent =
-                index == currentStep;
-
-            return Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 34,
-                          height: 34,
-                          alignment:
-                              Alignment.center,
-                          decoration: BoxDecoration(
-                            color: isCompleted ||
-                                    isCurrent
-                                ? _ConsultationRequestScreenState
-                                    ._green
-                                : const Color(
-                                    0xFFF3F4F6,
-                                  ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: isCompleted
-                              ? const Icon(
-                                  Icons.check_rounded,
-                                  color: Colors.white,
-                                  size: 19,
-                                )
-                              : Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    color: isCurrent
-                                        ? Colors.white
-                                        : _ConsultationRequestScreenState
-                                            ._textMuted,
-                                    fontSize: 13,
-                                    fontWeight:
-                                        FontWeight.w900,
-                                  ),
-                                ),
-                        ),
-                        const SizedBox(height: 7),
-                        Text(
-                          _steps[index],
-                          maxLines: 1,
-                          overflow:
-                              TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isCompleted ||
-                                    isCurrent
-                                ? _ConsultationRequestScreenState
-                                    ._green
-                                : _ConsultationRequestScreenState
-                                    ._textMuted,
-                            fontSize: 11.5,
-                            fontWeight:
-                                FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (index <
-                      _steps.length - 1)
-                    Container(
-                      width: 20,
-                      height: 2,
-                      margin:
-                          const EdgeInsets.only(
-                        left: 3,
-                        right: 3,
-                        bottom: 22,
-                      ),
-                      color: isCompleted
-                          ? _ConsultationRequestScreenState
-                              ._green
-                          : _ConsultationRequestScreenState
-                              ._border,
-                    ),
-                ],
-              ),
-            );
-          },
         ),
       ),
     );
@@ -1236,95 +1237,208 @@ class ConsultationRequestSuccessScreen
   const ConsultationRequestSuccessScreen({
     super.key,
     required this.requestId,
+    required this.companyName,
     required this.isGuest,
     required this.initialFullName,
     required this.initialPhone,
   });
 
   final String requestId;
+  final String companyName;
   final bool isGuest;
   final String initialFullName;
   final String initialPhone;
 
-  static const Color _green =
-      Color(0xFF0B5D3B);
-
   static const Color _background =
-      Color(0xFFF7F8F5);
+      Color(0xFFF7F9FB);
+  static const Color _navy =
+      Color(0xFF0B2239);
+  static const Color _petrol =
+      Color(0xFF052F3D);
+  static const Color _teal =
+      Color(0xFF087C72);
+  static const Color _turquoise =
+      Color(0xFF16C7B0);
+  static const Color _muted =
+      Color(0xFF748193);
+  static const Color _border =
+      Color(0xFFE4EAF0);
+
+  void _goHome(BuildContext context) {
+    Navigator.of(context).popUntil(
+      (route) => route.isFirst,
+    );
+  }
+
+  void _openRequests(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) =>
+            const MyConsultationRequestsScreen(),
+      ),
+      (route) => route.isFirst,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            22,
+            34,
+            22,
+            28,
+          ),
           child: Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
             children: [
               Container(
-                width: 82,
-                height: 82,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8F1EC),
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      _turquoise,
+                      _teal,
+                    ],
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _teal.withOpacity(0.22),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.check_rounded,
-                  color: _green,
-                  size: 45,
+                  color: Colors.white,
+                  size: 48,
                 ),
               ),
               const SizedBox(height: 24),
               const Text(
-                'Danışma Talebiniz Gönderildi',
+                'Talebiniz Alındı',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF111827),
-                  fontSize: 22,
+                  color: _navy,
+                  fontSize: 25,
+                  height: 1.1,
                   fontWeight: FontWeight.w900,
+                  letterSpacing: -0.4,
                 ),
               ),
-              const SizedBox(height: 11),
+              const SizedBox(height: 10),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF5E8),
+                  borderRadius:
+                      BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'Uzman Ataması Bekleniyor',
+                  style: TextStyle(
+                    color: Color(0xFFB54708),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 17),
               Text(
                 isGuest
-                    ? 'Uzman talebinizi inceleyecektir. '
-                        'Talebinizi uygulama üzerinden takip '
-                        'etmek için daha sonra hesabınızı '
-                        'oluşturabilirsiniz.'
-                    : 'Uzman talebinizi inceleyecektir. '
-                        'Talebinizin durumunu Danışmalarım '
-                        'bölümünden takip edebilirsiniz.',
+                    ? 'Talebiniz $companyName bünyesinde '
+                        'görev yapan uygun bir uzmana '
+                        'yönlendirilecektir. Talebinizin '
+                        'durumunu takip etmek ve '
+                        'gelişmelerden haberdar olmak için '
+                        'hesabınızı tamamlayabilirsiniz.'
+                    : 'Talebiniz $companyName bünyesinde '
+                        'görev yapan uygun bir uzmana '
+                        'yönlendirilecektir. Talebinizin '
+                        'durumunu Danışmalarım bölümünden '
+                        'takip edebilirsiniz.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                  color: _muted,
                   fontSize: 14,
-                  height: 1.55,
+                  height: 1.6,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.circular(22),
+                  border: Border.all(
+                    color: _border,
+                  ),
+                ),
+                child: const Column(
+                  children: [
+                    _SuccessStep(
+                      icon: Icons.check_circle_rounded,
+                      title: 'Talep oluşturuldu',
+                      completed: true,
+                    ),
+                    _SuccessConnector(
+                      active: true,
+                    ),
+                    _SuccessStep(
+                      icon: Icons.hourglass_top_rounded,
+                      title: 'Uygun uzman aranıyor',
+                      active: true,
+                    ),
+                    _SuccessConnector(),
+                    _SuccessStep(
+                      icon: Icons.person_add_alt_1_rounded,
+                      title: 'Uzman ataması',
+                    ),
+                    _SuccessConnector(),
+                    _SuccessStep(
+                      icon: Icons.phone_in_talk_rounded,
+                      title: 'Uzman sizinle iletişime geçecek',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               Text(
                 'Talep No: $requestId',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: _green,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w800,
+                  color: _teal,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 28),
               if (isGuest) ...[
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 57,
                   child: ElevatedButton(
                     onPressed: () async {
                       final bool? completed =
                           await Navigator.push<bool>(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => RegisterScreen(
+                          builder: (_) =>
+                              RegisterScreen(
                             initialFullName:
                                 initialFullName,
                             initialPhone:
@@ -1337,40 +1451,38 @@ class ConsultationRequestSuccessScreen
 
                       if (completed == true &&
                           context.mounted) {
-                        Navigator.of(context).popUntil(
-                          (route) => route.isFirst,
-                        );
+                        _openRequests(context);
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: _teal,
+                      foregroundColor:
+                          Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(
+                      shape:
+                          RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.circular(16),
+                            BorderRadius.circular(
+                          17,
+                        ),
+                      ),
+                      textStyle:
+                          const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight:
+                            FontWeight.w900,
                       ),
                     ),
                     child: const Text(
                       'Hesabını Tamamla ve Takip Et',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w900,
-                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).popUntil(
-                      (route) => route.isFirst,
-                    );
-                  },
+                  onPressed: () => _goHome(context),
                   style: TextButton.styleFrom(
-                    foregroundColor:
-                        const Color(0xFF6B7280),
+                    foregroundColor: _muted,
                   ),
                   child: const Text(
                     'Şimdilik Geç',
@@ -1382,34 +1494,125 @@ class ConsultationRequestSuccessScreen
               ] else
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 57,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil(
-                        (route) => route.isFirst,
-                      );
-                    },
+                    onPressed: () =>
+                        _openRequests(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: _teal,
+                      foregroundColor:
+                          Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(
+                      shape:
+                          RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.circular(16),
+                            BorderRadius.circular(
+                          17,
+                        ),
+                      ),
+                      textStyle:
+                          const TextStyle(
+                        fontSize: 15.5,
+                        fontWeight:
+                            FontWeight.w900,
                       ),
                     ),
                     child: const Text(
-                      'Tamam',
-                      style: TextStyle(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w900,
-                      ),
+                      'Danışmalarımı Gör',
                     ),
                   ),
                 ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SuccessStep extends StatelessWidget {
+  const _SuccessStep({
+    required this.icon,
+    required this.title,
+    this.completed = false,
+    this.active = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool completed;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = completed || active
+        ? ConsultationRequestSuccessScreen
+            ._teal
+        : ConsultationRequestSuccessScreen
+            ._muted;
+
+    return Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: completed || active
+                ? const Color(0xFFEAF8F5)
+                : const Color(0xFFF2F5F8),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: color,
+          ),
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: completed || active
+                  ? ConsultationRequestSuccessScreen
+                      ._petrol
+                  : ConsultationRequestSuccessScreen
+                      ._muted,
+              fontSize: 13.5,
+              fontWeight: completed || active
+                  ? FontWeight.w800
+                  : FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SuccessConnector extends StatelessWidget {
+  const _SuccessConnector({
+    this.active = false,
+  });
+
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        width: 2,
+        height: 18,
+        margin: const EdgeInsets.only(
+          left: 18,
+        ),
+        color: active
+            ? ConsultationRequestSuccessScreen
+                ._turquoise
+            : ConsultationRequestSuccessScreen
+                ._border,
       ),
     );
   }

@@ -1430,20 +1430,21 @@ class _StatusVisual {
 _StatusVisual _statusVisual(
   ConsultationRequest request,
 ) {
-  if (request.status == 'pending' &&
-      !DateTime.now().isBefore(
-        request.expiresAt,
-      )) {
-    return const _StatusVisual(
-      label: 'Yanıt Süresi Doldu',
-      description:
-          'Uzmanın yanıt süresi doldu. Talebiniz '
-          'yönetici incelemesine aktarılacaktır.',
-      foreground: Color(0xFF92400E),
-      background: Color(0xFFFFF3D6),
-      icon: Icons.schedule_rounded,
-    );
-  }
+  final DateTime? expiresAt = request.expiresAt;
+
+if (request.status == 'pending' &&
+    expiresAt != null &&
+    !DateTime.now().isBefore(expiresAt)) {
+  return const _StatusVisual(
+    label: 'Yanıt Süresi Doldu',
+    description:
+        'Uzmanın yanıt süresi doldu. Talebiniz '
+        'yönetici incelemesine aktarılacaktır.',
+    foreground: Color(0xFF92400E),
+    background: Color(0xFFFFF3D6),
+    icon: Icons.schedule_rounded,
+  );
+}
 
   switch (request.status) {
     case 'pending':
@@ -1581,18 +1582,22 @@ String _readExpertName(
       : combined;
 }
 
-String _formatDate(
-  DateTime date,
-) {
+String _formatDate(DateTime? date) {
+  if (date == null) {
+    return '-';
+  }
+
   return DateFormat(
     'd MMMM yyyy',
     'tr_TR',
   ).format(date);
 }
 
-String _formatDateTime(
-  DateTime date,
-) {
+String _formatDateTime(DateTime? date) {
+  if (date == null) {
+    return '-';
+  }
+
   return DateFormat(
     'd MMMM yyyy • HH:mm',
     'tr_TR',

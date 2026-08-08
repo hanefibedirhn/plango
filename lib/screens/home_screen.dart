@@ -7,14 +7,16 @@ import '../models/content_model.dart';
 import '../models/saved_plan_model.dart';
 import '../repositories/content_repository.dart';
 import '../repositories/last_calculated_plan_store.dart';
+import '../repositories/notification_repository.dart';
 import '../repositories/saved_plan_repository.dart';
 import '../widgets/app_drawer.dart';
 import 'account_router_screen.dart';
 import 'calculator_screen.dart';
 import 'companies_screen.dart';
 import 'featured_screen.dart';
-import 'saved_plans_screen.dart';
+import 'notification_center_screen.dart';
 import 'payment_plan_screen.dart';
+import 'saved_plans_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final SavedPlanRepository _savedPlanRepository = SavedPlanRepository();
   final ContentRepository _contentRepository = ContentRepository();
+  final NotificationRepository _notificationRepository =
+    NotificationRepository();
   final NumberFormat _currencyFormat = NumberFormat.currency(
     locale: 'tr_TR',
     symbol: '₺',
@@ -99,6 +103,15 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => FeaturedScreen()),
     );
   }
+
+  void _openNotificationCenter() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const NotificationCenterScreen(),
+    ),
+  );
+}
 
   void _handleBottomNavigation(int index) {
     if (index == 0) {
@@ -224,36 +237,78 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       actions: [
-        Stack(
+        Builder(
+  builder: (context) {
+    final User? user =
+        FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return IconButton(
+        tooltip: 'Bildirim Merkezi',
+        onPressed: _openNotificationCenter,
+        icon: const Icon(
+          Icons.notifications_none_rounded,
+        ),
+      );
+    }
+
+    return StreamBuilder<int>(
+      stream: _notificationRepository
+          .watchUnreadCount(user.uid),
+      builder: (context, snapshot) {
+        final int unreadCount =
+            snapshot.data ?? 0;
+
+        return Stack(
           clipBehavior: Clip.none,
           children: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.notifications_none_rounded),
+              tooltip: 'Bildirim Merkezi',
+              onPressed: _openNotificationCenter,
+              icon: const Icon(
+                Icons.notifications_none_rounded,
+              ),
             ),
-            Positioned(
-              right: 4,
-              top: 5,
-              child: Container(
-                width: 15,
-                height: 15,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF5A4F),
-                  shape: BoxShape.circle,
-                ),
-                child: const Text(
-                  '2',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w900,
+            if (unreadCount > 0)
+              Positioned(
+                right: 3,
+                top: 4,
+                child: Container(
+                  constraints:
+                      const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(
+                    horizontal: 4,
+                  ),
+                  alignment: Alignment.center,
+                  decoration:
+                      const BoxDecoration(
+                    color: Color(0xFFFF5A4F),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    unreadCount > 99
+                        ? '99+'
+                        : '$unreadCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      height: 1,
+                      fontWeight:
+                          FontWeight.w900,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
-        ),
+        );
+      },
+    );
+  },
+),
         const SizedBox(width: 7),
       ],
     );

@@ -8,61 +8,54 @@ class ConsultationRequest {
     required this.userId,
     required this.isGuest,
     required this.userFullName,
-    required this.expertId,
     required this.companyName,
     required this.plan,
     required this.status,
     required this.createdAt,
     required this.updatedAt,
-    required this.expiresAt,
+    this.expertId = '',
     this.userNote,
+    this.assignmentType,
+    this.assignedAt,
+    this.assignedBy,
+    this.expiresAt,
     this.acceptedAt,
     this.contactedAt,
     this.completedAt,
     this.rejectedAt,
     this.cancelledAt,
     this.rejectionReason,
-this.adminQueueReason,
-this.waitingForAdminAt,
-this.reassignedFromExpertId,
+    this.adminQueueReason,
+    this.waitingForAdminAt,
+    this.reassignedFromExpertId,
   });
 
-  /// Firestore danışma talebi belge kimliği.
   final String? requestId;
-
-  /// Kayıtlı kullanıcı UID'si veya anonim Firebase UID'si.
   final String userId;
-
-  /// Talebin anonim/misafir kullanıcı tarafından oluşturulup
-  /// oluşturulmadığını belirtir.
   final bool isGuest;
-
-  /// Uzmanın talep detayında göreceği kullanıcı adı.
   final String userFullName;
-
-  /// Uzman talebi kabul edene kadar gizli tutulacak telefon.
-
-  /// Talebin gönderildiği uzmanın Firebase UID'si.
-  final String expertId;
-
-  /// Seçilen tasarruf finansman şirketi.
   final String companyName;
-
-  /// FP Engine tarafından oluşturulan plan.
   final CalculationPlan plan;
-
-  /// Kullanıcının uzmana iletmek istediği isteğe bağlı not.
   final String? userNote;
 
-  /// pending, accepted, rejected, expired, reassigned,
-  /// cancelled, contacted veya completed
+  /// waiting_assignment, pending, accepted, contacted,
+  /// completed, rejected, expired veya cancelled.
   final String status;
+
+  /// Atanan uzmanın Firebase UID'si.
+  /// Atama yapılmadan önce boş string olarak tutulur.
+  final String expertId;
+
+  /// auto veya admin.
+  final String? assignmentType;
+  final DateTime? assignedAt;
+  final String? assignedBy;
 
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  /// Uzmanın talebe cevap vermesi gereken son zaman.
-  final DateTime expiresAt;
+  /// Uzman atandıktan sonra cevap süresinin bittiği zaman.
+  final DateTime? expiresAt;
 
   final DateTime? acceptedAt;
   final DateTime? contactedAt;
@@ -72,50 +65,42 @@ this.reassignedFromExpertId,
 
   final String? rejectionReason;
   final String? adminQueueReason;
-final DateTime? waitingForAdminAt;
-
-  /// Talep başka uzmana yönlendirildiyse önceki uzman UID'si.
+  final DateTime? waitingForAdminAt;
   final String? reassignedFromExpertId;
 
+  bool get isWaitingAssignment =>
+      status == 'waiting_assignment';
+
   bool get isPending => status == 'pending';
-
   bool get isAccepted => status == 'accepted';
-
   bool get isRejected => status == 'rejected';
-
   bool get isExpired => status == 'expired';
-
-  bool get isReassigned => status == 'reassigned';
-
   bool get isCancelled => status == 'cancelled';
-
   bool get isContacted => status == 'contacted';
-
   bool get isCompleted => status == 'completed';
 
+  bool get hasAssignedExpert => expertId.trim().isNotEmpty;
+
   bool get isOpen {
-    return isPending || isAccepted || isContacted;
+    return isWaitingAssignment ||
+        isPending ||
+        isAccepted ||
+        isContacted;
   }
 
   bool get canExpertRespond {
-    return isPending &&
-        DateTime.now().isBefore(expiresAt);
+    if (!isPending || expiresAt == null) {
+      return false;
+    }
+
+    return DateTime.now().isBefore(expiresAt!);
   }
 
-  /// Mevcut repository ve Firestore yapısıyla uyumlu
-  /// kolay erişim alanları.
   double get financeAmount => plan.financeAmount;
-
   double get downPayment => plan.downPayment;
-
-  double get monthlyInstallment =>
-      plan.monthlyInstallment;
-
+  double get monthlyInstallment => plan.monthlyInstallment;
   String get increaseModel => plan.increaseModel;
-
-  int get estimatedDelivery =>
-      plan.estimatedDelivery;
-
+  int get estimatedDelivery => plan.estimatedDelivery;
   int get estimatedTerm => plan.estimatedTerm;
 
   ConsultationRequest copyWith({
@@ -123,11 +108,14 @@ final DateTime? waitingForAdminAt;
     String? userId,
     bool? isGuest,
     String? userFullName,
-    String? expertId,
     String? companyName,
     CalculationPlan? plan,
     String? userNote,
     String? status,
+    String? expertId,
+    String? assignmentType,
+    DateTime? assignedAt,
+    String? assignedBy,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? expiresAt,
@@ -137,11 +125,16 @@ final DateTime? waitingForAdminAt;
     DateTime? rejectedAt,
     DateTime? cancelledAt,
     String? rejectionReason,
-String? adminQueueReason,
-DateTime? waitingForAdminAt,
-String? reassignedFromExpertId,
+    String? adminQueueReason,
+    DateTime? waitingForAdminAt,
+    String? reassignedFromExpertId,
     bool clearRequestId = false,
     bool clearUserNote = false,
+    bool clearExpertId = false,
+    bool clearAssignmentType = false,
+    bool clearAssignedAt = false,
+    bool clearAssignedBy = false,
+    bool clearExpiresAt = false,
     bool clearAcceptedAt = false,
     bool clearContactedAt = false,
     bool clearCompletedAt = false,
@@ -149,115 +142,88 @@ String? reassignedFromExpertId,
     bool clearCancelledAt = false,
     bool clearRejectionReason = false,
     bool clearAdminQueueReason = false,
-bool clearWaitingForAdminAt = false,
+    bool clearWaitingForAdminAt = false,
     bool clearReassignedFromExpertId = false,
   }) {
     return ConsultationRequest(
-      requestId: clearRequestId
-          ? null
-          : requestId ?? this.requestId,
+      requestId:
+          clearRequestId ? null : requestId ?? this.requestId,
       userId: userId ?? this.userId,
       isGuest: isGuest ?? this.isGuest,
-      userFullName:
-          userFullName ?? this.userFullName,
-      expertId: expertId ?? this.expertId,
-      companyName:
-          companyName ?? this.companyName,
+      userFullName: userFullName ?? this.userFullName,
+      companyName: companyName ?? this.companyName,
       plan: plan ?? this.plan,
-      userNote: clearUserNote
-          ? null
-          : userNote ?? this.userNote,
+      userNote: clearUserNote ? null : userNote ?? this.userNote,
       status: status ?? this.status,
+      expertId: clearExpertId ? '' : expertId ?? this.expertId,
+      assignmentType: clearAssignmentType
+          ? null
+          : assignmentType ?? this.assignmentType,
+      assignedAt:
+          clearAssignedAt ? null : assignedAt ?? this.assignedAt,
+      assignedBy:
+          clearAssignedBy ? null : assignedBy ?? this.assignedBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      expiresAt: expiresAt ?? this.expiresAt,
-      acceptedAt: clearAcceptedAt
-          ? null
-          : acceptedAt ?? this.acceptedAt,
-      contactedAt: clearContactedAt
-          ? null
-          : contactedAt ?? this.contactedAt,
-      completedAt: clearCompletedAt
-          ? null
-          : completedAt ?? this.completedAt,
-      rejectedAt: clearRejectedAt
-          ? null
-          : rejectedAt ?? this.rejectedAt,
-      cancelledAt: clearCancelledAt
-          ? null
-          : cancelledAt ?? this.cancelledAt,
+      expiresAt:
+          clearExpiresAt ? null : expiresAt ?? this.expiresAt,
+      acceptedAt:
+          clearAcceptedAt ? null : acceptedAt ?? this.acceptedAt,
+      contactedAt:
+          clearContactedAt ? null : contactedAt ?? this.contactedAt,
+      completedAt:
+          clearCompletedAt ? null : completedAt ?? this.completedAt,
+      rejectedAt:
+          clearRejectedAt ? null : rejectedAt ?? this.rejectedAt,
+      cancelledAt:
+          clearCancelledAt ? null : cancelledAt ?? this.cancelledAt,
       rejectionReason: clearRejectionReason
           ? null
-          : rejectionReason ??
-              this.rejectionReason,
-              adminQueueReason: clearAdminQueueReason
-    ? null
-    : adminQueueReason ??
-        this.adminQueueReason,
-waitingForAdminAt: clearWaitingForAdminAt
-    ? null
-    : waitingForAdminAt ??
-        this.waitingForAdminAt,
-      reassignedFromExpertId:
-          clearReassignedFromExpertId
-              ? null
-              : reassignedFromExpertId ??
-                  this.reassignedFromExpertId,
+          : rejectionReason ?? this.rejectionReason,
+      adminQueueReason: clearAdminQueueReason
+          ? null
+          : adminQueueReason ?? this.adminQueueReason,
+      waitingForAdminAt: clearWaitingForAdminAt
+          ? null
+          : waitingForAdminAt ?? this.waitingForAdminAt,
+      reassignedFromExpertId: clearReassignedFromExpertId
+          ? null
+          : reassignedFromExpertId ?? this.reassignedFromExpertId,
     );
   }
 
-  /// Plan alanları Firestore'da düz tutulur.
-  /// Böylece sorgular, Rules ve mevcut repository yapısı
-  /// sade kalır; uygulama içinde CalculationPlan kullanılır.
   Map<String, dynamic> toMap() {
     return {
       'requestId': requestId,
       'userId': userId,
       'isGuest': isGuest,
       'userFullName': userFullName.trim(),
-      'expertId': expertId,
       'companyName': companyName.trim(),
       'financeAmount': plan.financeAmount,
       'downPayment': plan.downPayment,
-      'monthlyInstallment':
-          plan.monthlyInstallment,
-      'increaseModel':
-          plan.increaseModel.trim(),
-      'estimatedDelivery':
-          plan.estimatedDelivery,
+      'monthlyInstallment': plan.monthlyInstallment,
+      'increaseModel': plan.increaseModel.trim(),
+      'estimatedDelivery': plan.estimatedDelivery,
       'estimatedTerm': plan.estimatedTerm,
       'userNote': _nullableTrimmed(userNote),
       'status': status,
-      'createdAt':
-          Timestamp.fromDate(createdAt),
-      'updatedAt':
-          Timestamp.fromDate(updatedAt),
-      'expiresAt':
-          Timestamp.fromDate(expiresAt),
-      'acceptedAt': acceptedAt == null
-          ? null
-          : Timestamp.fromDate(acceptedAt!),
-      'contactedAt': contactedAt == null
-          ? null
-          : Timestamp.fromDate(contactedAt!),
-      'completedAt': completedAt == null
-          ? null
-          : Timestamp.fromDate(completedAt!),
-      'rejectedAt': rejectedAt == null
-          ? null
-          : Timestamp.fromDate(rejectedAt!),
-      'cancelledAt': cancelledAt == null
-          ? null
-          : Timestamp.fromDate(cancelledAt!),
-      'rejectionReason':
-          _nullableTrimmed(rejectionReason),
-          'adminQueueReason':
-    _nullableTrimmed(adminQueueReason),
-'waitingForAdminAt': waitingForAdminAt == null
-    ? null
-    : Timestamp.fromDate(waitingForAdminAt!),
+      'expertId': expertId.trim(),
+      'assignmentType': _nullableTrimmed(assignmentType),
+      'assignedAt': _timestampOrNull(assignedAt),
+      'assignedBy': _nullableTrimmed(assignedBy),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+      'expiresAt': _timestampOrNull(expiresAt),
+      'acceptedAt': _timestampOrNull(acceptedAt),
+      'contactedAt': _timestampOrNull(contactedAt),
+      'completedAt': _timestampOrNull(completedAt),
+      'rejectedAt': _timestampOrNull(rejectedAt),
+      'cancelledAt': _timestampOrNull(cancelledAt),
+      'rejectionReason': _nullableTrimmed(rejectionReason),
+      'adminQueueReason': _nullableTrimmed(adminQueueReason),
+      'waitingForAdminAt': _timestampOrNull(waitingForAdminAt),
       'reassignedFromExpertId':
-          reassignedFromExpertId,
+          _nullableTrimmed(reassignedFromExpertId),
     };
   }
 
@@ -266,35 +232,27 @@ waitingForAdminAt: clearWaitingForAdminAt
     String? requestId,
   }) {
     return ConsultationRequest(
-      requestId:
-          requestId ?? map['requestId'] as String?,
+      requestId: requestId ?? map['requestId'] as String?,
       userId: map['userId'] as String? ?? '',
       isGuest: map['isGuest'] as bool? ?? false,
-      userFullName:
-          map['userFullName'] as String? ?? '',
-      expertId:
-          map['expertId'] as String? ?? '',
-      companyName:
-          map['companyName'] as String? ?? '',
+      userFullName: map['userFullName'] as String? ?? '',
+      companyName: map['companyName'] as String? ?? '',
       plan: CalculationPlan(
-        financeAmount:
-            _readDouble(map['financeAmount']),
-        downPayment:
-            _readDouble(map['downPayment']),
+        financeAmount: _readDouble(map['financeAmount']),
+        downPayment: _readDouble(map['downPayment']),
         monthlyInstallment:
-            _readDouble(
-          map['monthlyInstallment'],
-        ),
-        increaseModel:
-            map['increaseModel'] as String? ?? '',
+            _readDouble(map['monthlyInstallment']),
+        increaseModel: map['increaseModel'] as String? ?? '',
         estimatedDelivery:
             _readInt(map['estimatedDelivery']),
-        estimatedTerm:
-            _readInt(map['estimatedTerm']),
+        estimatedTerm: _readInt(map['estimatedTerm']),
       ),
       userNote: map['userNote'] as String?,
-      status:
-          map['status'] as String? ?? 'pending',
+      status: map['status'] as String? ?? 'waiting_assignment',
+      expertId: map['expertId'] as String? ?? '',
+      assignmentType: map['assignmentType'] as String?,
+      assignedAt: _readNullableDate(map['assignedAt']),
+      assignedBy: map['assignedBy'] as String?,
       createdAt: _readDate(
         map['createdAt'],
         fallback: DateTime.now(),
@@ -303,40 +261,25 @@ waitingForAdminAt: clearWaitingForAdminAt
         map['updatedAt'],
         fallback: DateTime.now(),
       ),
-      expiresAt: _readDate(
-        map['expiresAt'],
-        fallback: DateTime.now(),
-      ),
-      acceptedAt:
-          _readNullableDate(map['acceptedAt']),
-      contactedAt:
-          _readNullableDate(map['contactedAt']),
-      completedAt:
-          _readNullableDate(map['completedAt']),
-      rejectedAt:
-          _readNullableDate(map['rejectedAt']),
-      cancelledAt:
-          _readNullableDate(map['cancelledAt']),
-      rejectionReason:
-          map['rejectionReason'] as String?,
-          adminQueueReason:
-    map['adminQueueReason'] as String?,
-waitingForAdminAt:
-    _readNullableDate(
-      map['waitingForAdminAt'],
-    ),
+      expiresAt: _readNullableDate(map['expiresAt']),
+      acceptedAt: _readNullableDate(map['acceptedAt']),
+      contactedAt: _readNullableDate(map['contactedAt']),
+      completedAt: _readNullableDate(map['completedAt']),
+      rejectedAt: _readNullableDate(map['rejectedAt']),
+      cancelledAt: _readNullableDate(map['cancelledAt']),
+      rejectionReason: map['rejectionReason'] as String?,
+      adminQueueReason: map['adminQueueReason'] as String?,
+      waitingForAdminAt:
+          _readNullableDate(map['waitingForAdminAt']),
       reassignedFromExpertId:
-          map['reassignedFromExpertId']
-              as String?,
+          map['reassignedFromExpertId'] as String?,
     );
   }
 
   factory ConsultationRequest.fromDocument(
-    DocumentSnapshot<Map<String, dynamic>>
-        document,
+    DocumentSnapshot<Map<String, dynamic>> document,
   ) {
-    final Map<String, dynamic>? data =
-        document.data();
+    final Map<String, dynamic>? data = document.data();
 
     if (data == null) {
       throw StateError(
@@ -350,20 +293,16 @@ waitingForAdminAt:
     );
   }
 
-  static String? _nullableTrimmed(
-    String? value,
-  ) {
-    final String normalized =
-        value?.trim() ?? '';
-
-    return normalized.isEmpty
-        ? null
-        : normalized;
+  static String? _nullableTrimmed(String? value) {
+    final String normalized = value?.trim() ?? '';
+    return normalized.isEmpty ? null : normalized;
   }
 
-  static double _readDouble(
-    dynamic value,
-  ) {
+  static Timestamp? _timestampOrNull(DateTime? value) {
+    return value == null ? null : Timestamp.fromDate(value);
+  }
+
+  static double _readDouble(dynamic value) {
     if (value is num) {
       return value.toDouble();
     }
@@ -375,14 +314,11 @@ waitingForAdminAt:
     return 0;
   }
 
-  static int _readInt(
-    dynamic value,
-  ) {
+  static int _readInt(dynamic value) {
     if (value is num) {
       return value.toInt();
     }
 
-    // Eski kayıtlarda estimatedDelivery String olabilir.
     if (value is String) {
       return int.tryParse(
             value.replaceAll(RegExp(r'[^0-9]'), ''),
@@ -408,9 +344,7 @@ waitingForAdminAt:
     return fallback;
   }
 
-  static DateTime? _readNullableDate(
-    dynamic value,
-  ) {
+  static DateTime? _readNullableDate(dynamic value) {
     if (value is Timestamp) {
       return value.toDate();
     }
