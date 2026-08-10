@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B2239"/>
+      <stop offset="58%" stop-color="#0B5D6B"/>
+      <stop offset="100%" stop-color="#16C7B0"/>
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0B2239"/>
+      <stop offset="100%" stop-color="#087C72"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(90,70) scale(1.17)">
+    <path d="M110 40 H385
+             C535 40 610 125 610 245
+             C610 355 545 430 438 452
+             L438 335
+             C492 320 517 286 517 242
+             C517 186 475 151 398 151
+             H245
+             V625
+             H110 Z"
+          fill="url(#brand)"/>
+    <path d="M55 655 C115 490 180 360 278 275 C355 208 434 166 493 151
+             C420 208 365 262 327 323 C270 413 247 513 243 655 Z" fill="#F7F9FB"/>
+    <path d="M78 655 C128 516 184 406 265 330 C328 270 392 226 447 199
+             C378 257 327 316 294 380 C253 460 236 548 233 655 Z" fill="url(#roadGrad)"/>
+    <g fill="#F7F9FB">
+      <path d="M158 575 l14 -36 l9 3 l-13 37 z"/>
+      <path d="M177 521 l17 -38 l9 4 l-16 39 z"/>
+      <path d="M200 463 l19 -39 l9 5 l-18 39 z"/>
+      <path d="M228 404 l22 -37 l9 6 l-22 37 z"/>
+      <path d="M260 347 l26 -34 l8 7 l-26 34 z"/>
+      <path d="M298 296 l29 -29 l7 7 l-28 30 z"/>
+    </g>
+    <path d="M300 545 C390 540 475 530 585 498 L610 575 C505 603 407 615 300 617 Z" fill="#0B2239"/>
+    <g transform="translate(344,370)">
+      <path d="M0 95 L78 30 L156 95 V205 H0 Z" fill="#FFFFFF"/>
+      <path d="M-10 102 L78 20 L166 102" fill="none" stroke="#0B2239" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="62" y="72" width="28" height="28" rx="3" fill="#16C7B0"/>
+      <rect x="96" y="72" width="28" height="28" rx="3" fill="#16C7B0"/>
+      <rect x="62" y="106" width="28" height="28" rx="3" fill="#16C7B0"/>
+      <rect x="96" y="106" width="28" height="28" rx="3" fill="#16C7B0"/>
+      <rect x="20" y="145" width="38" height="60" rx="3" fill="#DDE8EA"/>
+    </g>
+    <g transform="translate(468,462)">
+      <path d="M10 58 C18 25 35 8 68 8 H116 C149 8 167 25 175 58 L186 66 V118 H0 V66 Z" fill="#16C7B0"/>
+      <path d="M35 56 L48 25 H136 L150 56 Z" fill="#DDF8F4"/>
+      <rect x="28" y="68" width="35" height="12" rx="6" fill="#F7F9FB"/>
+      <rect x="123" y="68" width="35" height="12" rx="6" fill="#F7F9FB"/>
+      <circle cx="35" cy="116" r="13" fill="#0B2239"/>
+      <circle cx="151" cy="116" r="13" fill="#0B2239"/>
+    </g>
+  </g>
+</svg>

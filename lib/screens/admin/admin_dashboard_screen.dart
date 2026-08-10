@@ -1,34 +1,80 @@
 import 'package:flutter/material.dart';
 
-import 'admin_expert_applications_screen.dart';
 import 'admin_consultation_management_screen.dart';
-import 'admin_content_management_screen.dart';
+import 'admin_experts_screen.dart';
+import 'admin_featured_list_screen.dart';
+import 'admin_feedback_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({
     super.key,
   });
 
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _softGreen = Color(0xFFE8F1EC);
+  // ============================================================
+  // PLANGO DESIGN SYSTEM
+  // ============================================================
 
-  void _showComingSoon(
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
+
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+
+  void _openExpertManagement(
     BuildContext context,
-    String moduleName,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '$moduleName modülü sonraki geliştirme aşamasında bağlanacak.',
-        ),
-        behavior: SnackBarBehavior.floating,
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AdminExpertsScreen(),
       ),
     );
   }
+
+  void _openConsultationManagement(
+    BuildContext context,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const AdminConsultationManagementScreen(),
+      ),
+    );
+  }
+
+  void _openFeaturedManagement(
+    BuildContext context,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AdminFeaturedListScreen(),
+      ),
+    );
+  }
+
+  void _openFeedbackManagement(
+    BuildContext context,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AdminFeedbackScreen(),
+      ),
+    );
+  }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -36,111 +82,110 @@ class AdminDashboardScreen extends StatelessWidget {
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        foregroundColor: _textDark,
+        foregroundColor: _navy,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: false,
         title: const Text(
           'Yönetici Paneli',
           style: TextStyle(
+            color: _navy,
+            fontSize: 20,
             fontWeight: FontWeight.w900,
+            letterSpacing: -0.35,
           ),
         ),
       ),
       body: SafeArea(
+        top: false,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
-            18,
-            10,
-            18,
+            16,
+            8,
+            16,
             36,
           ),
           children: [
-            const _AdminHeader(),
-            const SizedBox(height: 22),
+            const _AdminHeroCard(),
 
-            const _SectionTitle(
+            const SizedBox(height: 24),
+
+            const _SectionHeader(
+              icon: Icons.dashboard_outlined,
               title: 'Yönetim Merkezleri',
+              subtitle:
+                  'Platform operasyonlarına hızlı erişim sağlayın.',
             ),
-            const SizedBox(height: 10),
+
+            const SizedBox(height: 13),
+
+            // ==================================================
+            // UZMANLAR
+            // ==================================================
 
             _AdminModuleCard(
-              icon: Icons.badge_outlined,
-              title: 'Uzman Yönetimi',
+              icon: Icons.workspace_premium_outlined,
+              title: 'Uzmanlar',
               subtitle:
-                  'Başvuruları inceleyin, uzmanları onaylayın ve durumlarını yönetin.',
-              badgeText: 'Aktif',
+                  'Uzman ağını, durumlarını ve talep süreçlerini yönetin.',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const AdminExpertApplicationsScreen(),
-                  ),
-                );
+                _openExpertManagement(context);
               },
             ),
+
+            const SizedBox(height: 9),
+
+            // ==================================================
+            // DANIŞMALAR
+            // ==================================================
 
             _AdminModuleCard(
               icon: Icons.handshake_outlined,
-              title: 'Danışma Yönetimi',
+              title: 'Danışmalar',
               subtitle:
-                  'Kullanıcı ve uzman arasındaki danışma taleplerini takip edin.',
+                  'Danışma taleplerini ve operasyon süreçlerini yönetin.',
               onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) =>
-          const AdminConsultationManagementScreen(),
-    ),
-  );
-},
-            ),
-
-            _AdminModuleCard(
-              icon: Icons.people_outline_rounded,
-              title: 'Kullanıcı Yönetimi',
-              subtitle:
-                  'Kullanıcı hesaplarını, hareketlerini ve uzmanlık durumlarını görüntüleyin.',
-              onTap: () {
-                _showComingSoon(
-                  context,
-                  'Kullanıcı Yönetimi',
-                );
+                _openConsultationManagement(context);
               },
             ),
 
+            const SizedBox(height: 9),
+
+            // ==================================================
+            // İÇERİKLER
+            // ==================================================
+
             _AdminModuleCard(
-              icon: Icons.dashboard_customize_outlined,
-              title: 'İçerik Yönetimi',
+              icon: Icons.newspaper_rounded,
+              title: 'İçerikler',
               subtitle:
-                  'Öne Çıkanlar, şirket bilgileri, duyurular ve uygulama içeriklerini yönetin.',
+                  'Ana sayfadaki Öne Çıkanlar içeriklerini yönetin.',
               onTap: () {
-                Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) =>
-        const AdminContentManagementScreen(),
-  ),
-);
+                _openFeaturedManagement(context);
               },
             ),
 
+            const SizedBox(height: 9),
+
+            // ==================================================
+            // ŞİKAYET & ÖNERİ
+            // ==================================================
+
             _AdminModuleCard(
-              icon: Icons.security_outlined,
-              title: 'Sistem ve Denetim',
+              icon: Icons.forum_outlined,
+              title: 'Şikayet & Öneri',
               subtitle:
-                  'Şikâyetleri, yönetici işlemlerini ve sistem kayıtlarını inceleyin.',
+                  'Kullanıcı taleplerini inceleyin ve yanıtlayın.',
+              highlight: true,
               onTap: () {
-                _showComingSoon(
-                  context,
-                  'Sistem ve Denetim',
-                );
+                _openFeedbackManagement(context);
               },
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 24),
 
-            const _SecurityNotice(),
+            const _AdminFooter(),
           ],
         ),
       ),
@@ -148,49 +193,143 @@ class AdminDashboardScreen extends StatelessWidget {
   }
 }
 
-class _AdminHeader extends StatelessWidget {
-  const _AdminHeader();
+// ============================================================
+// HERO
+// ============================================================
+
+class _AdminHeroCard extends StatelessWidget {
+  const _AdminHeroCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AdminDashboardScreen._green,
-        borderRadius: BorderRadius.circular(24),
+      padding: const EdgeInsets.fromLTRB(
+        18,
+        18,
+        16,
+        18,
       ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.admin_panel_settings_rounded,
-            color: Colors.white,
-            size: 38,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AdminDashboardScreen._navy,
+            AdminDashboardScreen._petrol,
+            Color(0xFF07535A),
+            AdminDashboardScreen._teal,
+          ],
+          stops: [
+            0.0,
+            0.36,
+            0.72,
+            1.0,
+          ],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x240B2239),
+            blurRadius: 24,
+            offset: Offset(0, 10),
           ),
-          SizedBox(width: 15),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Plango Yönetim Merkezi',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(
+                      alpha: 0.10,
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: Colors.white.withValues(
+                        alpha: 0.13,
+                      ),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.shield_outlined,
+                        color: Color(0xFF55E2D0),
+                        size: 13,
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        'PLANGO ADMIN',
+                        style: TextStyle(
+                          color: Color(0xFFDDF7F3),
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.7,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 6),
-                Text(
-                  'Başvuruları, kullanıcı süreçlerini ve uygulama operasyonlarını tek merkezden yönetin.',
+
+                const SizedBox(height: 13),
+
+                const Text(
+                  'Yönetim Merkezi',
                   style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13.5,
-                    height: 1.45,
+                    color: Colors.white,
+                    fontSize: 22,
+                    height: 1.05,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Plango operasyonlarını ve platform '
+                  'içeriklerini tek merkezden yönetin.',
+                  style: TextStyle(
+                    color: Color(0xFFD6E6E8),
+                    fontSize: 12.2,
+                    height: 1.48,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          Container(
+            width: 66,
+            height: 66,
+            decoration: BoxDecoration(
+              color:
+                  AdminDashboardScreen._turquoise.withValues(
+                alpha: 0.12,
+              ),
+              borderRadius: BorderRadius.circular(21),
+              border: Border.all(
+                color: const Color(0xFF55E2D0).withValues(
+                  alpha: 0.22,
+                ),
+              ),
+            ),
+            child: const Icon(
+              Icons.admin_panel_settings_rounded,
+              color: Color(0xFF55E2D0),
+              size: 34,
             ),
           ),
         ],
@@ -199,25 +338,76 @@ class _AdminHeader extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
+// ============================================================
+// SECTION HEADER
+// ============================================================
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.icon,
     required this.title,
+    required this.subtitle,
   });
 
+  final IconData icon;
   final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AdminDashboardScreen._textDark,
-        fontSize: 16,
-        fontWeight: FontWeight.w900,
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8F7F5),
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Icon(
+            icon,
+            color: AdminDashboardScreen._teal,
+            size: 18,
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AdminDashboardScreen._navy,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.15,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: AdminDashboardScreen._textMuted,
+                  fontSize: 10.8,
+                  height: 1.3,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
+
+// ============================================================
+// HORIZONTAL MANAGEMENT CARD
+// ============================================================
 
 class _AdminModuleCard extends StatelessWidget {
   const _AdminModuleCard({
@@ -225,112 +415,123 @@ class _AdminModuleCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.badgeText,
+    this.highlight = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final String? badgeText;
+  final bool highlight;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 11),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(19),
-          child: Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(19),
-              border: Border.all(
-                color: AdminDashboardScreen._border,
+    final Color iconBackground = highlight
+        ? const Color(0xFFDDF7F3)
+        : const Color(0xFFEAF5F4);
+
+    final Color borderColor = highlight
+        ? AdminDashboardScreen._turquoise.withValues(
+            alpha: 0.32,
+          )
+        : AdminDashboardScreen._border;
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(
+            13,
+            12,
+            12,
+            12,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: borderColor,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0B2239).withValues(
+                  alpha: highlight ? 0.045 : 0.025,
+                ),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AdminDashboardScreen._softGreen,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: AdminDashboardScreen._green,
-                    size: 25,
-                  ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // ICON
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: iconBackground,
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
-                                color:
-                                    AdminDashboardScreen._textDark,
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                          if (badgeText != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    AdminDashboardScreen._softGreen,
-                                borderRadius:
-                                    BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                badgeText!,
-                                style: const TextStyle(
-                                  color:
-                                      AdminDashboardScreen._green,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          color:
-                              AdminDashboardScreen._textMuted,
-                          fontSize: 12.5,
-                          height: 1.4,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  icon,
+                  color: AdminDashboardScreen._teal,
+                  size: 22,
                 ),
-                const SizedBox(width: 8),
-                const Icon(
+              ),
+
+              const SizedBox(width: 13),
+
+              // TEXT
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AdminDashboardScreen._navy,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.15,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color:
+                            AdminDashboardScreen._textMuted,
+                        fontSize: 10.7,
+                        height: 1.35,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF4F7F8),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
                   Icons.chevron_right_rounded,
-                  color: Color(0xFF9CA3AF),
+                  color: Color(0xFF8B98A5),
+                  size: 20,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -338,36 +539,48 @@ class _AdminModuleCard extends StatelessWidget {
   }
 }
 
-class _SecurityNotice extends StatelessWidget {
-  const _SecurityNotice();
+// ============================================================
+// FOOTER
+// ============================================================
+
+class _AdminFooter extends StatelessWidget {
+  const _AdminFooter();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.fromLTRB(
+        14,
+        12,
+        14,
+        12,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFBEB),
-        borderRadius: BorderRadius.circular(18),
+        color: const Color(0xFFEAF7F5),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFDE68A),
+          color: const Color(0xFFD8ECE9),
         ),
       ),
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons.lock_outline_rounded,
-            color: Color(0xFF92400E),
-            size: 22,
+            Icons.verified_user_outlined,
+            color: AdminDashboardScreen._teal,
+            size: 19,
           ),
-          SizedBox(width: 11),
+
+          SizedBox(width: 9),
+
           Expanded(
             child: Text(
-              'Yönetici panelinde gerçekleştirilen kritik işlemler ileride işlem kayıtları ve yetki denetimiyle takip edilecektir.',
+              'Yönetim işlemleri yalnızca yetkili yönetici '
+              'hesapları üzerinden gerçekleştirilmelidir.',
               style: TextStyle(
-                color: Color(0xFF78350F),
-                fontSize: 12.5,
-                height: 1.45,
+                color: Color(0xFF48636B),
+                fontSize: 10.8,
+                height: 1.4,
                 fontWeight: FontWeight.w600,
               ),
             ),

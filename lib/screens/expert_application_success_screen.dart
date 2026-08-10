@@ -5,11 +5,14 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
     super.key,
   });
 
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _softGreen = Color(0xFFE8F1EC);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = _navy;
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _softTeal = Color(0xFFE8F7F5);
+  static const Color _border = Color(0xFFE4EBEE);
 
   void _returnToAccount(BuildContext context) {
     Navigator.of(context).popUntil(
@@ -26,34 +29,18 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
-                22,
-                30,
-                22,
-                30,
-              ),
+              padding: const EdgeInsets.fromLTRB(22, 30, 22, 30),
               child: Container(
                 width: double.infinity,
-                constraints: const BoxConstraints(
-                  maxWidth: 520,
-                ),
-                padding: const EdgeInsets.fromLTRB(
-                  22,
-                  30,
-                  22,
-                  24,
-                ),
+                constraints: const BoxConstraints(maxWidth: 520),
+                padding: const EdgeInsets.fromLTRB(22, 30, 22, 24),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(26),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: _border),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: 0.045,
-                      ),
+                      color: _petrol.withValues(alpha: 0.06),
                       blurRadius: 24,
                       offset: const Offset(0, 12),
                     ),
@@ -62,36 +49,36 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      width: 82,
-                      height: 82,
+                      width: 78,
+                      height: 78,
                       decoration: BoxDecoration(
-                        color: _softGreen,
-                        borderRadius: BorderRadius.circular(27),
+                        color: _softTeal,
+                        borderRadius: BorderRadius.circular(24),
                       ),
                       child: const Icon(
                         Icons.check_circle_outline_rounded,
-                        color: _green,
-                        size: 46,
+                        color: _teal,
+                        size: 43,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 22),
                     const Text(
                       'Başvurunuz Alındı',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: _textDark,
-                        fontSize: 24,
+                        fontSize: 23,
                         height: 1.2,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     const Text(
                       'Uzman başvurunuz başarıyla oluşturuldu.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: _textDark,
-                        fontSize: 15,
+                        fontSize: 14.5,
                         height: 1.5,
                         fontWeight: FontWeight.w700,
                       ),
@@ -105,38 +92,40 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: _textMuted,
-                        fontSize: 14,
+                        fontSize: 13.5,
                         height: 1.6,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 22),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: _softGreen,
-                        borderRadius: BorderRadius.circular(18),
+                        color: _softTeal,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _teal.withValues(alpha: 0.10),
+                        ),
                       ),
                       child: const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.hourglass_top_rounded,
-                            color: _green,
-                            size: 24,
+                            color: _teal,
+                            size: 22,
                           ),
                           SizedBox(width: 12),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Başvuru Durumu',
                                   style: TextStyle(
                                     color: _textDark,
-                                    fontSize: 14.5,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
@@ -144,8 +133,8 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                                 Text(
                                   'İnceleniyor',
                                   style: TextStyle(
-                                    color: _green,
-                                    fontSize: 14,
+                                    color: _teal,
+                                    fontSize: 13.5,
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
@@ -162,7 +151,7 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                         Icon(
                           Icons.notifications_none_rounded,
                           color: _textMuted,
-                          size: 20,
+                          size: 19,
                         ),
                         SizedBox(width: 10),
                         Expanded(
@@ -172,7 +161,7 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                             'alacaksınız.',
                             style: TextStyle(
                               color: _textMuted,
-                              fontSize: 13,
+                              fontSize: 12.5,
                               height: 1.5,
                               fontWeight: FontWeight.w500,
                             ),
@@ -180,26 +169,22 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 26),
                     FilledButton(
-                      onPressed: () {
-                        _returnToAccount(context);
-                      },
+                      onPressed: () => _returnToAccount(context),
                       style: FilledButton.styleFrom(
-                        backgroundColor: _green,
+                        backgroundColor: _teal,
                         foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(58),
+                        minimumSize: const Size.fromHeight(52),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(17),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         textStyle: const TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      child: const Text(
-                        'Hesabım Ekranına Dön',
-                      ),
+                      child: const Text('Hesabım Ekranına Dön'),
                     ),
                   ],
                 ),

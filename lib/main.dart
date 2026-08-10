@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'firebase_options.dart';
+import 'screens/home_screen.dart';
+import 'services/theme_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,120 +23,235 @@ class PlangoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Plango',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Arial',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0B5D3B),
-        ),
-        useMaterial3: true,
-      ),
-      home: const WelcomeScreen(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: PlangoThemeController.themeMode,
+      builder: (context, themeMode, _) {
+        return MaterialApp(
+          title: 'Plango',
+          debugShowCheckedModeBanner: false,
+          themeMode: themeMode,
+          theme: ThemeData(
+            fontFamily: 'Arial',
+            useMaterial3: true,
+            scaffoldBackgroundColor: AppColors.background,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.teal,
+              brightness: Brightness.light,
+            ),
+          ),
+          darkTheme: ThemeData(
+            fontFamily: 'Arial',
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: const Color(0xFF0B141B),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.teal,
+              brightness: Brightness.dark,
+              surface: const Color(0xFF111D25),
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF0B141B),
+              foregroundColor: Color(0xFFEAF4F5),
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+            ),
+            cardColor: const Color(0xFF111D25),
+            dividerColor: const Color(0xFF24323B),
+          ),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }
 
 class AppColors {
-  static const green = Color(0xFF0B5D3B);
-  static const dark = Color(0xFF10231B);
-  static const gold = Color(0xFFD6A84F);
-  static const bg = Color(0xFFF7F8F5);
+  static const navy = Color(0xFF0B2239);
+  static const petrol = Color(0xFF052F3D);
+  static const teal = Color(0xFF087C72);
+  static const turquoise = Color(0xFF16C7B0);
+  static const background = Color(0xFFF7F9FB);
+  static const muted = Color(0xFF748193);
+  static const border = Color(0xFFE4EBEE);
+  static const softTeal = Color(0xFFE8F7F5);
 }
 
-class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
-  void _goToDisclaimer(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const DisclaimerScreen()),
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _logoScale;
+  late final Animation<double> _logoOpacity;
+  late final Animation<double> _textOpacity;
+  late final Animation<Offset> _textOffset;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
     );
+
+    _logoScale = Tween<double>(
+      begin: 0.84,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(
+          0,
+          0.68,
+          curve: Curves.easeOutBack,
+        ),
+      ),
+    );
+
+    _logoOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(
+          0,
+          0.55,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    _textOpacity = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(
+          0.42,
+          1,
+          curve: Curves.easeOut,
+        ),
+      ),
+    );
+
+    _textOffset = Tween<Offset>(
+      begin: const Offset(0, 0.18),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(
+          0.42,
+          1,
+          curve: Curves.easeOutCubic,
+        ),
+      ),
+    );
+
+    _startSplash();
+  }
+
+  Future<void> _startSplash() async {
+    await _controller.forward();
+
+    await Future<void>.delayed(
+      const Duration(milliseconds: 650),
+    );
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        transitionDuration: const Duration(
+          milliseconds: 420,
+        ),
+        pageBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+        ) {
+          return const DisclaimerScreen();
+        },
+        transitionsBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const Spacer(),
-              Container(
-                width: 92,
-                height: 92,
-                decoration: BoxDecoration(
-                  color: AppColors.green,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                  child: Text(
-                    'P',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 54,
-                      fontWeight: FontWeight.w900,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 28,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ScaleTransition(
+                  scale: _logoScale,
+                  child: FadeTransition(
+                    opacity: _logoOpacity,
+                    child: Image.asset(
+                      'assets/images/plango_logo.png',
+                      width: 310,
+                      fit: BoxFit.contain,
+                      errorBuilder: (
+                        context,
+                        error,
+                        stackTrace,
+                      ) {
+                        return const _FallbackLogo();
+                      },
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              const Text(
-                'PLANGO',
-                style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                  color: AppColors.dark,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Türkiye’nin ilk bağımsız tasarruf finansmanı karar destek platformu',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 17,
-                  height: 1.4,
-                  color: AppColors.dark,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Planla. Karşılaştır. Karar Ver.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.green,
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => _goToDisclaimer(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.green,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(13),
+                const SizedBox(height: 14),
+                FadeTransition(
+                  opacity: _textOpacity,
+                  child: SlideTransition(
+                    position: _textOffset,
+                    child: const Text(
+                      'Planla • Karşılaştır • Karar Ver',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.teal,
+                        fontSize: 13,
+                        height: 1.2,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Girişimi Başlat',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'v0.1.0 • Founder: Hanefi Bedirhan Turanoğlu',
-                style: TextStyle(fontSize: 12, color: Colors.black54),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -147,90 +263,507 @@ class DisclaimerScreen extends StatefulWidget {
   const DisclaimerScreen({super.key});
 
   @override
-  State<DisclaimerScreen> createState() => _DisclaimerScreenState();
+  State<DisclaimerScreen> createState() =>
+      _DisclaimerScreenState();
 }
 
-class _DisclaimerScreenState extends State<DisclaimerScreen> {
+class _DisclaimerScreenState
+    extends State<DisclaimerScreen> {
   bool accepted = false;
 
   void _continue() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    if (!accepted) return;
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        transitionDuration: const Duration(
+          milliseconds: 360,
+        ),
+        pageBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+        ) {
+          return const HomeScreen();
+        },
+        transitionsBuilder: (
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        ) {
+          final Animation<Offset> slide =
+              Tween<Offset>(
+            begin: const Offset(0.04, 0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+          );
+
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: slide,
+              child: child,
+            ),
+          );
+        },
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(
-        title: const Text('Önemli Bilgilendirme'),
-        backgroundColor: AppColors.bg,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Stack(
           children: [
-            Expanded(
-              child: ListView(
-                children: const [
-                  Text(
-                    'Plango bağımsız bir karar destek platformudur.',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.dark,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'FP Engine tarafından oluşturulan sonuçlar; kullanıcı tarafından girilen verilere göre üretilen bağımsız ve bilgilendirme amaçlı tahmini analizlerdir.',
-                    style: TextStyle(fontSize: 16, height: 1.45),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Plango sözleşme oluşturmaz, ödeme kabul etmez, teslimat taahhüdünde bulunmaz ve hiçbir tasarruf finansman kuruluşu adına işlem yapmaz.',
-                    style: TextStyle(fontSize: 16, height: 1.45),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Nihai planlama, sözleşme şartları ve teslim bilgileri ilgili tasarruf finansman kuruluşu tarafından belirlenir.',
-                    style: TextStyle(fontSize: 16, height: 1.45),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Resmî karar vermeden önce ilgili tasarruf finansman kuruluşundan güncel bilgi almanız tavsiye edilir.',
-                    style: TextStyle(fontSize: 16, height: 1.45),
-                  ),
-                ],
+            const Positioned(
+              top: -90,
+              right: -85,
+              child: _BackgroundGlow(
+                size: 250,
+                color: Color(0x1816C7B0),
               ),
             ),
-            CheckboxListTile(
-              value: accepted,
-              onChanged: (v) => setState(() => accepted = v ?? false),
-              title: const Text('Okudum, anladım ve kabul ediyorum.'),
-              controlAffinity: ListTileControlAffinity.leading,
+            const Positioned(
+              bottom: -120,
+              left: -110,
+              child: _BackgroundGlow(
+                size: 300,
+                color: Color(0x12052F3D),
+              ),
             ),
-            SizedBox(
-              width: double.infinity,
-              height: 42,
-              child: ElevatedButton(
-                onPressed: accepted ? _continue : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.green,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: Colors.grey.shade300,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  18,
+                  24,
+                  18,
+                  24,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 520,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(
+                      18,
+                      18,
+                      18,
+                      17,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                        28,
+                      ),
+                      border: Border.all(
+                        color: AppColors.border,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.petrol
+                              .withOpacity(0.10),
+                          blurRadius: 34,
+                          offset: const Offset(0, 16),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.softTeal,
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  15,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons
+                                    .verified_user_outlined,
+                                color: AppColors.teal,
+                                size: 23,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+                                children: [
+                                  Text(
+                                    'Önemli Bilgilendirme',
+                                    style: TextStyle(
+                                      color:
+                                          AppColors.navy,
+                                      fontSize: 19,
+                                      height: 1.1,
+                                      fontWeight:
+                                          FontWeight
+                                              .w900,
+                                      letterSpacing:
+                                          -0.35,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    'Plango’yu kullanmadan önce aşağıdaki bilgileri okumanı rica ediyoruz.',
+                                    style: TextStyle(
+                                      color:
+                                          AppColors.muted,
+                                      fontSize: 11.5,
+                                      height: 1.42,
+                                      fontWeight:
+                                          FontWeight
+                                              .w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        const _InfoItem(
+                          icon: Icons
+                              .shield_outlined,
+                          title: 'Bağımsız Platform',
+                          description:
+                              'Plango, bağımsız bir tasarruf finansmanı karar destek platformudur.',
+                        ),
+                        const _InfoItem(
+                          icon:
+                              Icons.calculate_outlined,
+                          title: 'FP Engine',
+                          description:
+                              'FP Engine sonuçları, kullanıcı tarafından girilen verilere göre oluşturulan bilgilendirme amaçlı tahmini analizlerdir.',
+                        ),
+                        const _InfoItem(
+                          icon:
+                              Icons.description_outlined,
+                          title: 'Resmî Plan ve Sözleşme',
+                          description:
+                              'Plango sözleşme oluşturmaz, ödeme kabul etmez ve hiçbir tasarruf finansman kuruluşu adına işlem yapmaz.',
+                        ),
+                        const _InfoItem(
+                          icon: Icons
+                              .calendar_month_outlined,
+                          title: 'Teslim ve Planlama',
+                          description:
+                              'Nihai ödeme planı, sözleşme şartları ve teslim bilgileri ilgili tasarruf finansman kuruluşu tarafından belirlenir.',
+                        ),
+                        const _InfoItem(
+                          icon: Icons
+                              .info_outline_rounded,
+                          title: 'Güncel Bilgi',
+                          description:
+                              'Resmî karar vermeden önce ilgili tasarruf finansman kuruluşundan güncel bilgi alman tavsiye edilir.',
+                          showDivider: false,
+                        ),
+                        const SizedBox(height: 5),
+                        Container(
+                          decoration: BoxDecoration(
+                            color:
+                                const Color(
+                              0xFFF5F9FA,
+                            ),
+                            borderRadius:
+                                BorderRadius.circular(
+                              15,
+                            ),
+                            border: Border.all(
+                              color:
+                                  const Color(
+                                0xFFE6EEF0,
+                              ),
+                            ),
+                          ),
+                          child: CheckboxListTile(
+                            value: accepted,
+                            onChanged: (value) {
+                              setState(() {
+                                accepted =
+                                    value ?? false;
+                              });
+                            },
+                            activeColor:
+                                AppColors.teal,
+                            checkColor: Colors.white,
+                            controlAffinity:
+                                ListTileControlAffinity
+                                    .leading,
+                            contentPadding:
+                                const EdgeInsets
+                                    .symmetric(
+                              horizontal: 10,
+                              vertical: 1,
+                            ),
+                            title: const Text(
+                              'Okudum, anladım ve kabul ediyorum.',
+                              style: TextStyle(
+                                color:
+                                    AppColors.navy,
+                                fontSize: 11.5,
+                                height: 1.3,
+                                fontWeight:
+                                    FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: FilledButton(
+                            onPressed:
+                                accepted
+                                    ? _continue
+                                    : null,
+                            style:
+                                FilledButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor:
+                                  AppColors.teal,
+                              foregroundColor:
+                                  Colors.white,
+                              disabledBackgroundColor:
+                                  const Color(
+                                0xFFDCE4E7,
+                              ),
+                              disabledForegroundColor:
+                                  const Color(
+                                0xFF93A1AA,
+                              ),
+                              shape:
+                                  RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius
+                                        .circular(
+                                  15,
+                                ),
+                              ),
+                              textStyle:
+                                  const TextStyle(
+                                fontSize: 13,
+                                fontWeight:
+                                    FontWeight.w900,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment
+                                      .center,
+                              children: [
+                                Text('Devam Et'),
+                                SizedBox(width: 7),
+                                Icon(
+                                  Icons
+                                      .arrow_forward_rounded,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Center(
+                          child: Text(
+                            'Planla • Karşılaştır • Karar Ver',
+                            style: TextStyle(
+                              color:
+                                  AppColors.muted,
+                              fontSize: 9.5,
+                              fontWeight:
+                                  FontWeight.w700,
+                              letterSpacing: 0.45,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: const Text('Devam Et'),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InfoItem extends StatelessWidget {
+  const _InfoItem({
+    required this.icon,
+    required this.title,
+    required this.description,
+    this.showDivider = true,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 9,
+          ),
+          child: Row(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.softTeal,
+                  borderRadius:
+                      BorderRadius.circular(
+                    11,
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  color: AppColors.teal,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColors.navy,
+                        fontSize: 12.5,
+                        fontWeight:
+                            FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        color: AppColors.muted,
+                        fontSize: 11,
+                        height: 1.42,
+                        fontWeight:
+                            FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showDivider)
+          const Padding(
+            padding:
+                EdgeInsets.only(left: 47),
+            child: Divider(
+              height: 1,
+              thickness: 1,
+              color: Color(0xFFEDF1F3),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _BackgroundGlow extends StatelessWidget {
+  const _BackgroundGlow({
+    required this.size,
+    required this.color,
+  });
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+class _FallbackLogo extends StatelessWidget {
+  const _FallbackLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 92,
+          height: 92,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.turquoise,
+                AppColors.teal,
+                AppColors.navy,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(
+              26,
+            ),
+          ),
+          child: const Text(
+            'P',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 52,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        const Text(
+          'PLANGO',
+          style: TextStyle(
+            color: AppColors.navy,
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ],
     );
   }
 }

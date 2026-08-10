@@ -21,12 +21,15 @@ class ExpertApplicationScreen extends StatefulWidget {
 
 class _ExpertApplicationScreenState
     extends State<ExpertApplicationScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _softGreen = Color(0xFFE8F1EC);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = _navy;
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
+  static const Color _softTeal = Color(0xFFE8F7F5);
   static const Color _danger = Color(0xFFB42318);
 
   final GlobalKey<FormState> _companyFormKey =
@@ -727,13 +730,13 @@ class _ExpertApplicationScreenState
                   BorderRadius.circular(18),
               border: Border.all(
                 color: _informationConfirmed
-                    ? _green
+                    ? _teal
                     : _border,
               ),
             ),
             child: CheckboxListTile(
               value: _informationConfirmed,
-              activeColor: _green,
+              activeColor: _teal,
               controlAffinity:
                   ListTileControlAffinity.leading,
               contentPadding:
@@ -781,7 +784,7 @@ class _ExpertApplicationScreenState
       hintText: hint,
       prefixIcon: Icon(
         icon,
-        color: _green,
+        color: _teal,
       ),
       filled: true,
       fillColor: Colors.white,
@@ -802,7 +805,7 @@ class _ExpertApplicationScreenState
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: const BorderSide(
-          color: _green,
+          color: _teal,
           width: 1.7,
         ),
       ),
@@ -867,9 +870,9 @@ class _ApplicationProgress extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: completed
                               ? _ExpertApplicationScreenState
-                                  ._green
+                                  ._teal
                               : const Color(
-                                  0xFFE5E7EB,
+                                  0xFFE4EBEE,
                                 ),
                           shape: BoxShape.circle,
                         ),
@@ -891,7 +894,7 @@ class _ApplicationProgress extends StatelessWidget {
                         style: TextStyle(
                           color: completed
                               ? _ExpertApplicationScreenState
-                                  ._green
+                                  ._teal
                               : _ExpertApplicationScreenState
                                   ._textMuted,
                           fontSize: 11.5,
@@ -914,9 +917,9 @@ class _ApplicationProgress extends StatelessWidget {
                         ),
                         color: index < currentStep
                             ? _ExpertApplicationScreenState
-                                ._green
+                                ._teal
                             : const Color(
-                                0xFFE5E7EB,
+                                0xFFE4EBEE,
                               ),
                       ),
                     ),
@@ -947,8 +950,8 @@ class _StepHeader extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color:
-            _ExpertApplicationScreenState._softGreen,
-        borderRadius: BorderRadius.circular(22),
+            _ExpertApplicationScreenState._softTeal,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         crossAxisAlignment:
@@ -957,7 +960,7 @@ class _StepHeader extends StatelessWidget {
           Icon(
             icon,
             color:
-                _ExpertApplicationScreenState._green,
+                _ExpertApplicationScreenState._teal,
             size: 30,
           ),
           const SizedBox(width: 13),
@@ -1010,7 +1013,7 @@ class _ApplicationCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color:
               _ExpertApplicationScreenState._border,
@@ -1136,7 +1139,7 @@ class _BottomActions extends StatelessWidget {
         color: Colors.white,
         border: Border(
           top: BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: Color(0xFFE4EBEE),
           ),
         ),
       ),
@@ -1177,7 +1180,7 @@ class _BottomActions extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor:
                     _ExpertApplicationScreenState
-                        ._green,
+                        ._teal,
                 foregroundColor: Colors.white,
                 minimumSize:
                     const Size.fromHeight(56),
@@ -1220,10 +1223,10 @@ class _ApplicationLoadingScreen
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFFF7F8F5),
+      backgroundColor: Color(0xFFF7F9FB),
       body: Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF0B5D3B),
+          color: Color(0xFF087C72),
         ),
       ),
     );

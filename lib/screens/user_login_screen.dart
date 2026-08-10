@@ -12,12 +12,15 @@ class UserLoginScreen extends StatefulWidget {
 }
 
 class _UserLoginScreenState extends State<UserLoginScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _darkGreen = Color(0xFF07472E);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _fieldBackground = Color(0xFFFFFFFF);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _softTeal = Color(0xFFEAF8F5);
+  static const Color _border = Color(0xFFE4EAF0);
+  static const Color _textDark = Color(0xFF172B35);
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _fieldBackground = Color(0xFFF7F9FB);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -153,11 +156,12 @@ bool _isSubmitting = false;
       backgroundColor: _background,
       appBar: AppBar(
         backgroundColor: _background,
-        foregroundColor: _textDark,
+        surfaceTintColor: _background,
+        foregroundColor: _navy,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
-          'Kullanıcı Girişi',
+          'Giriş Yap',
           style: TextStyle(
             fontWeight: FontWeight.w800,
           ),
@@ -226,20 +230,20 @@ class _LoginHeader extends StatelessWidget {
     return const Column(
       children: [
         _LoginIcon(),
-        SizedBox(height: 18),
+        SizedBox(height: 15),
         Text(
           'Tekrar Hoş Geldiniz',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: _UserLoginScreenState._textDark,
-            fontSize: 25,
+            color: _UserLoginScreenState._navy,
+            fontSize: 23,
             height: 1.2,
             fontWeight: FontWeight.w900,
           ),
         ),
         SizedBox(height: 9),
         Text(
-          'Hesabınıza e-posta adresiniz ve şifrenizle giriş yapın.',
+          'Plango hesabınıza e-posta adresiniz ve şifrenizle giriş yapın.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _UserLoginScreenState._textMuted,
@@ -259,16 +263,19 @@ class _LoginIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 78,
-      height: 78,
+      width: 62,
+      height: 62,
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1EC),
-        borderRadius: BorderRadius.circular(25),
+        color: _UserLoginScreenState._softTeal,
+        borderRadius: BorderRadius.circular(19),
+        border: Border.all(
+          color: _UserLoginScreenState._teal.withValues(alpha: 0.16),
+        ),
       ),
       child: const Icon(
-        Icons.person_outline_rounded,
-        color: _UserLoginScreenState._green,
-        size: 39,
+        Icons.login_rounded,
+        color: _UserLoginScreenState._teal,
+        size: 30,
       ),
     );
   }
@@ -306,16 +313,16 @@ class _LoginCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+      padding: const EdgeInsets.fromLTRB(17, 19, 17, 18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: Colors.black.withValues(alpha: 0.055),
+          color: _UserLoginScreenState._border,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
+            color: _UserLoginScreenState._navy.withValues(alpha: 0.035),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -386,7 +393,7 @@ class _LoginCard extends StatelessWidget {
               child: TextButton(
                 onPressed: isSubmitting ? null : onForgotPassword,
                 style: TextButton.styleFrom(
-                  foregroundColor: _UserLoginScreenState._green,
+                  foregroundColor: _UserLoginScreenState._teal,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 4,
                     vertical: 8,
@@ -403,9 +410,9 @@ class _LoginCard extends StatelessWidget {
             FilledButton(
               onPressed: isSubmitting ? null : onLogin,
               style: FilledButton.styleFrom(
-                backgroundColor: _UserLoginScreenState._green,
+                backgroundColor: _UserLoginScreenState._teal,
                 disabledBackgroundColor:
-                    _UserLoginScreenState._green.withValues(alpha: 0.55),
+                    _UserLoginScreenState._teal.withValues(alpha: 0.55),
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(58),
                 shape: RoundedRectangleBorder(
@@ -459,7 +466,7 @@ class _LoginCard extends StatelessWidget {
       hintText: hint,
       prefixIcon: Icon(
         icon,
-        color: _UserLoginScreenState._green,
+        color: _UserLoginScreenState._teal,
       ),
       suffixIcon: suffixIcon,
       filled: true,
@@ -479,19 +486,19 @@ class _LoginCard extends StatelessWidget {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: const BorderSide(
-          color: Color(0xFFE5E7EB),
+          color: _UserLoginScreenState._border,
         ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: const BorderSide(
-          color: Color(0xFFE5E7EB),
+          color: _UserLoginScreenState._border,
         ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
         borderSide: const BorderSide(
-          color: _UserLoginScreenState._green,
+          color: _UserLoginScreenState._teal,
           width: 1.7,
         ),
       ),
@@ -527,8 +534,11 @@ class _RegisterSection extends StatelessWidget {
         vertical: 17,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1EC),
+        color: _UserLoginScreenState._softTeal,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: _UserLoginScreenState._teal.withValues(alpha: 0.16),
+        ),
       ),
       child: Row(
         children: [
@@ -536,7 +546,7 @@ class _RegisterSection extends StatelessWidget {
             child: Text(
               'Henüz hesabınız yok mu?',
               style: TextStyle(
-                color: _UserLoginScreenState._textDark,
+                color: _UserLoginScreenState._navy,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
@@ -545,7 +555,7 @@ class _RegisterSection extends StatelessWidget {
           TextButton(
             onPressed: onRegister,
             style: TextButton.styleFrom(
-              foregroundColor: _UserLoginScreenState._green,
+              foregroundColor: _UserLoginScreenState._teal,
               padding: const EdgeInsets.symmetric(
                 horizontal: 8,
                 vertical: 6,

@@ -6,8 +6,6 @@ class AppUser {
     required this.name,
     required this.surname,
     required this.email,
-    required this.username,
-    required this.usernameLowercase,
     required this.roles,
     required this.expertStatus,
     required this.createdAt,
@@ -19,11 +17,6 @@ class AppUser {
   final String name;
   final String surname;
   final String email;
-  final String username;
-
-  /// Kullanıcı adıyla arama ve giriş işlemlerinde kullanılır.
-  /// Örneğin "Hanefi_34" değeri "hanefi_34" olarak saklanır.
-  final String usernameLowercase;
 
   /// Aynı hesap birden fazla yetkiye sahip olabilir.
   /// Örnek: ['user', 'expert', 'admin']
@@ -50,8 +43,6 @@ class AppUser {
     String? name,
     String? surname,
     String? email,
-    String? username,
-    String? usernameLowercase,
     List<String>? roles,
     String? expertStatus,
     String? phone,
@@ -64,9 +55,6 @@ class AppUser {
       name: name ?? this.name,
       surname: surname ?? this.surname,
       email: email ?? this.email,
-      username: username ?? this.username,
-      usernameLowercase:
-          usernameLowercase ?? this.usernameLowercase,
       roles: roles ?? this.roles,
       expertStatus: expertStatus ?? this.expertStatus,
       phone: clearPhone ? null : phone ?? this.phone,
@@ -81,8 +69,6 @@ class AppUser {
       'name': name.trim(),
       'surname': surname.trim(),
       'email': email.trim().toLowerCase(),
-      'username': username.trim(),
-      'usernameLowercase': usernameLowercase.trim().toLowerCase(),
       'roles': roles,
       'expertStatus': expertStatus,
       'phone': phone?.trim(),
@@ -104,10 +90,6 @@ class AppUser {
       name: map['name'] as String? ?? '',
       surname: map['surname'] as String? ?? '',
       email: map['email'] as String? ?? '',
-      username: map['username'] as String? ?? '',
-      usernameLowercase:
-          map['usernameLowercase'] as String? ??
-              (map['username'] as String? ?? '').toLowerCase(),
       roles: List<String>.from(
         map['roles'] as List<dynamic>? ?? const ['user'],
       ),

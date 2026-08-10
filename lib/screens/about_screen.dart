@@ -8,161 +8,292 @@ class AboutScreen extends StatefulWidget {
 }
 
 class _AboutScreenState extends State<AboutScreen> {
-  int? openIndex;
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _muted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
 
-  static const Color primaryGreen = Color(0xFF0F7A4F);
-  static const Color darkGreen = Color(0xFF064E3B);
-  static const Color softGreen = Color(0xFFEAF7F1);
-  static const Color pageBg = Color(0xFFF7F9F8);
+  int? _openIndex;
 
-  final sections = const [
-    AboutSection(
+  final List<_AboutSection> _sections = const [
+    _AboutSection(
       icon: Icons.explore_outlined,
       title: 'Plango Nedir?',
-      content:
-          'Plango, Türkiye’deki tasarruf finansmanı sistemini daha anlaşılır, erişilebilir ve takip edilebilir hale getirmek amacıyla geliştirilen bağımsız bir tasarruf finansmanı karar destek platformudur.\n\n'
-          'Plango; kullanıcıların finansman tutarı, peşinat, taksit, vade ve ödeme modeli gibi bilgileri girerek farklı planlama senaryoları oluşturmasına yardımcı olur. Uygulama, kullanıcıya hesaplama yapma, tahmini sonuçları görme, sistem hakkında bilgi edinme ve doğrulanmış sektör uzmanlarıyla iletişim kurma imkânı sunar.\n\n'
-          'Plango herhangi bir tasarruf finansman şirketinin yerine geçmez, şirketler adına işlem yapmaz ve kullanıcı adına karar vermez. Plango’nun temel amacı; kullanıcıların tasarruf finansmanı sürecini daha bilinçli şekilde değerlendirebilmesine destek olmaktır.',
+      body:
+          'Plango; tasarruf finansmanı sistemini araştıran, farklı ödeme senaryolarını değerlendirmek isteyen ve karar sürecinde daha fazla bilgiye ihtiyaç duyan kullanıcılar için geliştirilmiş bağımsız bir dijital karar destek platformudur.\n\n'
+          'Platformun temel amacı, tasarruf finansmanı alanındaki karmaşık bilgileri daha anlaşılır hale getirmek; kullanıcıların finansman tutarı, peşinat, aylık ödeme, teslim süresi, vade ve ödeme modeli gibi başlıklarda kendi senaryolarını oluşturabilmesini sağlamaktır.\n\n'
+          'Plango herhangi bir tasarruf finansman şirketinin resmî uygulaması değildir. Herhangi bir şirket adına sözleşme düzenlemez, ödeme tahsil etmez, finansman sağlamaz ve kullanıcı adına karar vermez.\n\n'
+          'Plango’nun rolü; bilgi sunmak, hesaplama yapmak, seçenekleri görünür hale getirmek ve kullanıcının kendi kararını daha bilinçli şekilde verebilmesine destek olmaktır.',
     ),
-    AboutSection(
-      icon: Icons.lightbulb_outline,
-      title: 'Neden Plango Geliştirildi?',
-      content:
-          'Tasarruf finansmanı sistemi; ev, araç ve çatılı iş yeri gibi ihtiyaçlara ulaşmak isteyen kullanıcılar için önemli bir finansman modeli haline gelmiştir. Ancak bu sistemde finansman tutarı, peşinat, aylık ödeme, teslimat süresi, vade, mevzuat ve farklı ödeme modelleri gibi birçok değişken bulunmaktadır.\n\n'
-          'Bu değişkenler, kullanıcıların planlarını kendi başına değerlendirmesini zaman zaman zorlaştırabilir. Kullanıcılar çoğu zaman “Ne kadar peşinat verirsem teslimatım nasıl etkilenir?”, “Aylık taksitim değişirse vadem ne olur?”, “Artışlı ödeme modeli bana nasıl bir tablo çıkarır?” gibi sorulara hızlı ve anlaşılır yanıtlar arar.\n\n'
-          'Plango, bu ihtiyaca destek olmak için geliştirilmiştir. Amaç; kullanıcıların diledikleri senaryoları kolayca hesaplayabileceği, tasarruf finansmanı sistemini daha net anlayabileceği ve sektörel gelişmeleri takip edebileceği bağımsız bir dijital alan oluşturmaktır.',
+    _AboutSection(
+      icon: Icons.lightbulb_outline_rounded,
+      title: 'Plango Neden Geliştirildi?',
+      body:
+          'Tasarruf finansmanı sistemi; ev, araç ve benzeri finansman ihtiyaçlarını faizsiz modeller üzerinden planlamak isteyen kullanıcılar için önemli bir alternatif haline gelmiştir.\n\n'
+          'Ancak kullanıcı açısından sistem her zaman kolay anlaşılır değildir. Finansman tutarı, peşinat, aylık taksit, teslim süresi, toplam vade, organizasyon ücreti, artışlı ödeme modelleri, şirket uygulamaları ve mevzuat gibi çok sayıda değişken aynı anda değerlendirilmek zorundadır.\n\n'
+          'Kullanıcı çoğu zaman yalnızca “Ne kadar öderim?” sorusuna değil; “Ne zaman teslim alırım?”, “Peşinatı artırırsam ne değişir?”, “Taksiti yükseltirsem vade ne kadar kısalır?”, “Artışlı plan benim için nasıl sonuç verir?” gibi sorulara da cevap arar.\n\n'
+          'Plango bu ihtiyacı karşılamak için geliştirildi. Amaç; kullanıcının farklı senaryoları tekrar tekrar hesaplayabileceği, sistemin mantığını daha kolay anlayabileceği ve resmî karar vermeden önce kendi alternatiflerini değerlendirebileceği bağımsız bir dijital alan oluşturmaktır.',
     ),
-    AboutSection(
+    _AboutSection(
+      icon: Icons.troubleshoot_outlined,
+      title: 'Çözmek İstediğimiz Problem',
+      body:
+          'Tasarruf finansmanı sektöründe bilgi çoğu zaman farklı şirket ekranlarında, satış görüşmelerinde, sözleşme metinlerinde, kampanya duyurularında ve mevzuat kaynaklarında dağınık şekilde bulunur.\n\n'
+          'Bu da kullanıcıların aynı anda birden fazla kaynağı takip etmesini, farklı hesaplama yöntemlerini anlamasını ve kendi mali durumuna göre karşılaştırma yapmasını zorlaştırabilir.\n\n'
+          'Plango; bilgiye erişim, hesaplama ve değerlendirme süreçlerini tek bir dijital deneyim içinde bir araya getirmeyi hedefler.\n\n'
+          'Buradaki amaç sektörü veya şirketleri tek bir kalıba sokmak değil; kullanıcıya kendi kararını verebilmesi için daha anlaşılır bir çerçeve sunmaktır.',
+    ),
+    _AboutSection(
       icon: Icons.flag_outlined,
       title: 'Misyonumuz',
-      content:
-          'Plango’nun misyonu; tasarruf finansmanı sistemine ilişkin hesaplama, bilgilendirme ve yönlendirme süreçlerini daha anlaşılır hale getirerek kullanıcıların bilinçli karar verebilmesine destek olmaktır.\n\n'
-          'Plango, kullanıcıya nihai karar sunmaz; karar sürecinde ihtiyaç duyabileceği bilgileri, tahmini analizleri ve yardımcı araçları sağlar.',
+      body:
+          'Plango’nun misyonu; tasarruf finansmanı sistemine ilişkin hesaplama, bilgilendirme ve değerlendirme süreçlerini sadeleştirerek kullanıcıların daha bilinçli karar verebilmesine destek olmaktır.\n\n'
+          'Plango, kullanıcıya nihai karar sunmaz. Kullanıcı adına şirket seçmez. Kullanıcı adına plan belirlemez.\n\n'
+          'Bunun yerine; kullanıcının kendi verileriyle hesaplama yapabilmesini, farklı senaryoları görebilmesini, sektörel bilgileri okuyabilmesini ve resmî karar öncesinde daha güçlü bir değerlendirme zemini oluşturabilmesini sağlar.\n\n'
+          'Misyonumuzun merkezinde kullanıcıyı yönlendirmek değil, kullanıcıyı güçlendirmek vardır.',
     ),
-    AboutSection(
-      icon: Icons.public,
+    _AboutSection(
+      icon: Icons.public_rounded,
       title: 'Vizyonumuz',
-      content:
-          'Plango’nun vizyonu; tasarruf finansmanı alanında kullanıcıların hesaplama yapabildiği, sistemi anlayabildiği, güncel gelişmeleri takip edebildiği ve doğrulanmış sektör uzmanlarıyla iletişim kurabildiği kapsamlı bir karar destek platformu olmaktır.\n\n'
-          'Plango, sektördeki şirketlerin veya uzmanların yerine geçmeyi değil; kullanıcı ile bilgi arasında daha sade, anlaşılır ve tarafsız bir köprü kurmayı hedefler.',
+      body:
+          'Plango’nun vizyonu; tasarruf finansmanı alanında kullanıcıların hesaplama yapabildiği, sistemi anlayabildiği, güncel gelişmeleri takip edebildiği, şirket bilgilerine erişebildiği ve uygun olduğunda doğrulanmış sektör uzmanlarıyla iletişim kurabildiği kapsamlı bir karar destek platformu olmaktır.\n\n'
+          'Plango, sektördeki şirketlerin veya uzmanların yerine geçmeyi değil; kullanıcı ile bilgi arasında daha sade, anlaşılır ve tarafsız bir köprü kurmayı hedefler.\n\n'
+          'Uzun vadede hedefimiz, tasarruf finansmanı karar sürecinin kullanıcı açısından daha şeffaf, daha erişilebilir ve daha anlaşılır hale gelmesine katkı sunmaktır.',
     ),
-    AboutSection(
+    _AboutSection(
       icon: Icons.balance_outlined,
-      title: 'İlkelerimiz',
-      content:
-          'Bağımsızlık\nPlango, herhangi bir tasarruf finansman şirketinin resmî uygulaması değildir.\n\n'
-          'Tarafsızlık\nPlango, herhangi bir şirketi, uzmanı veya ödeme modelini diğerlerinden üstün göstermeyi amaçlamaz.\n\n'
-          'Bilgilendirme Odaklılık\nPlango’nun temel görevi, kullanıcıların tasarruf finansmanı sistemini daha kolay anlamasına yardımcı olmaktır.\n\n'
-          'Karar Kullanıcıya Aittir\nPlango, kullanıcı adına karar vermez. Nihai karar her zaman kullanıcıya aittir.\n\n'
-          'Şeffaflık\nPlango, sunduğu hesaplama ve bilgilendirme araçlarının tahmini ve destekleyici nitelikte olduğunu açıkça belirtir.\n\n'
-          'Sektöre Saygılı Yaklaşım\nPlango, tasarruf finansmanı ekosisteminde faaliyet gösteren şirketlere ve sektör profesyonellerine tarafsız bir çerçevede yaklaşır.\n\n'
-          'Sürekli Gelişim\nPlango, kullanıcı ihtiyaçlarına, mevzuat değişikliklerine ve sektörel gelişmelere göre kendini geliştirmeyi hedefler.',
+      title: 'Bağımsızlık İlkemiz',
+      body:
+          'Bağımsızlık, Plango’nun temel ürün ilkelerinden biridir.\n\n'
+          'Plango herhangi bir tasarruf finansman şirketine bağlı olarak faaliyet göstermez. Hesaplama sonuçları belirli bir şirketi öne çıkarmak, belirli bir kampanyayı avantajlı göstermek veya kullanıcıyı belirli bir kuruluşa yönlendirmek amacıyla hazırlanmaz.\n\n'
+          'Bir şirketin Plango’da yer alması, o şirketin Plango tarafından tavsiye edildiği anlamına gelmez. Benzer şekilde bir uzmanın Plango’da doğrulanmış olması da o uzmanın diğer uzmanlardan daha iyi olduğu anlamına gelmez.\n\n'
+          'Plango’nun bağımsızlık anlayışı; hesaplama, bilgilendirme, şirket görünürlüğü, uzman sistemi ve içerik yayınlama süreçlerinin tamamında kullanıcıya açık ve dürüst bir karar destek deneyimi sunmayı hedefler.',
     ),
-    AboutSection(
+    _AboutSection(
+      icon: Icons.compare_arrows_rounded,
+      title: 'Tarafsızlık İlkemiz',
+      body:
+          'Plango, tasarruf finansman şirketleri, uzmanlar, ödeme modelleri ve kampanyalar arasında taraflı bir değerlendirme yapmayı amaçlamaz.\n\n'
+          'Platformda yer alan bilgilerin mümkün olduğunca nesnel, doğrulanabilir ve açıklayıcı biçimde sunulması hedeflenir.\n\n'
+          'Plango’nun amacı “en iyi şirketi” veya “en iyi planı” ilan etmek değildir. Çünkü kullanıcıların mali durumları, ihtiyaçları, hedefleri ve öncelikleri birbirinden farklıdır.\n\n'
+          'Bir seçenek bir kullanıcı için uygunken başka bir kullanıcı için uygun olmayabilir. Bu nedenle Plango, mutlak sıralama yapmak yerine kullanıcıya kendi koşullarına göre değerlendirme yapabileceği bir yapı sunmayı tercih eder.',
+    ),
+    _AboutSection(
+      icon: Icons.visibility_outlined,
+      title: 'Şeffaflık Anlayışımız',
+      body:
+          'Plango, kullanıcıya sunduğu hesaplama ve bilgilendirme araçlarının niteliğini açık biçimde belirtmeyi temel bir sorumluluk olarak görür.\n\n'
+          'FP Engine sonuçlarının tahmini olduğu, resmî teklif veya sözleşme niteliğinde olmadığı ve resmî süreçlerin ilgili şirket tarafından yürütüldüğü açıkça ifade edilir.\n\n'
+          'Benzer şekilde şirket bilgileri, uzman profilleri ve bilgilendirici içerikler kullanıcıya olduğu gibi sunulmaya çalışılır; mümkün olduğunca yorum ile resmî bilgi birbirinden ayrılır.\n\n'
+          'Şeffaflık yaklaşımımızın amacı, kullanıcının neye baktığını ve gördüğü bilginin ne anlama geldiğini net şekilde anlayabilmesini sağlamaktır.',
+    ),
+    _AboutSection(
       icon: Icons.memory_outlined,
-      title: 'FP Engine Nedir?',
-      content:
+      title: 'FP Engine Teknolojisi',
+      body:
           'FP Engine, Plango içerisinde kullanılan bağımsız hesaplama motorudur.\n\n'
-          'Kullanıcı tarafından girilen finansman tutarı, peşinat, taksit, ödeme modeli ve benzeri bilgiler doğrultusunda tahmini vade ve teslimat analizleri oluşturur.\n\n'
-          'FP Engine sonuçları, yalnızca bilgilendirme ve karar destek amacı taşır. Bu sonuçlar kesin teslim tarihi, resmî ödeme planı veya şirket onayı anlamına gelmez.\n\n'
-          'Resmî sözleşme koşulları, ödeme planları, teslimat tarihleri ve diğer süreçler ilgili tasarruf finansman şirketi tarafından belirlenir.',
+          'Kullanıcı tarafından girilen finansman tutarı, peşinat, aylık ödeme, ödeme modeli, artış oranı, artış periyodu ve benzeri parametreleri kullanarak tahmini ödeme planları ve teslim süresi analizleri oluşturur.\n\n'
+          'FP Engine’in temel amacı şirket adına resmî teklif üretmek değil; kullanıcının farklı senaryoların muhtemel etkilerini görmesine yardımcı olacak standartlaştırılmış bir karar destek yaklaşımı sunmaktır.\n\n'
+          'Kullanıcı aynı finansman tutarını farklı peşinat, taksit ve artış modelleriyle tekrar tekrar hesaplayabilir. Böylece tek bir planı görmek yerine alternatifler arasındaki farkları değerlendirebilir.\n\n'
+          'FP Engine sonuçları tahmini ve bilgilendirme amaçlıdır. Resmî plan, sözleşme ve teslim tarihi ilgili tasarruf finansman şirketi tarafından belirlenir.',
     ),
-    AboutSection(
+    _AboutSection(
+      icon: Icons.person_search_outlined,
+      title: 'Kullanıcıya Sağladığımız Değer',
+      body:
+          'Plango’nun kullanıcıya sunduğu temel değer, karar sürecini daha anlaşılır hale getirmektir.\n\n'
+          'Kullanıcı; farklı finansman senaryolarını tek tek hesaplayabilir, tahmini teslim süresini görebilir, ödeme planını inceleyebilir, planını kaydedebilir ve ihtiyaç duyduğu bilgileri tekrar görüntüleyebilir.\n\n'
+          'Bu yapı, kullanıcının yalnızca satış görüşmesi sırasında duyduğu bilgilerle hareket etmek yerine kendi hesabını yapabilmesine destek olur.\n\n'
+          'Plango’nun amacı kullanıcıyı bir seçeneğe yönlendirmek değil; kullanıcının seçenekleri daha bilinçli biçimde değerlendirebilmesine yardımcı olmaktır.',
+    ),
+    _AboutSection(
+      icon: Icons.account_balance_outlined,
+      title: 'Tasarruf Finansmanı Bilgilendirmesi',
+      body:
+          'Plango yalnızca hesaplama aracı değildir.\n\n'
+          'Tasarruf finansman sistemi hakkında temel kavramlar, sistemin çalışma mantığı, ödeme modelleri, teslim süreci, organizasyon ücreti, sözleşme ve kullanıcıların dikkat etmesi gereken başlıklar hakkında bilgilendirici içerikler sunmayı hedefler.\n\n'
+          'Bu içeriklerin amacı kullanıcıların sistemle ilk kez karşılaştığında temel kavramları anlayabilmesini sağlamaktır.\n\n'
+          'Resmî ve bağlayıcı bilgiler için yürürlükteki mevzuat, yetkili kurumlar ve ilgili tasarruf finansman şirketlerinin resmî açıklamaları esas alınmalıdır.',
+    ),
+    _AboutSection(
+      icon: Icons.apartment_outlined,
+      title: 'Şirket Bilgileri Yaklaşımımız',
+      body:
+          'Plango’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller yer alabilir.\n\n'
+          'Bu profillerin amacı kullanıcıya şirketler hakkında temel ve doğrulanabilir bilgileri daha kolay erişilebilir biçimde sunmaktır.\n\n'
+          'Plango bir şirketi diğerinden üstün göstermeyi amaçlamaz. Şirket profillerinde yer alan bilgiler mümkün olduğunca nesnel bir çerçevede sunulmaya çalışılır.\n\n'
+          'Şirketlerin kampanyaları, ürün koşulları ve uygulamaları zaman içinde değişebileceğinden kullanıcıların nihai karar öncesinde ilgili şirketin resmî kanallarını kontrol etmesi önemlidir.',
+    ),
+    _AboutSection(
       icon: Icons.verified_user_outlined,
       title: 'Doğrulanmış Uzman Sistemi',
-      content:
-          'Plango’da yer alan uzman profilleri, doğrulama sürecini tamamlamış sektör profesyonellerinden oluşur.\n\n'
-          'Bu sistemin amacı, kullanıcıların tasarruf finansmanı alanında çalışan uzmanlara daha kolay ulaşabilmesini sağlamaktır. Bir uzmanın Plango’da yer alması, diğer uzmanlar hakkında olumlu veya olumsuz bir değerlendirme anlamına gelmez.\n\n'
-          'Plango, uzman profillerini kullanıcıya bilgi ve iletişim kolaylığı sağlamak amacıyla listeler. Uzmanlar tarafından sunulan bilgiler, ilgili uzmanın kendi mesleki değerlendirmesi kapsamındadır.',
+      body:
+          'Plango’da yer alan uzman profilleri, platform tarafından belirlenen doğrulama ve onay süreçlerinden geçmiş sektör profesyonellerinden oluşabilir.\n\n'
+          'Bu sistemin amacı kullanıcıların tasarruf finansmanı alanında çalışan uzmanlara daha düzenli ve güvenli bir şekilde ulaşabilmesini kolaylaştırmaktır.\n\n'
+          'Doğrulanmış uzman ifadesi, ilgili kişinin Plango doğrulama kriterlerini tamamladığını gösterir; devlet tarafından verilmiş bağımsız bir mesleki yeterlilik belgesi veya Plango tarafından verilmiş performans garantisi anlamına gelmez.\n\n'
+          'Uzmanlar tarafından sunulan bilgiler ilgili uzmanın kendi mesleki sorumluluğu kapsamındadır.',
     ),
-    AboutSection(
-      icon: Icons.assignment_outlined,
-      title: 'Plango’nun Kapsamı',
-      content:
-          'Plango’nun sunduğu hizmetler:\n\n'
-          '• Tasarruf finansmanı planı hesaplama\n'
-          '• Tahmini vade ve teslimat analizi\n'
-          '• Farklı ödeme modelleriyle senaryo oluşturma\n'
-          '• Tasarruf finansmanı sistemi hakkında bilgilendirme\n'
-          '• Güncel mevzuat ve sektör gelişmelerini takip etmeyi kolaylaştırma\n'
-          '• Lisanslı tasarruf finansman şirketleri hakkında bilgilendirici içerikler sunma\n'
-          '• Doğrulanmış sektör uzmanı profillerini listeleme\n'
-          '• Kullanıcının karar sürecine destek olacak yardımcı araçlar sunma\n\n'
-          'Plango aşağıdaki işlemleri gerçekleştirmez:\n\n'
-          '• Finansman sağlamaz.\n'
-          '• Sözleşme düzenlemez.\n'
-          '• Ödeme tahsil etmez.\n'
-          '• Teslimat tarihi belirlemez.\n'
-          '• Herhangi bir şirket adına işlem yapmaz.\n'
-          '• Kullanıcı adına başvuru veya sözleşme süreci yürütmez.\n'
-          '• Hukuki, finansal veya yatırım danışmanlığı hizmeti vermez.\n'
-          '• Herhangi bir şirketi veya uzmanı tavsiye etmez.',
+    _AboutSection(
+      icon: Icons.support_agent_outlined,
+      title: 'Danışma Deneyimi',
+      body:
+          'Plango’nun danışma sistemi, kullanıcıların tasarruf finansmanı hakkında soru sormak veya bilgi almak üzere uygun uzmanlarla iletişim kurmasını kolaylaştırmayı amaçlar.\n\n'
+          'Danışma talebi finansman başvurusu, sözleşme, ön onay veya satın alma işlemi değildir.\n\n'
+          'Plango’nun rolü kullanıcı ile uzman arasındaki iletişimi kolaylaştırmaktır. Kullanıcı ile uzman veya uzman tarafından temsil edilen şirket arasında kurulabilecek ticari ilişkinin tarafı Plango değildir.\n\n'
+          'Danışma deneyiminin temelinde saygı, doğru bilgi, kullanıcı güvenliği ve şeffaf iletişim ilkeleri bulunur.',
     ),
-    AboutSection(
-      icon: Icons.campaign_outlined,
-      title: 'Güncel Bilgilendirme',
-      content:
-          'Tasarruf finansman sistemi, mevzuat ve sektör uygulamaları zaman içinde değişebilir. Plango, kullanıcıların bu gelişmeleri daha kolay takip edebilmesine yardımcı olmayı amaçlar.\n\n'
-          'Platformda yer alan bilgilendirmeler, kullanıcıların sektörel gelişmeler hakkında genel fikir edinmesi için hazırlanır. Resmî ve bağlayıcı bilgiler için ilgili kurumların, mevzuat kaynaklarının ve tasarruf finansman şirketlerinin açıklamaları esas alınmalıdır.',
+    _AboutSection(
+      icon: Icons.shield_outlined,
+      title: 'Kullanıcı Güvenliği',
+      body:
+          'Plango, kullanıcıların güvenli bir dijital deneyim yaşamasını önemli bir ürün sorumluluğu olarak görür.\n\n'
+          'Kullanıcı hesapları, uzman doğrulama süreçleri, veri erişim kuralları ve uygulama içi yetkilendirmeler bu yaklaşımın parçalarıdır.\n\n'
+          'Bununla birlikte dijital güvenlik yalnızca teknik önlemlerden oluşmaz. Kullanıcıların parola, doğrulama kodu, banka şifresi veya benzeri hassas bilgileri üçüncü kişilerle paylaşmaması gerekir.\n\n'
+          'Plango, kullanıcıların önemli finansal veya sözleşmesel işlemlerde ilgili kişi ve kuruluşların kimliğini resmî kanallardan doğrulamasını önerir.',
     ),
-    AboutSection(
-      icon: Icons.favorite_border,
+    _AboutSection(
+      icon: Icons.lock_outline_rounded,
+      title: 'Veri ve Gizlilik Yaklaşımımız',
+      body:
+          'Plango, kullanıcı verilerinin yalnızca hizmetin sunulması ve geliştirilmesi için gerekli olduğu ölçüde işlenmesini hedefler.\n\n'
+          'Kullanıcının hesap bilgileri, kayıtlı planları veya uygulama içi işlemleri; ilgili özelliklerin çalışabilmesi amacıyla saklanabilir.\n\n'
+          'Kişisel verilerin korunması, erişim yetkilerinin sınırlandırılması ve kullanıcıların hesaplarını yönetebilmesi Plango’nun ürün yaklaşımının önemli parçalarıdır.\n\n'
+          'Veri işleme ve kullanıcı haklarına ilişkin detaylar Gizlilik Politikası ve ilgili yasal metinlerde açıklanır.',
+    ),
+    _AboutSection(
+      icon: Icons.hub_outlined,
+      title: 'Sektöre Bakışımız',
+      body:
+          'Plango tasarruf finansmanı sektörüne karşı veya sektörün yerine konumlanan bir yapı değildir.\n\n'
+          'Amacımız, sektörde faaliyet gösteren şirketler ile kullanıcılar arasındaki bilgi akışını daha anlaşılır hale getiren bağımsız bir dijital katman oluşturmaktır.\n\n'
+          'Tasarruf finansman şirketlerinin kendi ürünleri, operasyonları ve sözleşme süreçleri bulunur. Plango bu süreçlerin yerine geçmez.\n\n'
+          'Plango’nun hedefi, kullanıcıların sektörü daha iyi anlayabilmesine ve resmî karar öncesinde daha fazla bilgiyle hareket edebilmesine katkı sağlamaktır.',
+    ),
+    _AboutSection(
+      icon: Icons.handshake_outlined,
+      title: 'Sektöre Saygılı Yaklaşım',
+      body:
+          'Plango’nun bağımsızlığı, şirketlere veya sektör profesyonellerine karşı olumsuz bir yaklaşım anlamına gelmez.\n\n'
+          'Platform, sektörde faaliyet gösteren kuruluşlara ve uzmanlara tarafsız, saygılı ve doğrulanabilir bilgi temelli bir çerçevede yaklaşmayı hedefler.\n\n'
+          'Yanlış veya doğrulanamayan iddialarla şirketleri ya da uzmanları itibarsızlaştırmak Plango’nun yaklaşımıyla bağdaşmaz.\n\n'
+          'Aynı şekilde kullanıcıların da doğru, anlaşılır ve güncel bilgiye ulaşabilmesi önemlidir. Plango bu iki yaklaşım arasında dengeli bir bilgi ortamı kurmayı amaçlar.',
+    ),
+    _AboutSection(
+      icon: Icons.autorenew_rounded,
+      title: 'Sürekli Gelişim Anlayışımız',
+      body:
+          'Plango tamamlanmış ve değişmeyecek bir ürün olarak görülmez.\n\n'
+          'Tasarruf finansmanı sektörü, mevzuat, kullanıcı alışkanlıkları ve dijital ürün standartları zaman içinde değişir. Plango da bu değişimlere uyum sağlayacak şekilde gelişmeyi hedefler.\n\n'
+          'Kullanıcı geri bildirimleri, teknik performans, yeni mevzuat, sektör uygulamaları ve ürün kullanım verileri geliştirme sürecinde dikkate alınabilir.\n\n'
+          'Sürekli gelişim yaklaşımımızın temel amacı daha fazla özellik eklemek değil; kullanıcı için gerçekten değer üreten özellikleri daha iyi hale getirmektir.',
+    ),
+    _AboutSection(
+      icon: Icons.design_services_outlined,
+      title: 'Ürün Tasarım Anlayışımız',
+      body:
+          'Plango’nun tasarım yaklaşımı; sadelik, güven, okunabilirlik ve işlevsellik üzerine kuruludur.\n\n'
+          'Kullanıcıya gereksiz bilgi yüklemek yerine ihtiyaç duyduğu bilgiyi doğru zamanda ve anlaşılır biçimde sunmak hedeflenir.\n\n'
+          'Hesaplama ekranları, ödeme planları, bilgi sayfaları ve profil alanları aynı tasarım dili içerisinde oluşturulur.\n\n'
+          'Amaç yalnızca güzel görünen bir uygulama üretmek değil; kullanıcıyı yormayan, yönünü kaybettirmeyen ve karar sürecini kolaylaştıran bir deneyim oluşturmaktır.',
+    ),
+    _AboutSection(
+      icon: Icons.rocket_launch_outlined,
+      title: 'Gelecek Hedeflerimiz',
+      body:
+          'Plango’nun uzun vadeli hedefi, tasarruf finansmanı alanında kapsamlı ve güvenilir bir dijital karar destek ekosistemi oluşturmaktır.\n\n'
+          'Gelecekte hesaplama altyapısının geliştirilmesi, daha fazla bilgilendirici içerik, daha güçlü şirket veri yapıları, kullanıcı deneyimini destekleyen yeni karşılaştırma araçları ve uzman sisteminin geliştirilmesi değerlendirilebilir.\n\n'
+          'Ancak her yeni özellik aynı temel ilkelere bağlı kalmalıdır: bağımsızlık, tarafsızlık, şeffaflık, kullanıcı güvenliği ve kararın kullanıcıya ait olması.\n\n'
+          'Plango’nun büyümesi, bu ilkelerden uzaklaşmak değil; bu ilkeleri daha geniş bir kullanıcı kitlesine taşıyabilmek anlamına gelmelidir.',
+    ),
+    _AboutSection(
+      icon: Icons.block_outlined,
+      title: 'Plango’nun Yapmadıkları',
+      body:
+          'Plango’nun ne yaptığını anlatmak kadar ne yapmadığını açıkça belirtmek de önemlidir.\n\n'
+          'Plango finansman sağlamaz.\n\n'
+          'Plango şirket adına sözleşme düzenlemez.\n\n'
+          'Plango kullanıcıdan tasarruf finansmanı taksiti veya organizasyon ücreti tahsil etmez.\n\n'
+          'Plango kesin teslim tarihi taahhüdünde bulunmaz.\n\n'
+          'Plango kullanıcı adına şirket seçmez.\n\n'
+          'Plango herhangi bir şirketi veya uzmanı mutlak şekilde tavsiye etmez.\n\n'
+          'Plango resmî hukuki, yatırım veya finansal danışmanlık hizmeti sunmaz.\n\n'
+          'Bu sınırlar, Plango’nun bağımsız karar destek platformu niteliğinin temel parçasıdır.',
+    ),
+    _AboutSection(
+      icon: Icons.volunteer_activism_outlined,
+      title: 'Kullanıcıya Verdiğimiz Söz',
+      body:
+          'Plango’nun kullanıcıya verdiği temel söz şudur: Kullanıcıya mümkün olduğunca anlaşılır, tarafsız ve şeffaf bir karar destek deneyimi sunmak.\n\n'
+          'Hesaplama sonuçlarının niteliğini gizlememek, resmî süreç ile tahmini hesaplama arasındaki farkı açıkça belirtmek, şirket veya uzmanları kullanıcıya zorla yönlendirmemek ve kullanıcı güvenliğini ürün kararlarının merkezinde tutmak bu sözün parçalarıdır.\n\n'
+          'Plango’nun başarısı yalnızca kaç kişinin uygulamayı kullandığıyla değil, kullanıcıların karar sürecinde ne kadar fayda sağladığıyla ölçülmelidir.',
+    ),
+    _AboutSection(
+      icon: Icons.favorite_border_rounded,
       title: 'Son Söz',
-      content:
-          'Plango, kullanıcıların tasarruf finansmanı sürecini daha anlaşılır şekilde değerlendirebilmesi için geliştirilmiş bağımsız bir karar destek platformudur.\n\n'
-          'Plango bilgi sunar, hesaplama yapar ve kullanıcıların farklı senaryoları görmesine yardımcı olur. Nihai karar, resmî süreç ve sözleşme koşulları her zaman kullanıcı ile ilgili tasarruf finansman şirketi arasında yürütülür.\n\n'
-          'Plango’nun amacı, karar vermek değil; kullanıcıların karar sürecini daha bilinçli şekilde yönetmesine destek olmaktır.',
+      body:
+          'Plango; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır şekilde değerlendirebilmesi için geliştirilmiş bağımsız bir karar destek platformudur.\n\n'
+          'Bilgi sunar, hesaplama yapar, farklı senaryoları görünür hale getirir ve kullanıcıların kendi karar süreçlerini daha bilinçli yönetmesine yardımcı olur.\n\n'
+          'Resmî süreç, sözleşme, ödeme planı ve teslim şartları her zaman kullanıcı ile ilgili tasarruf finansman şirketi arasında yürütülür.\n\n'
+          'Plango’nun amacı karar vermek değildir.\n\n'
+          'Plango’nun amacı, kullanıcının kararını daha bilinçli verebilmesine yardımcı olmaktır.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: pageBg,
+      backgroundColor: _background,
       appBar: AppBar(
-        title: const Text('Hakkımızda'),
-        backgroundColor: primaryGreen,
-        foregroundColor: Colors.white,
+        backgroundColor: _background,
+        foregroundColor: _navy,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: const Text(
+          'Hakkımızda',
+          style: TextStyle(
+            color: _navy,
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.35,
+          ),
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const _AboutHeroCard(),
-          const SizedBox(height: 16),
-          const _IntroBox(),
-          const SizedBox(height: 16),
-          ...List.generate(sections.length, (index) {
-            final section = sections[index];
-            final isOpen = openIndex == index;
-
-            return _AccordionCard(
-              section: section,
-              isOpen: isOpen,
-              onTap: () {
-                setState(() {
-                  openIndex = isOpen ? null : index;
-                });
-              },
-            );
-          }),
-          const SizedBox(height: 24),
-        ],
+      body: SafeArea(
+        top: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+          children: [
+            const _AboutHeroCard(),
+            const SizedBox(height: 16),
+            const _AboutIntroCard(),
+            const SizedBox(height: 16),
+            const _SectionLabel(),
+            const SizedBox(height: 10),
+            ...List.generate(_sections.length, (index) {
+              final section = _sections[index];
+              final isOpen = _openIndex == index;
+              return _AboutAccordionCard(
+                number: index + 1,
+                section: section,
+                isOpen: isOpen,
+                onTap: () {
+                  setState(() {
+                    _openIndex = isOpen ? null : index;
+                  });
+                },
+              );
+            }),
+            const SizedBox(height: 8),
+            const _AboutFooterCard(),
+          ],
+        ),
       ),
     );
   }
-}
-
-class AboutSection {
-  final IconData icon;
-  final String title;
-  final String content;
-
-  const AboutSection({
-    required this.icon,
-    required this.title,
-    required this.content,
-  });
 }
 
 class _AboutHeroCard extends StatelessWidget {
@@ -171,54 +302,82 @@ class _AboutHeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [
-            _AboutScreenState.darkGreen,
-            _AboutScreenState.primaryGreen,
-          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            _AboutScreenState._navy,
+            _AboutScreenState._petrol,
+            Color(0xFF0C6268),
+            _AboutScreenState._teal,
+          ],
         ),
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: _AboutScreenState.primaryGreen.withOpacity(0.25),
+            color: Color(0x260B2239),
             blurRadius: 22,
-            offset: const Offset(0, 10),
+            offset: Offset(0, 10),
           ),
         ],
       ),
-      child: const Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'PLANGO',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.4,
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: _AboutScreenState._turquoise.withOpacity(.16),
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(
+                color: const Color(0xFF55E2D0).withOpacity(.28),
+              ),
+            ),
+            child: const Icon(
+              Icons.explore_outlined,
+              color: Color(0xFF55E2D0),
+              size: 29,
             ),
           ),
-          SizedBox(height: 8),
-          Text(
-            'Bağımsız Tasarruf Finansmanı\nKarar Destek Platformu',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              height: 1.35,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 18),
-          Text(
-            'Bilgi sunar. Hesaplama yapar. Karar sürecine destek olur.',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14.5,
-              height: 1.45,
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'PLANGO',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    height: 1,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Bağımsız Tasarruf Finansmanı\nKarar Destek Platformu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15.5,
+                    height: 1.28,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Bilgi sunar. Hesaplama yapar. Karar sürecine destek olur.',
+                  style: TextStyle(
+                    color: Color(0xFFD9E7E9),
+                    fontSize: 12,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -227,136 +386,245 @@ class _AboutHeroCard extends StatelessWidget {
   }
 }
 
-class _IntroBox extends StatelessWidget {
-  const _IntroBox();
+class _AboutIntroCard extends StatelessWidget {
+  const _AboutIntroCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
       decoration: BoxDecoration(
-        color: _AboutScreenState.softGreen,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: _AboutScreenState.primaryGreen.withOpacity(0.18),
-        ),
+        color: const Color(0xFFEAF7F5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFD5ECE8)),
       ),
-      child: const Text(
-        'Plango; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır şekilde değerlendirebilmesi için geliştirilmiş bağımsız bir karar destek platformudur.',
-        style: TextStyle(
-          fontSize: 14.5,
-          height: 1.5,
-          color: Color(0xFF064E3B),
-          fontWeight: FontWeight.w600,
-        ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.verified_user_outlined,
+            color: _AboutScreenState._teal,
+            size: 21,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Plango; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır '
+              'şekilde değerlendirebilmesi için geliştirilmiş bağımsız, tarafsız '
+              've bilgilendirme odaklı bir karar destek platformudur.',
+              style: TextStyle(
+                color: Color(0xFF48636B),
+                fontSize: 12,
+                height: 1.52,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _AccordionCard extends StatelessWidget {
-  final AboutSection section;
-  final bool isOpen;
-  final VoidCallback onTap;
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel();
 
-  const _AccordionCard({
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Icon(
+          Icons.menu_book_outlined,
+          color: _AboutScreenState._teal,
+          size: 18,
+        ),
+        SizedBox(width: 7),
+        Text(
+          'Plango’yu Yakından Tanıyın',
+          style: TextStyle(
+            color: _AboutScreenState._navy,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.2,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AboutAccordionCard extends StatelessWidget {
+  const _AboutAccordionCard({
+    required this.number,
     required this.section,
     required this.isOpen,
     required this.onTap,
   });
 
+  final int number;
+  final _AboutSection section;
+  final bool isOpen;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      margin: const EdgeInsets.only(bottom: 12),
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isOpen
-              ? _AboutScreenState.primaryGreen.withOpacity(0.35)
-              : const Color(0xFFE5E7EB),
+              ? _AboutScreenState._teal.withOpacity(.30)
+              : _AboutScreenState._border,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isOpen ? 0.06 : 0.035),
-            blurRadius: isOpen ? 18 : 10,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF0B2239).withOpacity(isOpen ? .055 : .028),
+            blurRadius: isOpen ? 16 : 10,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: _AboutScreenState.softGreen,
-                    foregroundColor: _AboutScreenState.primaryGreen,
-                    child: Icon(section.icon, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      section.title,
-                      style: const TextStyle(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF111827),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            _AboutScreenState._teal.withOpacity(.14),
+                            _AboutScreenState._turquoise.withOpacity(.10),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: Icon(
+                        section.icon,
+                        color: _AboutScreenState._teal,
+                        size: 21,
                       ),
                     ),
-                  ),
-                  AnimatedRotation(
-                    duration: const Duration(milliseconds: 220),
-                    turns: isOpen ? 0.5 : 0,
-                    child: const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: _AboutScreenState.primaryGreen,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '$number. ${section.title}',
+                        style: const TextStyle(
+                          color: _AboutScreenState._navy,
+                          fontSize: 13.8,
+                          height: 1.28,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    AnimatedRotation(
+                      turns: isOpen ? .5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      child: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Color(0xFF8D9AA5),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          AnimatedCrossFade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 3,
-                    width: 44,
-                    margin: const EdgeInsets.only(bottom: 12),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeInOutCubic,
+            alignment: Alignment.topCenter,
+            child: isOpen
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.fromLTRB(13, 0, 13, 13),
+                    padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
                     decoration: BoxDecoration(
-                      color: _AboutScreenState.primaryGreen,
-                      borderRadius: BorderRadius.circular(99),
+                      color: const Color(0xFFF7FBFC),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFE6EEF1),
+                      ),
                     ),
-                  ),
-                  Text(
-                    section.content,
-                    style: const TextStyle(
-                      fontSize: 14.5,
-                      height: 1.58,
-                      color: Color(0xFF374151),
+                    child: Text(
+                      section.body,
+                      style: const TextStyle(
+                        color: _AboutScreenState._muted,
+                        fontSize: 12.8,
+                        height: 1.63,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            crossFadeState:
-                isOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 220),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
     );
   }
+}
+
+class _AboutFooterCard extends StatelessWidget {
+  const _AboutFooterCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15, 14, 15, 14),
+      decoration: BoxDecoration(
+        color: _AboutScreenState._navy,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.favorite_border_rounded,
+            color: Color(0xFF55E2D0),
+            size: 21,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Plango’nun amacı karar vermek değil; kullanıcıların kendi karar '
+              'süreçlerini daha bilinçli, anlaşılır ve şeffaf şekilde yönetmesine '
+              'destek olmaktır.',
+              style: TextStyle(
+                color: Color(0xFFD9E7E9),
+                fontSize: 11.5,
+                height: 1.52,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutSection {
+  const _AboutSection({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
 }

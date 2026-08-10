@@ -82,7 +82,7 @@ class SavingsFinanceSystemScreen extends StatelessWidget {
           const SizedBox(height: 14),
 
           const _InformationTile(
-            icon: Icons.account_balance_wallet_outlined,
+            icon: Icons.account_balance_outlined,
             title: 'Tasarruf Finansmanı Nedir?',
             content:
                 'Tasarruf finansmanı; katılımcıların belirli bir plan kapsamında '
@@ -513,7 +513,7 @@ class _ProcessCard extends StatelessWidget {
       description: 'Plan ve teslimat koşullarını kontrol et.',
     ),
     _ProcessItem(
-      icon: Icons.savings_outlined,
+      icon: Icons.account_balance_outlined,
       title: 'Tasarruf süreci',
       description: 'Ödemelerini seçtiğin plana göre sürdür.',
     ),

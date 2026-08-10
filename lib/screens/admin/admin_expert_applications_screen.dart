@@ -7,18 +7,39 @@ import '../../repositories/expert_application_repository.dart';
 import '../../repositories/expert_review_repository.dart';
 import '../../repositories/user_repository.dart';
 
+// ============================================================
+// PLANGO ADMIN DESIGN SYSTEM
+// ============================================================
+
+class _AdminExpertColors {
+  static const Color navy = Color(0xFF0B2239);
+  static const Color petrol = Color(0xFF052F3D);
+  static const Color teal = Color(0xFF087C72);
+  static const Color turquoise = Color(0xFF16C7B0);
+
+  static const Color background = Color(0xFFF7F9FB);
+  static const Color card = Colors.white;
+
+  static const Color textDark = Color(0xFF0B2239);
+  static const Color textMuted = Color(0xFF748193);
+  static const Color border = Color(0xFFE4EBEE);
+
+  static const Color softTeal = Color(0xFFE8F7F5);
+  static const Color warning = Color(0xFFB54708);
+  static const Color softWarning = Color(0xFFFFF4E5);
+
+  static const Color danger = Color(0xFFB42318);
+  static const Color softDanger = Color(0xFFFFF0EF);
+}
+
+// ============================================================
+// APPLICATION LIST
+// ============================================================
+
 class AdminExpertApplicationsScreen extends StatelessWidget {
   const AdminExpertApplicationsScreen({
     super.key,
   });
-
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _softGreen = Color(0xFFE8F1EC);
-  static const Color _warning = Color(0xFFB54708);
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +47,19 @@ class AdminExpertApplicationsScreen extends StatelessWidget {
         ExpertApplicationRepository();
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: _AdminExpertColors.background,
       appBar: AppBar(
-        backgroundColor: _background,
-        foregroundColor: _textDark,
+        backgroundColor: _AdminExpertColors.background,
+        foregroundColor: _AdminExpertColors.navy,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'Uzman Başvuruları',
           style: TextStyle(
+            fontSize: 20,
             fontWeight: FontWeight.w900,
+            letterSpacing: -0.35,
           ),
         ),
       ),
@@ -64,20 +88,26 @@ class AdminExpertApplicationsScreen extends StatelessWidget {
 
             return ListView(
               padding: const EdgeInsets.fromLTRB(
-                18,
-                10,
-                18,
+                16,
+                8,
+                16,
                 32,
               ),
               children: [
-                _PendingSummaryCard(
+                _ApplicationsHero(
                   count: applications.length,
                 ),
-                const SizedBox(height: 20),
-                const _SectionTitle(
+
+                const SizedBox(height: 24),
+
+                _SectionHeader(
                   title: 'İnceleme Bekleyenler',
+                  subtitle:
+                      '${applications.length} uzman başvurusu karar bekliyor.',
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 12),
+
                 for (final application in applications)
                   _ApplicationListItem(
                     application: application,
@@ -119,6 +149,541 @@ class AdminExpertApplicationsScreen extends StatelessWidget {
   }
 }
 
+// ============================================================
+// LIST HERO
+// ============================================================
+
+class _ApplicationsHero extends StatelessWidget {
+  const _ApplicationsHero({
+    required this.count,
+  });
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        18,
+        18,
+        17,
+        18,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _AdminExpertColors.navy,
+            _AdminExpertColors.petrol,
+            Color(0xFF07535A),
+            _AdminExpertColors.teal,
+          ],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x220B2239),
+            blurRadius: 20,
+            offset: Offset(0, 9),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: _AdminExpertColors.turquoise
+                  .withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFF55E2D0)
+                    .withValues(alpha: 0.20),
+              ),
+            ),
+            child: const Icon(
+              Icons.how_to_reg_rounded,
+              color: Color(0xFF55E2D0),
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Uzman Başvuruları',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.25,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Yeni uzmanlık ve profil güncelleme '
+                  'başvurularını inceleyin.',
+                  style: TextStyle(
+                    color: Color(0xFFD5E5E7),
+                    fontSize: 11,
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            constraints: const BoxConstraints(
+              minWidth: 42,
+              minHeight: 42,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 9,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.13),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.12),
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '$count',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SECTION HEADER
+// ============================================================
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: _AdminExpertColors.softTeal,
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: const Icon(
+            Icons.pending_actions_rounded,
+            color: _AdminExpertColors.teal,
+            size: 18,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: _AdminExpertColors.navy,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: _AdminExpertColors.textMuted,
+                  fontSize: 10.5,
+                  height: 1.35,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================
+// APPLICATION CARD
+// ============================================================
+
+class _ApplicationListItem extends StatelessWidget {
+  const _ApplicationListItem({
+    required this.application,
+    required this.onTap,
+  });
+
+  final ExpertApplication application;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<AppUser>(
+      future: UserRepository().getUserById(
+        application.uid,
+      ),
+      builder: (context, snapshot) {
+        final AppUser? user = snapshot.data;
+
+        final String name =
+            user?.fullName.trim().isNotEmpty == true
+                ? user!.fullName
+                : snapshot.connectionState ==
+                        ConnectionState.waiting
+                    ? 'Yükleniyor...'
+                    : 'Başvuru Sahibi';
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: _AdminExpertColors.border,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x070B2239),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        _ApplicantAvatar(
+                          name: name,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color:
+                                      _AdminExpertColors.navy,
+                                  fontSize: 14.5,
+                                  fontWeight:
+                                      FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                application.companyName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color:
+                                      _AdminExpertColors.teal,
+                                  fontSize: 11.5,
+                                  fontWeight:
+                                      FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _ApplicationTypeBadge(
+                          application: application,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 11,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFB),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          color: const Color(0xFFEDF1F3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _MiniInformation(
+                              icon: Icons.location_city_outlined,
+                              label: 'Şube',
+                              value: application.branch,
+                            ),
+                          ),
+                          Container(
+                            width: 1,
+                            height: 31,
+                            color: _AdminExpertColors.border,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _MiniInformation(
+                              icon: Icons.work_outline_rounded,
+                              label: 'Pozisyon',
+                              value: application.position,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule_rounded,
+                          size: 15,
+                          color: _AdminExpertColors.textMuted,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _relativeDate(
+                              application.createdAt,
+                            ),
+                            style: const TextStyle(
+                              color:
+                                  _AdminExpertColors.textMuted,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const Text(
+                          'İncele',
+                          style: TextStyle(
+                            color: _AdminExpertColors.teal,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: _AdminExpertColors.teal,
+                          size: 18,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _relativeDate(DateTime date) {
+    final Duration difference =
+        DateTime.now().difference(date);
+
+    if (difference.isNegative ||
+        difference.inMinutes < 1) {
+      return 'Az önce';
+    }
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} dakika önce';
+    }
+
+    if (difference.inHours < 24) {
+      return '${difference.inHours} saat önce';
+    }
+
+    if (difference.inDays < 7) {
+      return '${difference.inDays} gün önce';
+    }
+
+    return '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.'
+        '${date.year}';
+  }
+}
+
+class _ApplicantAvatar extends StatelessWidget {
+  const _ApplicantAvatar({
+    required this.name,
+  });
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    String initial = 'U';
+
+    final String cleanName = name.trim();
+
+    if (cleanName.isNotEmpty &&
+        cleanName != 'Yükleniyor...' &&
+        cleanName != 'Başvuru Sahibi') {
+      initial = cleanName.substring(0, 1).toUpperCase();
+    }
+
+    return Container(
+      width: 43,
+      height: 43,
+      decoration: BoxDecoration(
+        color: _AdminExpertColors.softTeal,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: const TextStyle(
+          color: _AdminExpertColors.teal,
+          fontSize: 16,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _ApplicationTypeBadge extends StatelessWidget {
+  const _ApplicationTypeBadge({
+    required this.application,
+  });
+
+  final ExpertApplication application;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isUpdate =
+        application.isProfileUpdateApplication;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: isUpdate
+            ? _AdminExpertColors.softWarning
+            : _AdminExpertColors.softTeal,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        isUpdate ? 'Değişiklik' : 'Yeni',
+        style: TextStyle(
+          color: isUpdate
+              ? _AdminExpertColors.warning
+              : _AdminExpertColors.teal,
+          fontSize: 9.5,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniInformation extends StatelessWidget {
+  const _MiniInformation({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 17,
+          color: _AdminExpertColors.teal,
+        ),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: _AdminExpertColors.textMuted,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value.trim().isEmpty ? '-' : value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: _AdminExpertColors.navy,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================
+// DETAIL SCREEN
+// ============================================================
+
 class AdminExpertApplicationDetailScreen
     extends StatefulWidget {
   const AdminExpertApplicationDetailScreen({
@@ -135,20 +700,14 @@ class AdminExpertApplicationDetailScreen
 
 class _AdminExpertApplicationDetailScreenState
     extends State<AdminExpertApplicationDetailScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _danger = Color(0xFFB42318);
-  static const Color _warning = Color(0xFFB54708);
-
-  final UserRepository _userRepository = UserRepository();
+  final UserRepository _userRepository =
+      UserRepository();
 
   final ExpertReviewRepository _reviewRepository =
       ExpertReviewRepository();
 
   AppUser? _applicant;
+
   bool _isLoadingUser = true;
   bool _isProcessing = false;
 
@@ -185,13 +744,19 @@ class _AdminExpertApplicationDetailScreenState
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
+
+  // ============================================================
+  // APPROVE
+  // ============================================================
 
   Future<void> _confirmApproval() async {
     if (_isProcessing) {
@@ -207,18 +772,29 @@ class _AdminExpertApplicationDetailScreenState
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
-          icon: const Icon(
-            Icons.verified_outlined,
-            color: _green,
-            size: 38,
+          icon: Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: _AdminExpertColors.softTeal,
+              borderRadius: BorderRadius.circular(17),
+            ),
+            child: const Icon(
+              Icons.verified_outlined,
+              color: _AdminExpertColors.teal,
+              size: 29,
+            ),
           ),
           title: const Text(
             'Başvuruyu Onayla',
             textAlign: TextAlign.center,
             style: TextStyle(
+              color: _AdminExpertColors.navy,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -228,22 +804,31 @@ class _AdminExpertApplicationDetailScreenState
             'başvurusunu onaylamak istediğinizden emin misiniz?',
             textAlign: TextAlign.center,
             style: const TextStyle(
+              color: _AdminExpertColors.textMuted,
+              fontSize: 13,
               height: 1.5,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext, false);
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
               },
               child: const Text('Vazgeç'),
             ),
             FilledButton(
               onPressed: () {
-                Navigator.pop(dialogContext, true);
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
               },
               style: FilledButton.styleFrom(
-                backgroundColor: _green,
+                backgroundColor:
+                    _AdminExpertColors.navy,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Onayla'),
@@ -301,11 +886,10 @@ class _AdminExpertApplicationDetailScreenState
         return;
       }
 
-      final String message = error
-              .toString()
-              .contains('permission-denied')
-          ? 'Bu işlem için yönetici yetkisi gerekiyor.'
-          : 'Başvuru onaylanırken bir sorun oluştu.';
+      final String message =
+          error.toString().contains('permission-denied')
+              ? 'Bu işlem için yönetici yetkisi gerekiyor.'
+              : 'Başvuru onaylanırken bir sorun oluştu.';
 
       _showMessage(message);
     } finally {
@@ -317,6 +901,10 @@ class _AdminExpertApplicationDetailScreenState
     }
   }
 
+  // ============================================================
+  // REJECT
+  // ============================================================
+
   Future<void> _showRejectDialog() async {
     if (_isProcessing) {
       return;
@@ -327,25 +915,40 @@ class _AdminExpertApplicationDetailScreenState
 
     String? validationMessage;
 
-    final String? reviewNote = await showDialog<String>(
+    final String? reviewNote =
+        await showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius:
+                    BorderRadius.circular(22),
               ),
-              icon: const Icon(
-                Icons.cancel_outlined,
-                color: _danger,
-                size: 38,
+              icon: Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color:
+                      _AdminExpertColors.softDanger,
+                  borderRadius:
+                      BorderRadius.circular(17),
+                ),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: _AdminExpertColors.danger,
+                  size: 29,
+                ),
               ),
               title: const Text(
                 'Başvuruyu Reddet',
                 textAlign: TextAlign.center,
                 style: TextStyle(
+                  color: _AdminExpertColors.navy,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -357,6 +960,9 @@ class _AdminExpertApplicationDetailScreenState
                     'Lütfen açıklayıcı bir bilgi yazınız.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
+                      color:
+                          _AdminExpertColors.textMuted,
+                      fontSize: 12.5,
                       height: 1.45,
                     ),
                   ),
@@ -372,12 +978,39 @@ class _AdminExpertApplicationDetailScreenState
                     decoration: InputDecoration(
                       labelText: 'Red Nedeni',
                       hintText:
-                          'Örneğin kurumsal e-posta doğrulanamadı.',
+                          'Örn. Kurumsal e-posta doğrulanamadı.',
                       errorText: validationMessage,
                       alignLabelWithHint: true,
-                      border: OutlineInputBorder(
+                      filled: true,
+                      fillColor:
+                          const Color(0xFFF9FBFC),
+                      enabledBorder:
+                          OutlineInputBorder(
                         borderRadius:
-                            BorderRadius.circular(15),
+                            BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color:
+                              _AdminExpertColors.border,
+                        ),
+                      ),
+                      focusedBorder:
+                          OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color:
+                              _AdminExpertColors.teal,
+                          width: 1.4,
+                        ),
+                      ),
+                      errorBorder:
+                          OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color:
+                              _AdminExpertColors.danger,
+                        ),
                       ),
                     ),
                   ),
@@ -409,7 +1042,8 @@ class _AdminExpertApplicationDetailScreenState
                     );
                   },
                   style: FilledButton.styleFrom(
-                    backgroundColor: _danger,
+                    backgroundColor:
+                        _AdminExpertColors.danger,
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Reddet'),
@@ -476,11 +1110,10 @@ class _AdminExpertApplicationDetailScreenState
         return;
       }
 
-      final String message = error
-              .toString()
-              .contains('permission-denied')
-          ? 'Bu işlem için yönetici yetkisi gerekiyor.'
-          : 'Başvuru reddedilirken bir sorun oluştu.';
+      final String message =
+          error.toString().contains('permission-denied')
+              ? 'Bu işlem için yönetici yetkisi gerekiyor.'
+              : 'Başvuru reddedilirken bir sorun oluştu.';
 
       _showMessage(message);
     } finally {
@@ -492,30 +1125,36 @@ class _AdminExpertApplicationDetailScreenState
     }
   }
 
+  // ============================================================
+  // BUILD DETAIL
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
     final ExpertApplication application =
         widget.application;
 
-    final String applicantName =
-        _isLoadingUser
-            ? 'Kullanıcı bilgisi yükleniyor...'
-            : (_applicant?.fullName.trim().isNotEmpty ==
-                    true
-                ? _applicant!.fullName
-                : 'Kullanıcı bulunamadı');
+    final String applicantName = _isLoadingUser
+        ? 'Kullanıcı bilgisi yükleniyor...'
+        : (_applicant?.fullName.trim().isNotEmpty ==
+                true
+            ? _applicant!.fullName
+            : 'Kullanıcı bulunamadı');
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: _AdminExpertColors.background,
       appBar: AppBar(
-        backgroundColor: _background,
-        foregroundColor: _textDark,
+        backgroundColor: _AdminExpertColors.background,
+        foregroundColor: _AdminExpertColors.navy,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'Başvuru Detayı',
           style: TextStyle(
+            fontSize: 20,
             fontWeight: FontWeight.w900,
+            letterSpacing: -0.35,
           ),
         ),
       ),
@@ -525,65 +1164,97 @@ class _AdminExpertApplicationDetailScreenState
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
-                  18,
-                  10,
-                  18,
+                  16,
+                  8,
+                  16,
                   28,
                 ),
                 children: [
-                  _ApplicationTypeHeader(
+                  _ApplicationDetailHero(
                     application: application,
+                    applicantName: applicantName,
                   ),
-                  const SizedBox(height: 17),
-                  _DetailCard(
+
+                  const SizedBox(height: 22),
+
+                  const _DetailSectionHeader(
+                    icon: Icons.person_outline_rounded,
                     title: 'Başvuru Sahibi',
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _DetailCard(
                     children: [
                       _DetailRow(
-                        icon: Icons.person_outline_rounded,
+                        icon: Icons.badge_outlined,
                         label: 'Ad Soyad',
                         value: applicantName,
                       ),
+                      _DetailDivider(),
                       _DetailRow(
-                        icon: Icons.alternate_email_rounded,
+                        icon:
+                            Icons.alternate_email_rounded,
                         label: 'Kullanıcı Adı',
                         value:
-                            _applicant?.username ?? '-',
+                            _applicant?.email ?? '-',
                       ),
                     ],
                   ),
-                  const SizedBox(height: 13),
-                  _DetailCard(
+
+                  const SizedBox(height: 18),
+
+                  const _DetailSectionHeader(
+                    icon: Icons.apartment_rounded,
                     title: 'Kurumsal Bilgiler',
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _DetailCard(
                     children: [
                       _DetailRow(
                         icon: Icons.apartment_rounded,
                         label: 'Şirket',
                         value: application.companyName,
                       ),
+                      const _DetailDivider(),
                       _DetailRow(
                         icon:
                             Icons.location_city_outlined,
                         label: 'Şube',
                         value: application.branch,
                       ),
+                      const _DetailDivider(),
                       _DetailRow(
-                        icon: Icons.work_outline_rounded,
+                        icon:
+                            Icons.work_outline_rounded,
                         label: 'Pozisyon',
                         value: application.position,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 13),
-                  _DetailCard(
+
+                  const SizedBox(height: 18),
+
+                  const _DetailSectionHeader(
+                    icon: Icons.contact_mail_outlined,
                     title: 'İletişim Bilgileri',
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _DetailCard(
                     children: [
                       _DetailRow(
-                        icon: Icons.mail_outline_rounded,
+                        icon:
+                            Icons.mail_outline_rounded,
                         label: 'Kurumsal E-posta',
                         value:
                             application.corporateEmail,
                         selectable: true,
                       ),
+                      const _DetailDivider(),
                       _DetailRow(
                         icon: Icons.phone_outlined,
                         label: 'Telefon',
@@ -592,16 +1263,30 @@ class _AdminExpertApplicationDetailScreenState
                       ),
                     ],
                   ),
+
                   if (application
                       .isProfileUpdateApplication) ...[
-                    const SizedBox(height: 13),
+                    const SizedBox(height: 18),
+                    const _DetailSectionHeader(
+                      icon: Icons.history_rounded,
+                      title: 'Önceki Uzman Bilgileri',
+                    ),
+                    const SizedBox(height: 10),
                     _PreviousInformationCard(
                       application: application,
                     ),
                   ],
-                  const SizedBox(height: 13),
-                  _DetailCard(
+
+                  const SizedBox(height: 18),
+
+                  const _DetailSectionHeader(
+                    icon: Icons.receipt_long_outlined,
                     title: 'Başvuru Bilgileri',
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  _DetailCard(
                     children: [
                       _DetailRow(
                         icon: Icons.schedule_rounded,
@@ -610,6 +1295,7 @@ class _AdminExpertApplicationDetailScreenState
                           application.createdAt,
                         ),
                       ),
+                      const _DetailDivider(),
                       _DetailRow(
                         icon: Icons.tag_rounded,
                         label: 'Başvuru Kimliği',
@@ -623,6 +1309,7 @@ class _AdminExpertApplicationDetailScreenState
                 ],
               ),
             ),
+
             _ReviewActions(
               isProcessing: _isProcessing,
               onApprove: _confirmApproval,
@@ -647,80 +1334,111 @@ class _AdminExpertApplicationDetailScreenState
   }
 }
 
-class _PendingSummaryCard extends StatelessWidget {
-  const _PendingSummaryCard({
-    required this.count,
+// ============================================================
+// DETAIL HERO
+// ============================================================
+
+class _ApplicationDetailHero extends StatelessWidget {
+  const _ApplicationDetailHero({
+    required this.application,
+    required this.applicantName,
   });
 
-  final int count;
+  final ExpertApplication application;
+  final String applicantName;
 
   @override
   Widget build(BuildContext context) {
+    final bool isUpdate =
+        application.isProfileUpdateApplication;
+
     return Container(
-      padding: const EdgeInsets.all(19),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AdminExpertApplicationsScreen._softGreen,
         borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _AdminExpertColors.navy,
+            _AdminExpertColors.petrol,
+            Color(0xFF07535A),
+            _AdminExpertColors.teal,
+          ],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x220B2239),
+            blurRadius: 20,
+            offset: Offset(0, 9),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 54,
-            height: 54,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(17),
+              color: Colors.white.withValues(alpha: 0.11),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.pending_actions_outlined,
-              color: AdminExpertApplicationsScreen._green,
-              size: 29,
+            child: Icon(
+              isUpdate
+                  ? Icons.sync_alt_rounded
+                  : Icons.person_add_alt_1_rounded,
+              color: const Color(0xFF55E2D0),
+              size: 27,
             ),
           ),
-          const SizedBox(width: 14),
+
+          const SizedBox(width: 13),
+
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Bekleyen Başvurular',
-                  style: TextStyle(
-                    color:
-                        AdminExpertApplicationsScreen
-                            ._textDark,
+                Text(
+                  isUpdate
+                      ? 'Profil Güncelleme Başvurusu'
+                      : 'İlk Uzmanlık Başvurusu',
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontSize: 15.5,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
-                  '$count başvuru inceleme bekliyor.',
+                  applicantName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color:
-                        AdminExpertApplicationsScreen
-                            ._textMuted,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFD5E5E7),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
+
+          const SizedBox(width: 8),
+
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: 13,
-              vertical: 8,
+              horizontal: 9,
+              vertical: 6,
             ),
             decoration: BoxDecoration(
-              color: AdminExpertApplicationsScreen._green,
+              color: const Color(0xFFFFF4E5),
               borderRadius: BorderRadius.circular(999),
             ),
-            child: Text(
-              '$count',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
+            child: const Text(
+              'Bekliyor',
+              style: TextStyle(
+                color: _AdminExpertColors.warning,
+                fontSize: 9.5,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -731,242 +1449,43 @@ class _PendingSummaryCard extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
+// ============================================================
+// DETAIL COMPONENTS
+// ============================================================
+
+class _DetailSectionHeader extends StatelessWidget {
+  const _DetailSectionHeader({
+    required this.icon,
     required this.title,
   });
 
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AdminExpertApplicationsScreen._textDark,
-        fontSize: 16,
-        fontWeight: FontWeight.w900,
-      ),
-    );
-  }
-}
-
-class _ApplicationListItem extends StatelessWidget {
-  const _ApplicationListItem({
-    required this.application,
-    required this.onTap,
-  });
-
-  final ExpertApplication application;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<AppUser>(
-      future: UserRepository().getUserById(
-        application.uid,
-      ),
-      builder: (context, snapshot) {
-        final AppUser? user = snapshot.data;
-
-        final String name =
-            user?.fullName.trim().isNotEmpty == true
-                ? user!.fullName
-                : 'Başvuru Sahibi';
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 11),
-          child: Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(19),
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(19),
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(19),
-                  border: Border.all(
-                    color:
-                        AdminExpertApplicationsScreen
-                            ._border,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: const TextStyle(
-                              color:
-                                  AdminExpertApplicationsScreen
-                                      ._textDark,
-                              fontSize: 15.5,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                        _StatusBadge(
-                          application: application,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 11),
-                    _CompactInformation(
-                      icon: Icons.apartment_rounded,
-                      text: application.companyName,
-                    ),
-                    const SizedBox(height: 7),
-                    _CompactInformation(
-                      icon:
-                          Icons.location_city_outlined,
-                      text: application.branch,
-                    ),
-                    const SizedBox(height: 7),
-                    _CompactInformation(
-                      icon: Icons.work_outline_rounded,
-                      text: application.position,
-                    ),
-                    const SizedBox(height: 13),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.schedule_rounded,
-                          size: 17,
-                          color:
-                              AdminExpertApplicationsScreen
-                                  ._textMuted,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            _relativeDate(
-                              application.createdAt,
-                            ),
-                            style: const TextStyle(
-                              color:
-                                  AdminExpertApplicationsScreen
-                                      ._textMuted,
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const Icon(
-                          Icons.chevron_right_rounded,
-                          color: Color(0xFF9CA3AF),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  String _relativeDate(DateTime date) {
-    final Duration difference =
-        DateTime.now().difference(date);
-
-    if (difference.isNegative) {
-      return 'Az önce';
-    }
-
-    if (difference.inMinutes < 1) {
-      return 'Az önce';
-    }
-
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} dakika önce';
-    }
-
-    if (difference.inHours < 24) {
-      return '${difference.inHours} saat önce';
-    }
-
-    if (difference.inDays < 7) {
-      return '${difference.inDays} gün önce';
-    }
-
-    return '${date.day.toString().padLeft(2, '0')}.'
-        '${date.month.toString().padLeft(2, '0')}.'
-        '${date.year}';
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({
-    required this.application,
-  });
-
-  final ExpertApplication application;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isUpdate =
-        application.isProfileUpdateApplication;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 5,
-      ),
-      decoration: BoxDecoration(
-        color: isUpdate
-            ? const Color(0xFFFFF4E5)
-            : AdminExpertApplicationsScreen._softGreen,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        isUpdate ? 'Değişiklik' : 'İlk Başvuru',
-        style: TextStyle(
-          color: isUpdate
-              ? AdminExpertApplicationsScreen._warning
-              : AdminExpertApplicationsScreen._green,
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
-}
-
-class _CompactInformation extends StatelessWidget {
-  const _CompactInformation({
-    required this.icon,
-    required this.text,
-  });
-
   final IconData icon;
-  final String text;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: AdminExpertApplicationsScreen._green,
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: _AdminExpertColors.softTeal,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: _AdminExpertColors.teal,
+            size: 17,
+          ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color:
-                  AdminExpertApplicationsScreen._textDark,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+        const SizedBox(width: 9),
+        Text(
+          title,
+          style: const TextStyle(
+            color: _AdminExpertColors.navy,
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
           ),
         ),
       ],
@@ -974,122 +1493,50 @@ class _CompactInformation extends StatelessWidget {
   }
 }
 
-class _ApplicationTypeHeader extends StatelessWidget {
-  const _ApplicationTypeHeader({
-    required this.application,
-  });
-
-  final ExpertApplication application;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isUpdate =
-        application.isProfileUpdateApplication;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: isUpdate
-            ? const Color(0xFFFFF4E5)
-            : const Color(0xFFE8F1EC),
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isUpdate
-                ? Icons.sync_alt_rounded
-                : Icons.person_add_alt_1_outlined,
-            color: isUpdate
-                ? _AdminExpertApplicationDetailScreenState
-                    ._warning
-                : _AdminExpertApplicationDetailScreenState
-                    ._green,
-            size: 31,
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isUpdate
-                      ? 'Profil Güncelleme Başvurusu'
-                      : 'İlk Uzmanlık Başvurusu',
-                  style: const TextStyle(
-                    color:
-                        _AdminExpertApplicationDetailScreenState
-                            ._textDark,
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Durum: İnceleme Bekliyor',
-                  style: TextStyle(
-                    color:
-                        _AdminExpertApplicationDetailScreenState
-                            ._textMuted,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _DetailCard extends StatelessWidget {
   const _DetailCard({
-    required this.title,
     required this.children,
   });
 
-  final String title;
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(
-        17,
-        16,
-        17,
-        7,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 5,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color:
-              _AdminExpertApplicationDetailScreenState
-                  ._border,
+          color: _AdminExpertColors.border,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color:
-                  _AdminExpertApplicationDetailScreenState
-                      ._textDark,
-              fontSize: 15,
-              fontWeight: FontWeight.w900,
-            ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x070B2239),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
-          const SizedBox(height: 8),
-          ...children,
         ],
       ),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+}
+
+class _DetailDivider extends StatelessWidget {
+  const _DetailDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Divider(
+      height: 1,
+      thickness: 1,
+      color: Color(0xFFF0F3F5),
     );
   }
 }
@@ -1114,54 +1561,57 @@ class _DetailRow extends StatelessWidget {
             value,
             textAlign: TextAlign.right,
             style: const TextStyle(
-              color:
-                  _AdminExpertApplicationDetailScreenState
-                      ._textDark,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              color: _AdminExpertColors.navy,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
             ),
           )
         : Text(
             value,
             textAlign: TextAlign.right,
             style: const TextStyle(
-              color:
-                  _AdminExpertApplicationDetailScreenState
-                      ._textDark,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              color: _AdminExpertColors.navy,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
             ),
           );
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: 10,
+        vertical: 12,
       ),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color:
-                _AdminExpertApplicationDetailScreenState
-                    ._green,
-            size: 20,
+          Container(
+            width: 31,
+            height: 31,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F8F8),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Icon(
+              icon,
+              color: _AdminExpertColors.teal,
+              size: 16,
+            ),
           ),
+
           const SizedBox(width: 10),
+
           Expanded(
             child: Text(
               label,
               style: const TextStyle(
-                color:
-                    _AdminExpertApplicationDetailScreenState
-                        ._textMuted,
-                fontSize: 13,
+                color: _AdminExpertColors.textMuted,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
+
           const SizedBox(width: 12),
+
           Flexible(
             child: valueWidget,
           ),
@@ -1171,7 +1621,8 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-class _PreviousInformationCard extends StatelessWidget {
+class _PreviousInformationCard
+    extends StatelessWidget {
   const _PreviousInformationCard({
     required this.application,
   });
@@ -1181,34 +1632,43 @@ class _PreviousInformationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _DetailCard(
-      title: 'Önceki Uzman Bilgileri',
       children: [
         _DetailRow(
           icon: Icons.apartment_outlined,
           label: 'Önceki Şirket',
-          value: application.previousCompanyName ?? '-',
+          value:
+              application.previousCompanyName ?? '-',
         ),
+        const _DetailDivider(),
         _DetailRow(
           icon: Icons.location_city_outlined,
           label: 'Önceki Şube',
           value: application.previousBranch ?? '-',
         ),
+        const _DetailDivider(),
         _DetailRow(
           icon: Icons.work_outline_rounded,
           label: 'Önceki Pozisyon',
-          value: application.previousPosition ?? '-',
+          value:
+              application.previousPosition ?? '-',
         ),
+        const _DetailDivider(),
         _DetailRow(
           icon: Icons.mail_outline_rounded,
           label: 'Önceki E-posta',
           value:
-              application.previousCorporateEmail ?? '-',
+              application.previousCorporateEmail ??
+                  '-',
           selectable: true,
         ),
       ],
     );
   }
 }
+
+// ============================================================
+// REVIEW ACTIONS
+// ============================================================
 
 class _ReviewActions extends StatelessWidget {
   const _ReviewActions({
@@ -1225,18 +1685,25 @@ class _ReviewActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
-        18,
-        12,
-        18,
-        18,
+        16,
+        11,
+        16,
+        16,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
           top: BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: _AdminExpertColors.border,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0D0B2239),
+            blurRadius: 16,
+            offset: Offset(0, -4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -1246,62 +1713,69 @@ class _ReviewActions extends StatelessWidget {
                   isProcessing ? null : onReject,
               icon: const Icon(
                 Icons.close_rounded,
+                size: 19,
               ),
               label: const Text('Reddet'),
               style: OutlinedButton.styleFrom(
                 foregroundColor:
-                    _AdminExpertApplicationDetailScreenState
-                        ._danger,
+                    _AdminExpertColors.danger,
                 side: const BorderSide(
-                  color: Color(0xFFF2B8B5),
+                  color: Color(0xFFEAB4B1),
                 ),
                 minimumSize:
-                    const Size.fromHeight(56),
+                    const Size.fromHeight(52),
                 shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.circular(16),
+                      BorderRadius.circular(15),
                 ),
                 textStyle: const TextStyle(
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w900,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+
+          const SizedBox(width: 10),
+
           Expanded(
+            flex: 2,
             child: FilledButton.icon(
               onPressed:
                   isProcessing ? null : onApprove,
               icon: isProcessing
                   ? const SizedBox(
-                      width: 19,
-                      height: 19,
+                      width: 18,
+                      height: 18,
                       child:
                           CircularProgressIndicator(
-                        strokeWidth: 2.2,
+                        strokeWidth: 2,
                         color: Colors.white,
                       ),
                     )
                   : const Icon(
                       Icons.check_rounded,
+                      size: 19,
                     ),
               label: Text(
                 isProcessing
-                    ? 'İşleniyor'
-                    : 'Onayla',
+                    ? 'İşleniyor...'
+                    : 'Başvuruyu Onayla',
               ),
               style: FilledButton.styleFrom(
                 backgroundColor:
-                    _AdminExpertApplicationDetailScreenState
-                        ._green,
+                    _AdminExpertColors.navy,
                 foregroundColor: Colors.white,
+                disabledBackgroundColor:
+                    const Color(0xFF9AA6B1),
                 minimumSize:
-                    const Size.fromHeight(56),
+                    const Size.fromHeight(52),
                 shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.circular(16),
+                      BorderRadius.circular(15),
                 ),
                 textStyle: const TextStyle(
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -1313,20 +1787,30 @@ class _ReviewActions extends StatelessWidget {
   }
 }
 
-class _ApplicationsLoadingView extends StatelessWidget {
+// ============================================================
+// LOADING
+// ============================================================
+
+class _ApplicationsLoadingView
+    extends StatelessWidget {
   const _ApplicationsLoadingView();
 
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: CircularProgressIndicator(
-        color: AdminExpertApplicationsScreen._green,
+        color: _AdminExpertColors.teal,
       ),
     );
   }
 }
 
-class _ApplicationsErrorView extends StatelessWidget {
+// ============================================================
+// ERROR
+// ============================================================
+
+class _ApplicationsErrorView
+    extends StatelessWidget {
   const _ApplicationsErrorView({
     required this.message,
   });
@@ -1336,25 +1820,44 @@ class _ApplicationsErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline_rounded,
-              color: Color(0xFFB42318),
-              size: 42,
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                color:
+                    _AdminExpertColors.softDanger,
+                borderRadius:
+                    BorderRadius.circular(22),
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                color: _AdminExpertColors.danger,
+                size: 35,
+              ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 17),
+            const Text(
+              'Başvurular Yüklenemedi',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _AdminExpertColors.navy,
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 7),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color:
-                    AdminExpertApplicationsScreen
-                        ._textDark,
-                fontSize: 14,
+                    _AdminExpertColors.textMuted,
+                fontSize: 12,
                 height: 1.5,
               ),
             ),
@@ -1365,7 +1868,12 @@ class _ApplicationsErrorView extends StatelessWidget {
   }
 }
 
-class _EmptyApplicationsView extends StatelessWidget {
+// ============================================================
+// EMPTY
+// ============================================================
+
+class _EmptyApplicationsView
+    extends StatelessWidget {
   const _EmptyApplicationsView();
 
   @override
@@ -1381,16 +1889,14 @@ class _EmptyApplicationsView extends StatelessWidget {
               height: 78,
               decoration: BoxDecoration(
                 color:
-                    AdminExpertApplicationsScreen
-                        ._softGreen,
-                borderRadius: BorderRadius.circular(25),
+                    _AdminExpertColors.softTeal,
+                borderRadius:
+                    BorderRadius.circular(25),
               ),
               child: const Icon(
                 Icons.task_alt_rounded,
-                color:
-                    AdminExpertApplicationsScreen
-                        ._green,
-                size: 41,
+                color: _AdminExpertColors.teal,
+                size: 39,
               ),
             ),
             const SizedBox(height: 19),
@@ -1398,24 +1904,22 @@ class _EmptyApplicationsView extends StatelessWidget {
               'Bekleyen Başvuru Yok',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color:
-                    AdminExpertApplicationsScreen
-                        ._textDark,
-                fontSize: 19,
+                color: _AdminExpertColors.navy,
+                fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Yeni uzman başvuruları geldiğinde '
-              'bu ekranda otomatik olarak listelenecektir.',
+              'Tüm uzman başvuruları incelenmiş durumda.\n'
+              'Yeni bir başvuru geldiğinde burada otomatik olarak görünecek.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color:
-                    AdminExpertApplicationsScreen
-                        ._textMuted,
-                fontSize: 13.5,
+                    _AdminExpertColors.textMuted,
+                fontSize: 12,
                 height: 1.5,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

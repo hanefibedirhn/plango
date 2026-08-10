@@ -11,10 +11,15 @@ class ChangePasswordScreen extends StatefulWidget {
 
 class _ChangePasswordScreenState
     extends State<ChangePasswordScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = _navy;
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
+  static const Color _softTeal = Color(0xFFE8F7F5);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -178,9 +183,9 @@ class _ChangePasswordScreenState
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: const Color(0xFFE5E7EB),
+                  color: const Color(0xFFE4EBEE),
                 ),
               ),
               child: Form(
@@ -249,14 +254,14 @@ class _ChangePasswordScreenState
               onPressed:
                   _isSubmitting ? null : _updatePassword,
               style: FilledButton.styleFrom(
-                backgroundColor: _green,
+                backgroundColor: _teal,
                 foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(58),
+                minimumSize: const Size.fromHeight(52),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
                 textStyle: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -286,14 +291,14 @@ class _PasswordHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1EC),
-        borderRadius: BorderRadius.circular(22),
+        color: _ChangePasswordScreenState._softTeal,
+        borderRadius: BorderRadius.circular(18),
       ),
       child: const Row(
         children: [
           Icon(
             Icons.security_rounded,
-            color: _ChangePasswordScreenState._green,
+            color: _ChangePasswordScreenState._teal,
             size: 30,
           ),
           SizedBox(width: 13),
@@ -343,7 +348,7 @@ class _PasswordField extends StatelessWidget {
         labelText: label,
         prefixIcon: const Icon(
           Icons.lock_outline_rounded,
-          color: _ChangePasswordScreenState._green,
+          color: _ChangePasswordScreenState._teal,
         ),
         suffixIcon: IconButton(
           tooltip: visible
@@ -358,20 +363,20 @@ class _PasswordField extends StatelessWidget {
           ),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: const Color(0xFFF9FBFC),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: Color(0xFFE4EBEE),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: _ChangePasswordScreenState._green,
+            color: _ChangePasswordScreenState._teal,
             width: 1.7,
           ),
         ),

@@ -57,6 +57,26 @@ class ExpertRepository {
     );
   }
 
+  /// Sistemdeki tüm uzmanları gerçek zamanlı olarak izler.
+  ///
+  /// Yönetici panelindeki Uzman Yönetimi ekranı tarafından
+  /// kullanılır. Uzman kayıtlarında yapılan değişiklikler
+  /// ekrana otomatik olarak yansır.
+  Stream<List<Expert>> watchAllExperts() {
+    return _expertsCollection
+        .orderBy('companyName')
+        .snapshots()
+        .map(
+      (snapshot) {
+        return snapshot.docs
+            .map(
+              (document) => Expert.fromDocument(document),
+            )
+            .toList();
+      },
+    );
+  }
+
   /// Yeni uzman profili oluşturur.
   ///
   /// Normal kullanıcı istemcisinden çağrılmamalıdır.
@@ -197,20 +217,120 @@ class ExpertRepository {
   /// Uzmanın yeni danışma talebi alıp almayacağını değiştirir.
   ///
   /// Özel uzman kaydı ile kullanıcıların göreceği açık uzman
-  /// profili aynı batch içinde birlikte güncellenir.
+  /// profili aynı transaction içinde birlikte güncellenir.
   Future<void> setAcceptsNewRequests({
+    required String uid,
+    required bool value,
+  }) async {
+    final DocumentReference<Map<String, dynamic>>
+        expertReference =
+        _expertsCollection.doc(uid);
+
+    final DocumentReference<Map<String, dynamic>>
+        publicProfileReference =
+        _expertProfilesCollection.doc(uid);
+
+    await _firestore.runTransaction(
+      (transaction) async {
+        final DocumentSnapshot<Map<String, dynamic>>
+            expertSnapshot =
+            await transaction.get(expertReference);
+
+        if (!expertSnapshot.exists ||
+            expertSnapshot.data() == null) {
+          throw const ExpertNotFoundException();
+        }
+
+        final Map<String, dynamic> expertData =
+            expertSnapshot.data()!;
+
+        final String status =
+            expertData['status'] as String? ?? 'inactive';
+
+        final String verificationStatus =
+            expertData['verificationStatus'] as String? ??
+                'rejected';
+
+        if (value &&
+            (status != 'active' ||
+                verificationStatus != 'approved')) {
+          throw StateError(
+            'Aktif ve onaylı olmayan uzman yeni talep alımını açamaz.',
+          );
+        }
+
+        transaction.update(
+          expertReference,
+          {
+            'acceptsNewRequests': value,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+        );
+
+        transaction.set(
+          publicProfileReference,
+          {
+            'uid': uid,
+            'firstName':
+                expertData['firstName'] as String? ?? '',
+            'lastName':
+                expertData['lastName'] as String? ?? '',
+            'companyName':
+                expertData['companyName'] as String? ?? '',
+            'branch':
+                expertData['branch'] as String? ?? '',
+            'position':
+                expertData['position'] as String? ?? '',
+            'status': status,
+            'acceptsNewRequests': value,
+            'createdAt':
+                expertData['createdAt'] ??
+                    FieldValue.serverTimestamp(),
+            'updatedAt':
+                FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      },
+    );
+  }
+
+  /// Uzmanlığı sistemden kalıcı olarak kaldırır.
+///
+/// Bu işlem kullanıcının normal Plango hesabını silmez.
+/// Sadece uzman kayıtlarını kaldırır ve kullanıcı profilini
+/// tekrar normal kullanıcı durumuna döndürür.
+///
+/// Silinen kayıtlar:
+/// - experts/{uid}
+/// - expertProfiles/{uid}
+///
+/// Güncellenen kayıt:
+/// - users/{uid}
+Future<void> deleteExpert({
   required String uid,
-  required bool value,
 }) async {
+  final String normalizedUid = uid.trim();
+
+  if (normalizedUid.isEmpty) {
+    throw ArgumentError(
+      'Silinecek uzman kimliği bulunamadı.',
+    );
+  }
+
   final DocumentReference<Map<String, dynamic>>
       expertReference =
-      _expertsCollection.doc(uid);
+      _expertsCollection.doc(normalizedUid);
 
   final DocumentReference<Map<String, dynamic>>
       publicProfileReference =
-      _expertProfilesCollection.doc(uid);
+      _expertProfilesCollection.doc(normalizedUid);
 
-  await _firestore.runTransaction<void>(
+  final DocumentReference<Map<String, dynamic>>
+      userReference =
+      _firestore.collection('users').doc(normalizedUid);
+
+  await _firestore.runTransaction(
     (transaction) async {
       final DocumentSnapshot<Map<String, dynamic>>
           expertSnapshot =
@@ -221,56 +341,29 @@ class ExpertRepository {
         throw const ExpertNotFoundException();
       }
 
-      final Map<String, dynamic> expertData =
-          expertSnapshot.data()!;
+      final DocumentSnapshot<Map<String, dynamic>>
+          userSnapshot =
+          await transaction.get(userReference);
 
-      final String status =
-          expertData['status'] as String? ?? 'inactive';
+      transaction.delete(
+        expertReference,
+      );
 
-      final String verificationStatus =
-          expertData['verificationStatus'] as String? ??
-              'rejected';
+      transaction.delete(
+        publicProfileReference,
+      );
 
-      if (value &&
-          (status != 'active' ||
-              verificationStatus != 'approved')) {
-        throw StateError(
-          'Aktif ve onaylı olmayan uzman yeni talep alımını açamaz.',
+      if (userSnapshot.exists) {
+        transaction.update(
+          userReference,
+          {
+            'roles': const ['user'],
+            'expertStatus': 'none',
+            'updatedAt':
+                FieldValue.serverTimestamp(),
+          },
         );
       }
-
-      transaction.update(
-        expertReference,
-        {
-          'acceptsNewRequests': value,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-      );
-
-      transaction.set(
-        publicProfileReference,
-        {
-          'uid': uid,
-          'firstName':
-              expertData['firstName'] as String? ?? '',
-          'lastName':
-              expertData['lastName'] as String? ?? '',
-          'companyName':
-              expertData['companyName'] as String? ?? '',
-          'branch':
-              expertData['branch'] as String? ?? '',
-          'position':
-              expertData['position'] as String? ?? '',
-          'status': status,
-          'acceptsNewRequests': value,
-          'createdAt':
-              expertData['createdAt'] ??
-                  FieldValue.serverTimestamp(),
-          'updatedAt':
-              FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
     },
   );
 }

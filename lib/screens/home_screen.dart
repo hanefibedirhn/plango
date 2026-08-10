@@ -9,7 +9,6 @@ import '../repositories/content_repository.dart';
 import '../repositories/last_calculated_plan_store.dart';
 import '../repositories/notification_repository.dart';
 import '../repositories/saved_plan_repository.dart';
-import '../widgets/app_drawer.dart';
 import 'account_router_screen.dart';
 import 'calculator_screen.dart';
 import 'companies_screen.dart';
@@ -17,6 +16,8 @@ import 'featured_screen.dart';
 import 'notification_center_screen.dart';
 import 'payment_plan_screen.dart';
 import 'saved_plans_screen.dart';
+import 'savings_finance_system_screen.dart';
+import 'faq_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -155,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: _background,
-      drawer: const AppDrawer(),
       appBar: _buildPremiumAppBar(),
       body: SafeArea(
         top: false,
@@ -185,8 +185,12 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildHeroCard(),
             const SizedBox(height: 16),
             _buildLastPlanSection(),
-            const SizedBox(height: 20),
-            _buildHighlightsSection(),
+const SizedBox(height: 18),
+
+_buildCategoriesSection(),
+const SizedBox(height: 18),
+
+_buildHighlightsSection(),
           ],
         ),
       ),
@@ -337,11 +341,45 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
-                'assets/images/home_hero_house_car.png',
-                fit: BoxFit.cover,
-                alignment: const Alignment(0.55, 0.12),
-                errorBuilder: (_, __, ___) => const _HeroFallbackArtwork(),
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: width * 0.55,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(26),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 10, 8, 10),
+                        child: Image.asset(
+                          'assets/images/home_hero_house_car.png',
+                          fit: BoxFit.contain,
+                          alignment: Alignment.centerRight,
+                          errorBuilder: (_, __, ___) =>
+                              const _HeroFallbackArtwork(),
+                        ),
+                      ),
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            stops: [0.0, 0.34, 0.72],
+                            colors: [
+                              Color(0xFF073947),
+                              Color(0x99073947),
+                              Color(0x00073947),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const DecoratedBox(
                 decoration: BoxDecoration(
@@ -462,94 +500,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLastPlanSection() {
-  final User? user = _currentUser;
-
-  if (user == null) {
-    return ValueListenableBuilder<LastCalculatedPlanData?>(
-      valueListenable:
-          LastCalculatedPlanStore.instance.dataNotifier,
-      builder: (context, lastData, _) {
-        if (lastData != null) {
-          return _buildLastCalculatedPlanCard(
-            lastData,
-          );
-        }
-
-        return _buildPlanMessageCard(
-          icon: Icons.add_chart_rounded,
-          title: 'Henüz planın yok',
-          subtitle:
-              'İlk planını oluşturarak teslim ve vade tahminini görüntüle.',
-          actionLabel: 'Plan Oluştur',
-          onAction: _openCalculator,
-        );
-      },
-    );
-  }
-
-  return StreamBuilder<List<SavedPlan>>(
-    stream: _savedPlanRepository.watchSavedPlans(
-      userId: user.uid,
-    ),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState ==
-              ConnectionState.waiting &&
-          !snapshot.hasData) {
-        return _buildLoadingPlanCard();
+  return ValueListenableBuilder<LastCalculatedPlanData?>(
+    valueListenable: LastCalculatedPlanStore.instance.dataNotifier,
+    builder: (context, lastData, _) {
+      if (lastData != null) {
+        return _buildLastCalculatedPlanCard(lastData);
       }
 
-      if (snapshot.hasError) {
-        return _buildPlanMessageCard(
-          icon: Icons.cloud_off_outlined,
-          title: 'Son planın yüklenemedi',
-          subtitle:
-              'Bağlantını kontrol edip tekrar deneyebilirsin.',
-        );
-      }
-
-      final List<SavedPlan> plans =
-          snapshot.data ?? <SavedPlan>[];
-
-      if (plans.isEmpty) {
-        return ValueListenableBuilder<
-            LastCalculatedPlanData?>(
-          valueListenable:
-              LastCalculatedPlanStore.instance.dataNotifier,
-          builder: (context, lastData, _) {
-            if (lastData != null) {
-              return _buildLastCalculatedPlanCard(
-                lastData,
-              );
-            }
-
-            return _buildPlanMessageCard(
-              icon: Icons.add_chart_rounded,
-              title: 'Henüz planın yok',
-              subtitle:
-                  'İlk planını oluşturarak teslim ve vade tahminini görüntüle.',
-              actionLabel: 'Plan Oluştur',
-              onAction: _openCalculator,
-            );
-          },
-        );
-      }
-
-      final List<SavedPlan> sortedPlans =
-          List<SavedPlan>.from(plans)
-            ..sort((a, b) {
-              final DateTime aDate =
-                  a.createdAt ??
-                  DateTime.fromMillisecondsSinceEpoch(0);
-
-              final DateTime bDate =
-                  b.createdAt ??
-                  DateTime.fromMillisecondsSinceEpoch(0);
-
-              return bDate.compareTo(aDate);
-            });
-
-      return _buildLastPlanCard(
-        sortedPlans.first,
+      return _buildPlanMessageCard(
+        icon: Icons.add_chart_rounded,
+        title: 'Henüz planın yok',
+        subtitle:
+            'İlk planını oluşturarak teslim ve vade tahminini görüntüle.',
+        actionLabel: 'Plan Oluştur',
+        onAction: _openCalculator,
       );
     },
   );
@@ -911,7 +875,54 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 }
 
-  DateTime? _findDeliveryDate(SavedPlan plan) {
+Widget _buildCategoriesSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Bilgi Merkezi',
+        style: TextStyle(
+          color: _navy,
+          fontSize: 18,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      const SizedBox(height: 12),
+
+      _InfoRowCard(
+        icon: Icons.workspace_premium_outlined,
+        title: 'Tasarruf Finansmanı Nedir?',
+        color: _teal,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const SavingsFinanceSystemScreen(),
+            ),
+          );
+        },
+      ),
+
+      const SizedBox(height: 10),
+
+      _InfoRowCard(
+        icon: Icons.quiz_outlined,
+        title: 'Sıkça Sorulan Sorular',
+        color: Color(0xFF1565C0),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const FaqScreen(),
+            ),
+          );
+        },
+      ),
+    ],
+  );
+}
+
+DateTime? _findDeliveryDate(SavedPlan plan) {
     for (final SavedPaymentPlanItem item in plan.paymentPlan) {
       if (item.isDeliveryMonth) return item.paymentDate;
     }
@@ -1262,32 +1273,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const Spacer(),
-                        InkWell(
-                          onTap: itemCount <= 1
-                              ? null
-                              : () {
-                                  final int next = (_featuredIndex + 1) % itemCount;
-                                  _featuredController.animateToPage(
-                                    next,
-                                    duration: const Duration(milliseconds: 330),
-                                    curve: Curves.easeOutCubic,
-                                  );
-                                },
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.arrow_forward_rounded,
-                              color: Color(0xFF0B4E53),
-                              size: 20,
-                            ),
+                        if (itemCount > 1) ...[
+                          _FeaturedArrowButton(
+                            icon: Icons.arrow_back_rounded,
+                            enabled: _featuredIndex > 0,
+                            onTap: () {
+                              _featuredController.animateToPage(
+                                _featuredIndex - 1,
+                                duration: const Duration(milliseconds: 330),
+                                curve: Curves.easeOutCubic,
+                              );
+                            },
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          _FeaturedArrowButton(
+                            icon: Icons.arrow_forward_rounded,
+                            enabled: _featuredIndex < itemCount - 1,
+                            onTap: () {
+                              _featuredController.animateToPage(
+                                _featuredIndex + 1,
+                                duration: const Duration(milliseconds: 330),
+                                curve: Curves.easeOutCubic,
+                              );
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -1746,6 +1756,44 @@ class _PlanMetricDivider extends StatelessWidget {
   }
 }
 
+class _FeaturedArrowButton extends StatelessWidget {
+  const _FeaturedArrowButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 180),
+      opacity: enabled ? 1 : 0.34,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(enabled ? 1 : 0.72),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: const Color(0xFF0B4E53),
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
 class _BottomNavItem extends StatelessWidget {
   const _BottomNavItem({
     required this.icon,
@@ -1803,3 +1851,78 @@ class _BottomNavItem extends StatelessWidget {
   }
 }
 
+class _InfoRowCard extends StatelessWidget {
+  const _InfoRowCard({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          height: 58,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: const Color(0xFFE5ECEF),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(.10),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+  fontSize: 14,
+  fontWeight: FontWeight.w800,
+  color: const Color(0xFF0B2239),
+),
+                ),
+              ),
+              const Icon(
+  Icons.arrow_forward_ios_rounded,
+  size: 16,
+  color: Color(0xFF9AA5B1),
+),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

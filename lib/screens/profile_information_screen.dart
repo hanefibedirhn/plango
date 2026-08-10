@@ -16,12 +16,16 @@ class ProfileInformationScreen extends StatefulWidget {
 
 class _ProfileInformationScreenState
     extends State<ProfileInformationScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _petrol = Color(0xFF052F3D);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _turquoise = Color(0xFF16C7B0);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = _navy;
+  static const Color _textMuted = Color(0xFF748193);
   static const Color _danger = Color(0xFFB42318);
-  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _border = Color(0xFFE4EBEE);
+  static const Color _softTeal = Color(0xFFE8F7F5);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -196,7 +200,7 @@ AppUser? _currentProfile;
         builder: (context, setDialogState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(18),
             ),
             icon: const Icon(
               Icons.warning_amber_rounded,
@@ -214,9 +218,8 @@ AppUser? _currentProfile;
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Hesabınız, profil bilgileriniz ve kullanıcı adı '
-                  'kaydınız kalıcı olarak silinecektir. Bu işlem '
-                  'geri alınamaz.',
+                  'Hesabınız ve profil bilgileriniz kalıcı olarak '
+                  'silinecektir. Bu işlem geri alınamaz.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     height: 1.5,
@@ -302,11 +305,10 @@ AppUser? _currentProfile;
     return;
   }
 
-  final AppUser? profile = _currentProfile;
   final User? firebaseUser =
       FirebaseAuth.instance.currentUser;
 
-  if (profile == null || firebaseUser == null) {
+  if (firebaseUser == null) {
     _showMessage(
       'Aktif kullanıcı bilgileri bulunamadı.',
     );
@@ -372,7 +374,6 @@ AppUser? _currentProfile;
     // Kullanıcı hâlâ oturum açmışken Firestore kayıtları silinir.
     await _userRepository.deleteUserProfile(
       uid: firebaseUser.uid,
-      username: profile.username,
     );
 
     // Son olarak Authentication hesabı silinir.
@@ -495,14 +496,14 @@ AppUser? _currentProfile;
               children: [
                 _ProfileHeader(
                   fullName: user.fullName,
-                  username: user.username,
+                  email: user.email,
                 ),
                 const SizedBox(height: 20),
 
                 Form(
                   key: _formKey,
                   child: Container(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius:
@@ -557,13 +558,7 @@ AppUser? _currentProfile;
                           icon:
                               Icons.mail_outline_rounded,
                         ),
-                        const SizedBox(height: 15),
-                        _ReadOnlyProfileField(
-                          label: 'Kullanıcı Adı',
-                          value: user.username,
-                          icon:
-                              Icons.alternate_email_rounded,
-                        ),
+
                       ],
                     ),
                   ),
@@ -604,7 +599,7 @@ AppUser? _currentProfile;
                               ? null
                               : _saveProfile,
                           style: FilledButton.styleFrom(
-                            backgroundColor: _green,
+                            backgroundColor: _teal,
                             foregroundColor:
                                 Colors.white,
                             minimumSize:
@@ -690,19 +685,33 @@ AppUser? _currentProfile;
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.fullName,
-    required this.username,
+    required this.email,
   });
 
   final String fullName;
-  final String username;
+  final String email;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(19),
       decoration: BoxDecoration(
-        color: _ProfileInformationScreenState._green,
-        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _ProfileInformationScreenState._petrol,
+            Color(0xFF07585A),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: _ProfileInformationScreenState._petrol.withOpacity(0.14),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -735,7 +744,7 @@ class _ProfileHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '@$username',
+                  email,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 13.5,
@@ -786,32 +795,32 @@ class _EditableProfileField extends StatelessWidget {
         hintText: hint,
         prefixIcon: Icon(
           icon,
-          color: _ProfileInformationScreenState._green,
+          color: _ProfileInformationScreenState._teal,
         ),
         filled: true,
         fillColor: enabled
             ? Colors.white
-            : const Color(0xFFF9FAFB),
+            : const Color(0xFFF3F7F8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: Color(0xFFE4EBEE),
           ),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: Color(0xFFE4EBEE),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
             color:
-                _ProfileInformationScreenState._green,
+                _ProfileInformationScreenState._teal,
             width: 1.7,
           ),
         ),
@@ -838,17 +847,17 @@ class _ReadOnlyProfileField extends StatelessWidget {
         labelText: label,
         prefixIcon: Icon(
           icon,
-          color: _ProfileInformationScreenState._green,
+          color: _ProfileInformationScreenState._teal,
         ),
         filled: true,
-        fillColor: const Color(0xFFF9FAFB),
+        fillColor: const Color(0xFFF3F7F8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: const BorderSide(
-            color: Color(0xFFE5E7EB),
+            color: Color(0xFFE4EBEE),
           ),
         ),
       ),
@@ -890,7 +899,7 @@ class _SettingsCard extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.iconColor =
-        _ProfileInformationScreenState._green,
+        _ProfileInformationScreenState._teal,
     this.titleColor =
         _ProfileInformationScreenState._textDark,
     this.backgroundColor = Colors.white,
@@ -917,17 +926,27 @@ class _SettingsCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: const Color(0xFFE5E7EB),
+              color: const Color(0xFFE4EBEE),
             ),
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 25,
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: iconColor == _ProfileInformationScreenState._danger
+                      ? const Color(0xFFFFECEA)
+                      : _ProfileInformationScreenState._softTeal,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20,
+                ),
               ),
-              const SizedBox(width: 13),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment:
@@ -973,10 +992,10 @@ class _ProfileLoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFFF7F8F5),
+      backgroundColor: Color(0xFFF7F9FB),
       body: Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF0B5D3B),
+          color: Color(0xFF087C72),
         ),
       ),
     );
@@ -993,9 +1012,9 @@ class _ProfileErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8F5),
+      backgroundColor: const Color(0xFFF7F9FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8F5),
+        backgroundColor: const Color(0xFFF7F9FB),
         title: const Text(
           'Profil Bilgilerim',
           style: TextStyle(
