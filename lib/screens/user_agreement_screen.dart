@@ -23,35 +23,35 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.handshake_outlined,
       title: 'Taraflar',
       body:
-          'İşbu Kullanıcı Sözleşmesi, Plango dijital platformunu kullanan gerçek kişi kullanıcı ile Plango hizmetinin veri sorumlusu ve/veya hizmet sağlayıcısı sıfatıyla faaliyet gösterecek gerçek veya tüzel kişi arasında, kullanıcının üyelik işlemini tamamlaması ve sözleşmeyi elektronik ortamda kabul etmesiyle kurulur.\n\n'
-          'Plango’nun nihai ticari unvanı, merkez adresi, iletişim kanalları ve varsa MERSİS/vergi bilgileri yayına çıkmadan önce sözleşmenin bu bölümüne açık biçimde eklenmelidir.\n\n'
-          'Bu sözleşmede “Kullanıcı”, Plango’da hesap oluşturan veya üyelik kapsamında sunulan hizmetlerden yararlanan kişiyi; “Plango” ise uygulama, hesaplama altyapısı ve ilgili dijital hizmetlerin bütününü ifade eder.',
+          'İşbu Kullanıcı Sözleşmesi, Tasarruf Planım dijital platformunu kullanan gerçek kişi kullanıcı ile Tasarruf Planım hizmetinin veri sorumlusu ve/veya hizmet sağlayıcısı sıfatıyla faaliyet gösterecek gerçek veya tüzel kişi arasında, kullanıcının üyelik işlemini tamamlaması ve sözleşmeyi elektronik ortamda kabul etmesiyle kurulur.\n\n'
+          'Tasarruf Planım’ın nihai ticari unvanı, merkez adresi, iletişim kanalları ve varsa MERSİS/vergi bilgileri yayına çıkmadan önce sözleşmenin bu bölümüne açık biçimde eklenmelidir.\n\n'
+          'Bu sözleşmede “Kullanıcı”, Tasarruf Planım’da hesap oluşturan veya üyelik kapsamında sunulan hizmetlerden yararlanan kişiyi; “Tasarruf Planım” ise uygulama, hesaplama altyapısı ve ilgili dijital hizmetlerin bütününü ifade eder.',
     ),
     _AgreementSection(
       icon: Icons.description_outlined,
       title: 'Sözleşmenin Konusu',
       body:
-          'Bu sözleşmenin konusu, kullanıcının Plango’ya üye olması ve Plango tarafından sunulan dijital özelliklerden yararlanmasına ilişkin temel kullanım şartlarının, tarafların hak ve yükümlülüklerinin ve üyelik ilişkisinin çerçevesinin belirlenmesidir.\n\n'
-          'Sözleşme; Plango hesabının kullanımı, FP Engine, kayıtlı planlar, ödeme planı çıktıları, danışma sistemi, doğrulanmış uzmanlarla iletişim, bildirimler ve üyelik kapsamında sunulan diğer işlevler bakımından uygulanır.\n\n'
-          'Plango’nun herhangi bir tasarruf finansman şirketiyle kullanıcı arasında imzalanan sözleşmenin tarafı olmadığı ve bu sözleşmenin bir tasarruf finansmanı sözleşmesi niteliği taşımadığı taraflarca kabul edilir.',
+          'Bu sözleşmenin konusu, kullanıcının Tasarruf Planım’a üye olması ve Tasarruf Planım tarafından sunulan dijital özelliklerden yararlanmasına ilişkin temel kullanım şartlarının, tarafların hak ve yükümlülüklerinin ve üyelik ilişkisinin çerçevesinin belirlenmesidir.\n\n'
+          'Sözleşme; Tasarruf Planım hesabının kullanımı, FP Engine, kayıtlı planlar, ödeme planı çıktıları, danışma sistemi, doğrulanmış uzmanlarla iletişim, bildirimler ve üyelik kapsamında sunulan diğer işlevler bakımından uygulanır.\n\n'
+          'Tasarruf Planım’ın herhangi bir tasarruf finansman şirketiyle kullanıcı arasında imzalanan sözleşmenin tarafı olmadığı ve bu sözleşmenin bir tasarruf finansmanı sözleşmesi niteliği taşımadığı taraflarca kabul edilir.',
     ),
     _AgreementSection(
       icon: Icons.menu_book_outlined,
       title: 'Tanımlar',
       body:
-          'FP Engine: Kullanıcının girdiği finansman ve ödeme parametrelerini kullanarak tahmini planlama sonuçları oluşturan Plango hesaplama motorudur.\n\n'
+          'FP Engine: Kullanıcının girdiği finansman ve ödeme parametrelerini kullanarak tahmini planlama sonuçları oluşturan Tasarruf Planım hesaplama motorudur.\n\n'
           'Kayıtlı Plan: Kullanıcının daha sonra görüntülemek amacıyla hesabına kaydettiği tahmini hesaplama kaydıdır.\n\n'
-          'Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Plango üzerinden uygun bir doğrulanmış uzmanla iletişim kurulmasını talep ettiği uygulama içi süreçtir.\n\n'
-          'Doğrulanmış Uzman: Plango tarafından belirlenen doğrulama kriterlerinden geçen sektör profesyonelidir.\n\n'
-          'İçerik: Plango içerisinde yayımlanan metin, haber, bilgi, şirket profili, açıklama, grafik, hesaplama sonucu ve benzeri dijital unsurlardır.',
+          'Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Tasarruf Planım üzerinden uygun bir doğrulanmış uzmanla iletişim kurulmasını talep ettiği uygulama içi süreçtir.\n\n'
+          'Doğrulanmış Uzman: Tasarruf Planım tarafından belirlenen doğrulama kriterlerinden geçen sektör profesyonelidir.\n\n'
+          'İçerik: Tasarruf Planım içerisinde yayımlanan metin, haber, bilgi, şirket profili, açıklama, grafik, hesaplama sonucu ve benzeri dijital unsurlardır.',
     ),
     _AgreementSection(
       icon: Icons.person_add_alt_1_outlined,
       title: 'Üyeliğin Başlatılması',
       body:
           'Kullanıcı, üyelik formunda talep edilen zorunlu bilgileri doğru ve güncel biçimde girerek ve işbu Kullanıcı Sözleşmesini kabul ederek üyelik başvurusunu tamamlar.\n\n'
-          'Plango, teknik güvenlik, kötüye kullanımın önlenmesi veya hesap doğrulaması amacıyla e-posta doğrulaması ve benzeri güvenlik adımları uygulayabilir.\n\n'
-          'Üyelik, kullanıcının Plango üzerindeki her özelliği sınırsız veya süresiz kullanma hakkı kazandığı anlamına gelmez. Özelliklerin kapsamı uygulamanın güncel sürümüne göre değişebilir.',
+          'Tasarruf Planım, teknik güvenlik, kötüye kullanımın önlenmesi veya hesap doğrulaması amacıyla e-posta doğrulaması ve benzeri güvenlik adımları uygulayabilir.\n\n'
+          'Üyelik, kullanıcının Tasarruf Planım üzerindeki her özelliği sınırsız veya süresiz kullanma hakkı kazandığı anlamına gelmez. Özelliklerin kapsamı uygulamanın güncel sürümüne göre değişebilir.',
     ),
     _AgreementSection(
       icon: Icons.how_to_reg_outlined,
@@ -59,7 +59,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       body:
           'Kullanıcı, üyelik oluştururken kendi adına işlem yaptığını, verdiği bilgilerin doğru olduğunu ve hesabı hukuka uygun amaçlarla kullanacağını beyan eder.\n\n'
           'Başka kişilerin kimlik veya iletişim bilgileriyle izinsiz hesap oluşturulamaz.\n\n'
-          'Plango’nun hizmetleri, niteliği gereği kendi adına finansal değerlendirme ve sözleşme işlemleri yapabilecek kullanıcılar için tasarlanmıştır. Kullanıcının hukuki işlem ehliyetine ilişkin zorunlu hükümler saklıdır.',
+          'Tasarruf Planım’ın hizmetleri, niteliği gereği kendi adına finansal değerlendirme ve sözleşme işlemleri yapabilecek kullanıcılar için tasarlanmıştır. Kullanıcının hukuki işlem ehliyetine ilişkin zorunlu hükümler saklıdır.',
     ),
     _AgreementSection(
       icon: Icons.fact_check_outlined,
@@ -75,7 +75,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       body:
           'Kullanıcı kendi hesabının, parolasının ve doğrulama araçlarının güvenliğini korumakla yükümlüdür.\n\n'
           'Parola, tek kullanımlık doğrulama kodu, e-posta erişimi ve benzeri güvenlik bilgileri üçüncü kişilerle paylaşılmamalıdır.\n\n'
-          'Hesabın izinsiz kullanıldığından şüphe edilmesi halinde kullanıcı, mümkün olan en kısa sürede parolasını değiştirmeli ve Plango’nun ilan ettiği destek kanalı üzerinden bildirimde bulunmalıdır.',
+          'Hesabın izinsiz kullanıldığından şüphe edilmesi halinde kullanıcı, mümkün olan en kısa sürede parolasını değiştirmeli ve Tasarruf Planım’ın ilan ettiği destek kanalı üzerinden bildirimde bulunmalıdır.',
     ),
     _AgreementSection(
       icon: Icons.person_outline_rounded,
@@ -83,22 +83,22 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       body:
           'Kullanıcı hesabı kişiseldir. Hesabın başka kişilere kiralanması, devredilmesi, satılması veya sistematik olarak ortak kullanılması yasaktır.\n\n'
           'Kullanıcı, kendi hesabı üzerinden gerçekleştirilen işlemlerin kendi kontrolünde olmasını sağlamakla yükümlüdür.\n\n'
-          'Yetkisiz hesap paylaşımının güvenlik riski doğurduğu durumlarda Plango gerekli teknik tedbirleri uygulayabilir.',
+          'Yetkisiz hesap paylaşımının güvenlik riski doğurduğu durumlarda Tasarruf Planım gerekli teknik tedbirleri uygulayabilir.',
     ),
     _AgreementSection(
       icon: Icons.explore_outlined,
-      title: 'Plango Hizmetinin Niteliği',
+      title: 'Tasarruf Planım Hizmetinin Niteliği',
       body:
-          'Plango, tasarruf finansmanı alanında bilgilendirme, hesaplama ve karar destek amacıyla sunulan bağımsız bir dijital platformdur.\n\n'
-          'Plango finansman sağlamaz, tasarruf finansmanı sözleşmesi düzenlemez, kullanıcı adına finansman başvurusu yapmaz ve tasarruf finansman şirketi adına bağlayıcı teklif oluşturmaz.\n\n'
-          'Plango’nun sunduğu dijital araçlar, kullanıcının kendi değerlendirmesini yapmasına yardımcı olmak amacıyla kullanılır.',
+          'Tasarruf Planım, tasarruf finansmanı alanında bilgilendirme, hesaplama ve karar destek amacıyla sunulan bağımsız bir dijital platformdur.\n\n'
+          'Tasarruf Planım finansman sağlamaz, tasarruf finansmanı sözleşmesi düzenlemez, kullanıcı adına finansman başvurusu yapmaz ve tasarruf finansman şirketi adına bağlayıcı teklif oluşturmaz.\n\n'
+          'Tasarruf Planım’ın sunduğu dijital araçlar, kullanıcının kendi değerlendirmesini yapmasına yardımcı olmak amacıyla kullanılır.',
     ),
     _AgreementSection(
       icon: Icons.memory_outlined,
       title: 'FP Engine Kullanımı',
       body:
           'Kullanıcı, FP Engine’e girdiği finansman tutarı, peşinat, aylık ödeme, ödeme modeli ve diğer parametrelerin doğruluğundan sorumludur.\n\n'
-          'FP Engine, kullanıcı girdilerine ve Plango tarafından tanımlanan hesaplama kurallarına göre tahmini sonuçlar oluşturur.\n\n'
+          'FP Engine, kullanıcı girdilerine ve Tasarruf Planım tarafından tanımlanan hesaplama kurallarına göre tahmini sonuçlar oluşturur.\n\n'
           'Kullanıcı, FP Engine’i kişisel planlama ve bilgilendirme amacıyla kullanabilir. Hesaplama sonuçlarının üçüncü kişilere resmî teklif veya şirket taahhüdü gibi sunulması yasaktır.',
     ),
     _AgreementSection(
@@ -113,7 +113,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.event_available_outlined,
       title: 'Tahmini Teslim ve Vade Bilgileri',
       body:
-          'Plango’da gösterilen tahmini teslim süresi, tahmini teslim tarihi ve toplam vade sonuçları kullanıcı girdilerine dayalı karar destek verileridir.\n\n'
+          'Tasarruf Planım’da gösterilen tahmini teslim süresi, tahmini teslim tarihi ve toplam vade sonuçları kullanıcı girdilerine dayalı karar destek verileridir.\n\n'
           'Gerçek teslim ve ödeme koşulları ilgili tasarruf finansman şirketinin sözleşmesi, güncel uygulamaları ve yürürlükteki düzenlemeler kapsamında belirlenir.\n\n'
           'Kullanıcı, tahmini sonuçları kesin şirket taahhüdü olarak yorumlamamalıdır.',
     ),
@@ -121,7 +121,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.bookmark_outline_rounded,
       title: 'Kayıtlı Planlar',
       body:
-          'Kullanıcı, Plango’nun sunduğu özellik kapsamında oluşturduğu tahmini planları hesabına kaydedebilir.\n\n'
+          'Kullanıcı, Tasarruf Planım’ın sunduğu özellik kapsamında oluşturduğu tahmini planları hesabına kaydedebilir.\n\n'
           'Kayıtlı plan, kullanıcının kendi hesaplama geçmişinin bir parçasıdır ve ilgili planın herhangi bir şirket tarafından kabul edildiği anlamına gelmez.\n\n'
           'Kullanıcı, uygulamanın sunduğu imkanlar dahilinde kayıtlı planlarını görüntüleyebilir ve silebilir.',
     ),
@@ -129,7 +129,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.history_rounded,
       title: 'Son Hesaplanan Plan',
       body:
-          'Plango, kullanıcı deneyimini kolaylaştırmak amacıyla son hesaplanan plana ilişkin bilgileri geçici veya kalıcı olmayan bir kullanıcı deneyimi kaydı olarak gösterebilir.\n\n'
+          'Tasarruf Planım, kullanıcı deneyimini kolaylaştırmak amacıyla son hesaplanan plana ilişkin bilgileri geçici veya kalıcı olmayan bir kullanıcı deneyimi kaydı olarak gösterebilir.\n\n'
           'Son hesaplanan plan, kullanıcının özellikle “Planı Kaydet” işlemiyle oluşturduğu kayıtlı plandan farklı olabilir.\n\n'
           'Bu alanın amacı kullanıcının son çalıştığı senaryoya hızlı biçimde dönebilmesini sağlamaktır.',
     ),
@@ -145,8 +145,8 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.picture_as_pdf_outlined,
       title: 'PDF ve Dışa Aktarılan Belgeler',
       body:
-          'Kullanıcı, Plango tarafından sunulması halinde planını PDF veya benzeri belge formatında dışa aktarabilir.\n\n'
-          'Bu belgeler Plango hesaplamasının kullanıcı tarafından saklanabilen bir çıktısıdır; resmî tasarruf finansmanı teklifi veya sözleşme değildir.\n\n'
+          'Kullanıcı, Tasarruf Planım tarafından sunulması halinde planını PDF veya benzeri belge formatında dışa aktarabilir.\n\n'
+          'Bu belgeler Tasarruf Planım hesaplamasının kullanıcı tarafından saklanabilen bir çıktısıdır; resmî tasarruf finansmanı teklifi veya sözleşme değildir.\n\n'
           'Kullanıcı, dışa aktardığı belgelerin kendi cihazında saklanmasından ve üçüncü kişilerle paylaşılması halinde bu paylaşımın sonuçlarından sorumludur.',
     ),
     _AgreementSection(
@@ -155,7 +155,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       body:
           'Danışma sistemi, kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla doğrulanmış sektör uzmanlarıyla iletişim kurmasını kolaylaştırır.\n\n'
           'Danışma talebi oluşturulması, bir tasarruf finansman şirketine resmî başvuru yapılması veya sözleşme kurulması anlamına gelmez.\n\n'
-          'Plango, kullanıcı ile uzman arasındaki iletişimi kolaylaştıran platform rolündedir.',
+          'Tasarruf Planım, kullanıcı ile uzman arasındaki iletişimi kolaylaştıran platform rolündedir.',
     ),
     _AgreementSection(
       icon: Icons.contact_support_outlined,
@@ -170,7 +170,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       title: 'Uzmanlarla İletişim',
       body:
           'Kullanıcı, uzmanla iletişiminde saygılı, hukuka uygun ve dürüst davranmalıdır.\n\n'
-          'Uzmanın Plango’da doğrulanmış olması, ilgili uzmanın her beyanının Plango tarafından garanti edildiği anlamına gelmez.\n\n'
+          'Uzmanın Tasarruf Planım’da doğrulanmış olması, ilgili uzmanın her beyanının Tasarruf Planım tarafından garanti edildiği anlamına gelmez.\n\n'
           'Kullanıcı, mali yükümlülük veya sözleşme sonucu doğurabilecek önemli bilgileri ilgili şirketin resmî belgelerinden ayrıca doğrulamalıdır.',
     ),
     _AgreementSection(
@@ -178,22 +178,22 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       title: 'Uzmanların Bağımsız Mesleki Beyanları',
       body:
           'Uzmanların kullanıcıyla paylaştığı yorumlar, açıklamalar ve değerlendirmeler ilgili uzmanın kendi mesleki sorumluluğu kapsamında olabilir.\n\n'
-          'Plango, uzmanların her iletişimini önceden inceleyen veya onaylayan bir taraf değildir.\n\n'
-          'Plango’nun uzman sistemi; kullanıcıların doğrulanmış sektör profesyonellerine ulaşmasını kolaylaştırmak amacıyla sunulur.',
+          'Tasarruf Planım, uzmanların her iletişimini önceden inceleyen veya onaylayan bir taraf değildir.\n\n'
+          'Tasarruf Planım’ın uzman sistemi; kullanıcıların doğrulanmış sektör profesyonellerine ulaşmasını kolaylaştırmak amacıyla sunulur.',
     ),
     _AgreementSection(
       icon: Icons.apartment_outlined,
       title: 'Şirket Bilgileri',
       body:
-          'Plango’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller ve kamuya açık bilgiler sunulabilir.\n\n'
+          'Tasarruf Planım’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller ve kamuya açık bilgiler sunulabilir.\n\n'
           'Kullanıcı, şirket bilgilerini genel araştırma amacıyla kullanabilir; ancak güncel ücret, kampanya, teslim koşulu veya sözleşme hükümleri için ilgili şirketin resmî kaynaklarını kontrol etmelidir.\n\n'
-          'Plango üzerinde bir şirketin bulunması, o şirketin tavsiye edildiği veya diğer şirketlerden üstün olduğu anlamına gelmez.',
+          'Tasarruf Planım üzerinde bir şirketin bulunması, o şirketin tavsiye edildiği veya diğer şirketlerden üstün olduğu anlamına gelmez.',
     ),
     _AgreementSection(
       icon: Icons.notifications_none_rounded,
       title: 'Bildirim Merkezi',
       body:
-          'Plango, üyelik kapsamında uygulama içi bildirimler gösterebilir.\n\n'
+          'Tasarruf Planım, üyelik kapsamında uygulama içi bildirimler gösterebilir.\n\n'
           'Bildirimler genel içerik güncellemeleri, kullanıcı hesabı veya uygulamanın işleyişiyle ilgili uygun bilgilendirmeleri içerebilir.\n\n'
           'Ticari elektronik ileti niteliği taşıyan mesajlar bakımından yürürlükteki zorunlu mevzuat hükümleri ayrıca uygulanır.',
     ),
@@ -201,15 +201,15 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.chat_bubble_outline_rounded,
       title: 'Şikayet ve Öneri Sistemi',
       body:
-          'Kullanıcı Plango deneyimi, içerikler, teknik sorunlar veya uzman sistemi hakkında geri bildirimde bulunabilir.\n\n'
+          'Kullanıcı Tasarruf Planım deneyimi, içerikler, teknik sorunlar veya uzman sistemi hakkında geri bildirimde bulunabilir.\n\n'
           'Geri bildirimler hakaret, tehdit, kişisel saldırı, üçüncü kişilerin kişisel verilerini hukuka aykırı biçimde açıklama veya yanıltıcı bilgi yayma amacıyla kullanılamaz.\n\n'
-          'Plango, doğrulanabilir geri bildirimleri hizmet kalitesini geliştirmek amacıyla değerlendirebilir.',
+          'Tasarruf Planım, doğrulanabilir geri bildirimleri hizmet kalitesini geliştirmek amacıyla değerlendirebilir.',
     ),
     _AgreementSection(
       icon: Icons.rule_outlined,
       title: 'Kullanıcının Genel Yükümlülükleri',
       body:
-          'Kullanıcı Plango’yu yürürlükteki mevzuata, işbu sözleşmeye ve dürüstlük kurallarına uygun biçimde kullanmalıdır.\n\n'
+          'Kullanıcı Tasarruf Planım’ı yürürlükteki mevzuata, işbu sözleşmeye ve dürüstlük kurallarına uygun biçimde kullanmalıdır.\n\n'
           'Kullanıcı, sistemin çalışmasını bozacak girişimlerde bulunmamalı; diğer kullanıcıların, uzmanların veya üçüncü kişilerin haklarını ihlal etmemelidir.\n\n'
           'Kullanıcı, uygulamada gördüğü tahmini sonuçları yanıltıcı biçimde resmî belge veya şirket taahhüdü gibi sunmamalıdır.',
     ),
@@ -217,15 +217,15 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.block_outlined,
       title: 'Yasaklanan Kullanımlar',
       body:
-          'Plango üzerinde hukuka aykırı içerik paylaşmak, sahte hesap oluşturmak, başka kişilerin hesaplarına izinsiz erişmeye çalışmak, güvenlik önlemlerini aşmak veya hizmeti kötüye kullanmak yasaktır.\n\n'
+          'Tasarruf Planım üzerinde hukuka aykırı içerik paylaşmak, sahte hesap oluşturmak, başka kişilerin hesaplarına izinsiz erişmeye çalışmak, güvenlik önlemlerini aşmak veya hizmeti kötüye kullanmak yasaktır.\n\n'
           'Otomatik sistemlerle uygulamanın olağan kullanımını bozacak yoğun istek göndermek, veri toplamak veya güvenlik açıklarını istismar etmek yasaktır.\n\n'
-          'Plango içeriğini üçüncü kişileri yanıltmak, dolandırıcılık yapmak veya yetkisiz ticari faaliyet yürütmek amacıyla kullanmak yasaktır.',
+          'Tasarruf Planım içeriğini üçüncü kişileri yanıltmak, dolandırıcılık yapmak veya yetkisiz ticari faaliyet yürütmek amacıyla kullanmak yasaktır.',
     ),
     _AgreementSection(
       icon: Icons.security_outlined,
       title: 'Kötüye Kullanımın Önlenmesi',
       body:
-          'Plango, kullanıcıların ve platformun güvenliğini korumak amacıyla şüpheli kullanım davranışlarını inceleyebilir ve gerekli teknik tedbirleri uygulayabilir.\n\n'
+          'Tasarruf Planım, kullanıcıların ve platformun güvenliğini korumak amacıyla şüpheli kullanım davranışlarını inceleyebilir ve gerekli teknik tedbirleri uygulayabilir.\n\n'
           'Açık kötüye kullanım, güvenlik ihlali veya hukuka aykırı faaliyet şüphesinde erişim geçici olarak sınırlandırılabilir.\n\n'
           'Bu tedbirler uygulanırken olayın niteliği, ölçülülük ve yürürlükteki zorunlu hükümler dikkate alınır.',
     ),
@@ -233,7 +233,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.copyright_outlined,
       title: 'Fikri Mülkiyet Hakları',
       body:
-          'Plango adı, uygulama tasarımı, özgün metinler, yazılım bileşenleri, FP Engine yapısı ve Plango’ya ait diğer özgün unsurlar üzerindeki haklar ilgili hak sahiplerine aittir.\n\n'
+          'Tasarruf Planım adı, uygulama tasarımı, özgün metinler, yazılım bileşenleri, FP Engine yapısı ve Tasarruf Planım’a ait diğer özgün unsurlar üzerindeki haklar ilgili hak sahiplerine aittir.\n\n'
           'Kullanıcıya üyelik verilmesi bu unsurların mülkiyetinin devredildiği anlamına gelmez.\n\n'
           'Kullanıcı, yalnızca uygulamanın normal kullanım amacı kapsamında kişisel ve sınırlı kullanım hakkına sahiptir.',
     ),
@@ -241,15 +241,15 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.business_center_outlined,
       title: 'Şirket Marka ve Logoları',
       body:
-          'Plango’da yer alan üçüncü taraf şirketlerin marka, logo ve ticaret unvanları ilgili hak sahiplerine aittir.\n\n'
-          'Bu unsurların bilgilendirme amacıyla gösterilmesi, ilgili şirket ile Plango arasında ortaklık veya temsil ilişkisi bulunduğu anlamına gelmez.\n\n'
+          'Tasarruf Planım’da yer alan üçüncü taraf şirketlerin marka, logo ve ticaret unvanları ilgili hak sahiplerine aittir.\n\n'
+          'Bu unsurların bilgilendirme amacıyla gösterilmesi, ilgili şirket ile Tasarruf Planım arasında ortaklık veya temsil ilişkisi bulunduğu anlamına gelmez.\n\n'
           'Kullanıcı, üçüncü taraf marka ve logolarını hukuka aykırı biçimde çoğaltmamalı veya kullanmamalıdır.',
     ),
     _AgreementSection(
       icon: Icons.privacy_tip_outlined,
       title: 'Kişisel Veriler ve Gizlilik',
       body:
-          'Üyelik kapsamında kişisel verilerin işlenmesine ilişkin ayrıntılar Plango Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.\n\n'
+          'Üyelik kapsamında kişisel verilerin işlenmesine ilişkin ayrıntılar Tasarruf Planım Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.\n\n'
           'Kullanıcı Sözleşmesinin kabulü, açık rıza gerektiren her türlü veri işleme faaliyetine otomatik olarak açık rıza verildiği anlamına gelmez.\n\n'
           'Açık rıza gereken durumlarda ilgili onayın ayrı ve özgür iradeyle alınması esastır.',
     ),
@@ -265,7 +265,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.check_circle_outline_rounded,
       title: 'Açık Rıza Gerektiren İşlemler',
       body:
-          'Plango’nun belirli bir veri işleme faaliyeti için açık rızaya ihtiyaç duyması halinde, bu rıza işbu sözleşmenin genel kabul kutusuna gizlenmemelidir.\n\n'
+          'Tasarruf Planım’ın belirli bir veri işleme faaliyeti için açık rızaya ihtiyaç duyması halinde, bu rıza işbu sözleşmenin genel kabul kutusuna gizlenmemelidir.\n\n'
           'Açık rıza belirli bir konuya ilişkin, bilgilendirmeye dayanan ve özgür iradeyle açıklanan ayrı bir kullanıcı tercihi olarak alınmalıdır.\n\n'
           'Kullanıcının hizmetten yararlanmasıyla doğrudan ilgili olmayan bir veri işleme amacına rıza vermesi, üyeliğin zorunlu şartı haline getirilmemelidir.',
     ),
@@ -273,23 +273,23 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.extension_outlined,
       title: 'Üçüncü Taraf Hizmetler',
       body:
-          'Plango; kimlik doğrulama, bulut veri saklama, dosya oluşturma veya teknik altyapı gibi alanlarda üçüncü taraf hizmetlerden yararlanabilir.\n\n'
+          'Tasarruf Planım; kimlik doğrulama, bulut veri saklama, dosya oluşturma veya teknik altyapı gibi alanlarda üçüncü taraf hizmetlerden yararlanabilir.\n\n'
           'Üçüncü taraf hizmetler kendi teknik ve hukuki koşullarına sahip olabilir.\n\n'
-          'Kullanıcının Plango dışındaki bağımsız bir web sitesine veya hizmete yönlendirilmesi halinde ilgili üçüncü tarafın kendi şartları uygulanabilir.',
+          'Kullanıcının Tasarruf Planım dışındaki bağımsız bir web sitesine veya hizmete yönlendirilmesi halinde ilgili üçüncü tarafın kendi şartları uygulanabilir.',
     ),
     _AgreementSection(
       icon: Icons.open_in_new_outlined,
       title: 'Harici Bağlantılar',
       body:
-          'Plango, şirketlerin, kamu kurumlarının veya bilgilendirici kaynakların internet sayfalarına bağlantılar sunabilir.\n\n'
-          'Harici bağlantının sunulması, bağlantı verilen sitenin tüm içeriklerinin Plango tarafından onaylandığı veya garanti edildiği anlamına gelmez.\n\n'
+          'Tasarruf Planım, şirketlerin, kamu kurumlarının veya bilgilendirici kaynakların internet sayfalarına bağlantılar sunabilir.\n\n'
+          'Harici bağlantının sunulması, bağlantı verilen sitenin tüm içeriklerinin Tasarruf Planım tarafından onaylandığı veya garanti edildiği anlamına gelmez.\n\n'
           'Kullanıcı üçüncü taraf siteye geçtiğinde ilgili sitenin gizlilik ve kullanım koşullarını ayrıca incelemelidir.',
     ),
     _AgreementSection(
       icon: Icons.auto_awesome_outlined,
       title: 'Hizmetin Geliştirilmesi',
       body:
-          'Plango, kullanıcı deneyimini, güvenliği ve hizmet kalitesini geliştirmek amacıyla uygulama özelliklerinde değişiklik yapabilir.\n\n'
+          'Tasarruf Planım, kullanıcı deneyimini, güvenliği ve hizmet kalitesini geliştirmek amacıyla uygulama özelliklerinde değişiklik yapabilir.\n\n'
           'Yeni özellikler eklenebilir, mevcut özelliklerin çalışma biçimi değiştirilebilir veya artık gerekli olmayan özellikler kaldırılabilir.\n\n'
           'Esaslı değişikliklerin kullanıcı haklarını etkilediği durumlarda gerekli bilgilendirme süreçleri uygulanmalıdır.',
     ),
@@ -297,15 +297,15 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.build_outlined,
       title: 'Bakım ve Teknik Kesintiler',
       body:
-          'Plango; bakım, güncelleme, güvenlik çalışmaları, internet altyapısı veya üçüncü taraf servislerden kaynaklanan nedenlerle geçici olarak erişilemeyebilir.\n\n'
-          'Plango hizmetin her an kesintisiz çalışacağını garanti etmez.\n\n'
+          'Tasarruf Planım; bakım, güncelleme, güvenlik çalışmaları, internet altyapısı veya üçüncü taraf servislerden kaynaklanan nedenlerle geçici olarak erişilemeyebilir.\n\n'
+          'Tasarruf Planım hizmetin her an kesintisiz çalışacağını garanti etmez.\n\n'
           'Planlı veya beklenmeyen teknik kesintiler, kullanıcı ile tasarruf finansman şirketi arasındaki bağımsız sözleşme ilişkisini etkilemez.',
     ),
     _AgreementSection(
       icon: Icons.system_update_alt_outlined,
       title: 'Sürüm ve Uyumluluk',
       body:
-          'Plango’nun bazı özellikleri uygulamanın güncel sürümünü gerektirebilir.\n\n'
+          'Tasarruf Planım’ın bazı özellikleri uygulamanın güncel sürümünü gerektirebilir.\n\n'
           'Eski sürümlerde güvenlik, performans veya özellik uyumsuzlukları oluşabilir.\n\n'
           'Kullanıcının güvenli ve sağlıklı kullanım için uygulamanın güncel sürümünü kullanması önerilir.',
     ),
@@ -322,14 +322,14 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       title: 'Hesabın Sonlandırılması',
       body:
           'Kullanıcı, uygulamanın sunduğu hesap silme özelliği veya ilan edilen uygun kanal üzerinden üyeliğini sonlandırabilir.\n\n'
-          'Ağır veya tekrarlanan sözleşme ihlali, sahte hesap, hukuka aykırı kullanım veya ciddi güvenlik ihlali durumunda Plango üyeliği sona erdirebilir.\n\n'
+          'Ağır veya tekrarlanan sözleşme ihlali, sahte hesap, hukuka aykırı kullanım veya ciddi güvenlik ihlali durumunda Tasarruf Planım üyeliği sona erdirebilir.\n\n'
           'Hesabın kapatılması halinde kişisel verilerin akıbeti Gizlilik Politikası ve ilgili veri koruma düzenlemeleri çerçevesinde ele alınır.',
     ),
     _AgreementSection(
       icon: Icons.logout_rounded,
       title: 'Kullanıcının Üyelikten Ayrılması',
       body:
-          'Kullanıcının Plango üyeliğini sonlandırması, tasarruf finansman şirketleriyle yapmış olduğu bağımsız sözleşmeleri sona erdirmez.\n\n'
+          'Kullanıcının Tasarruf Planım üyeliğini sonlandırması, tasarruf finansman şirketleriyle yapmış olduğu bağımsız sözleşmeleri sona erdirmez.\n\n'
           'Kullanıcı, üyelikten ayrılmadan önce ihtiyaç duyduğu kayıtlı plan veya dışa aktarılabilir belgeleri uygulamanın sunduğu ölçüde saklayabilir.\n\n'
           'Üyelik sona erdikten sonra hesaba bağlı bazı uygulama özelliklerine erişim mümkün olmayabilir.',
     ),
@@ -337,23 +337,23 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.payments_outlined,
       title: 'Ücretsiz ve Ücretli Özellikler',
       body:
-          'Plango’nun mevcut veya gelecekteki bazı özellikleri ücretsiz, bazı özellikleri ise ileride ücretli olarak sunulabilir.\n\n'
+          'Tasarruf Planım’ın mevcut veya gelecekteki bazı özellikleri ücretsiz, bazı özellikleri ise ileride ücretli olarak sunulabilir.\n\n'
           'Yeni bir ücretli hizmet sunulması halinde kullanıcı, ücret ve temel koşullar hakkında ödeme öncesinde bilgilendirilmelidir.\n\n'
           'İşbu sözleşmenin kabulü, gelecekte oluşturulabilecek ücretli bir hizmetin bedelinin kullanıcı tarafından peşinen kabul edildiği anlamına gelmez.',
     ),
     _AgreementSection(
       icon: Icons.shield_outlined,
-      title: 'Plango’nun Sorumluluk Alanı',
+      title: 'Tasarruf Planım’ın Sorumluluk Alanı',
       body:
-          'Plango kendi dijital hizmetinin yürütülmesi, hesaplama altyapısının işletilmesi ve kendi kontrolündeki kullanıcı deneyimi bakımından sorumluluk taşır.\n\n'
-          'Tasarruf finansman şirketlerinin sözleşmeleri, teslim süreçleri, tahsilatları, şirket çalışanlarının bağımsız beyanları ve şirketlerin kendi operasyonları Plango’nun doğrudan kontrolünde değildir.\n\n'
-          'Bu hüküm, Plango’nun kendi kusurundan veya emredici hukuk hükümlerinden doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.',
+          'Tasarruf Planım kendi dijital hizmetinin yürütülmesi, hesaplama altyapısının işletilmesi ve kendi kontrolündeki kullanıcı deneyimi bakımından sorumluluk taşır.\n\n'
+          'Tasarruf finansman şirketlerinin sözleşmeleri, teslim süreçleri, tahsilatları, şirket çalışanlarının bağımsız beyanları ve şirketlerin kendi operasyonları Tasarruf Planım’ın doğrudan kontrolünde değildir.\n\n'
+          'Bu hüküm, Tasarruf Planım’ın kendi kusurundan veya emredici hukuk hükümlerinden doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.',
     ),
     _AgreementSection(
       icon: Icons.warning_amber_rounded,
       title: 'Sorumluluğun Sınırları',
       body:
-          'Plango’nun tahmini hesaplama sonuçları, kullanıcı girdilerine ve uygulanan modele bağlıdır.\n\n'
+          'Tasarruf Planım’ın tahmini hesaplama sonuçları, kullanıcı girdilerine ve uygulanan modele bağlıdır.\n\n'
           'Kullanıcının yanlış veri girmesi, tahmini sonucu resmî teklif gibi yorumlaması veya üçüncü tarafın bağımsız işlemine dayanarak karar vermesi nedeniyle ortaya çıkabilecek sonuçlar somut olayın niteliğine göre değerlendirilir.\n\n'
           'Bu sözleşmedeki hiçbir hüküm, tüketici hukukundan veya diğer emredici mevzuattan doğan vazgeçilmez hakları ortadan kaldırmaz ya da hukuken geçerli olmayacak bir sorumsuzluk kaydı oluşturmaz.',
     ),
@@ -362,14 +362,14 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       title: 'Mücbir Sebep ve Kontrol Dışı Olaylar',
       body:
           'Doğal afet, savaş, yaygın iletişim kesintisi, kamu otoritesi kararı, büyük ölçekli siber saldırı, altyapı arızası ve tarafların makul kontrolü dışında gelişen benzeri olaylar hizmetin geçici olarak aksamasına neden olabilir.\n\n'
-          'Bu durumlarda Plango, hizmeti makul sürede yeniden sağlamak için gerekli teknik çabayı göstermeyi hedefler.\n\n'
+          'Bu durumlarda Tasarruf Planım, hizmeti makul sürede yeniden sağlamak için gerekli teknik çabayı göstermeyi hedefler.\n\n'
           'Emredici mevzuattan doğan hak ve sorumluluklar saklıdır.',
     ),
     _AgreementSection(
       icon: Icons.update_outlined,
       title: 'Sözleşme ve Politika Güncellemeleri',
       body:
-          'Plango’nun hizmet kapsamı, mevzuat veya teknik altyapı değiştikçe bu sözleşme güncellenebilir.\n\n'
+          'Tasarruf Planım’ın hizmet kapsamı, mevzuat veya teknik altyapı değiştikçe bu sözleşme güncellenebilir.\n\n'
           'Kullanıcının hak ve yükümlülüklerini esaslı biçimde etkileyen değişikliklerde, güncel metnin kullanıcıya sunulması ve gerektiğinde yeniden kabul alınması değerlendirilir.\n\n'
           'Sadece bilgilendirme niteliğindeki küçük yazım veya açıklama değişiklikleri aynı kapsamda olmayabilir.',
     ),
@@ -377,7 +377,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.history_toggle_off_outlined,
       title: 'Sözleşme Sürümü ve Kabul Kaydı',
       body:
-          'Plango, kullanıcının hangi sözleşme sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.\n\n'
+          'Tasarruf Planım, kullanıcının hangi sözleşme sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.\n\n'
           'Bu kayıt, sözleşme yönetimi, kullanıcı taleplerinin yanıtlanması ve hukuki yükümlülüklerin yerine getirilmesi amacıyla kullanılabilir.\n\n'
           'Sözleşme sürümü ve kabul kaydının kişisel veri niteliğindeki kısımları Gizlilik Politikası ve KVKK düzenlemeleri kapsamında ele alınır.',
     ),
@@ -401,7 +401,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.account_balance_rounded,
       title: 'Uyuşmazlıkların Çözümü',
       body:
-          'Taraflar, uyuşmazlık halinde öncelikle Plango’nun ilan ettiği iletişim kanalı üzerinden çözüm arayabilir.\n\n'
+          'Taraflar, uyuşmazlık halinde öncelikle Tasarruf Planım’ın ilan ettiği iletişim kanalı üzerinden çözüm arayabilir.\n\n'
           'Kullanıcının tüketici sıfatını taşıdığı durumlarda, yürürlükteki mevzuat uyarınca görevli ve yetkili Tüketici Hakem Heyetleri, Tüketici Mahkemeleri ve diğer yetkili mercilere başvuru hakları saklıdır.\n\n'
           'Bu sözleşme, kanunen yetkili mercileri ortadan kaldıran veya tüketiciyi zorunlu biçimde hakkından vazgeçiren bir yetki şartı olarak yorumlanamaz.',
     ),
@@ -425,8 +425,8 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.mail_outline_rounded,
       title: 'İletişim',
       body:
-          'Kullanıcı, üyelik ve sözleşmeye ilişkin soru veya taleplerini Plango tarafından uygulama içinde veya resmî kanallarda ilan edilen iletişim adresleri üzerinden iletebilir.\n\n'
-          'Plango’nun nihai ticari unvanı, e-posta adresi ve resmî bildirim kanalları yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.\n\n'
+          'Kullanıcı, üyelik ve sözleşmeye ilişkin genel soru veya taleplerini info@tasarrufplanim.com adresi üzerinden iletebilir.\n\n'
+          'Uygulamanın kullanımı, hesap işlemleri veya teknik destek konularındaki talepler destek@tasarrufplanim.com adresi üzerinden iletilebilir.\n\n'
           'Kişisel verilere ilişkin başvurular ise ilgili KVKK Aydınlatma Metni ve Gizlilik Politikası kapsamında belirtilen kanallardan yürütülür.',
     ),
     _AgreementSection(
@@ -441,8 +441,8 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       icon: Icons.verified_outlined,
       title: 'Son Hüküm',
       body:
-          'Kullanıcı, işbu sözleşmenin Plango üyeliğinin kullanım şartlarını düzenlediğini; tasarruf finansman şirketleriyle kuracağı bağımsız sözleşme ilişkilerinin bu sözleşmenin konusu olmadığını kabul eder.\n\n'
-          'Plango’nun amacı kullanıcı adına finansal karar vermek değil; kullanıcıya kendi kararını destekleyen dijital araçlar ve bilgi sunmaktır.\n\n'
+          'Kullanıcı, işbu sözleşmenin Tasarruf Planım üyeliğinin kullanım şartlarını düzenlediğini; tasarruf finansman şirketleriyle kuracağı bağımsız sözleşme ilişkilerinin bu sözleşmenin konusu olmadığını kabul eder.\n\n'
+          'Tasarruf Planım’ın amacı kullanıcı adına finansal karar vermek değil; kullanıcıya kendi kararını destekleyen dijital araçlar ve bilgi sunmaktır.\n\n'
           'Kullanıcı, üyelik işlemini tamamlamadan önce sözleşmeye erişme ve sözleşme hükümlerini inceleme imkanına sahip olmalıdır.',
     ),
   ];
@@ -566,7 +566,7 @@ class _AgreementHeroCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Plango üyeliğinin kullanım şartları ile kullanıcı ve '
+                  'Tasarruf Planım üyeliğinin kullanım şartları ile kullanıcı ve '
                   'platform arasındaki temel hak ve yükümlülükler.',
                   style: TextStyle(
                     color: Color(0xFFD9E7E9),
@@ -607,7 +607,7 @@ class _AgreementIntroCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Bu sözleşme Plango üyeliğinin kurallarını düzenler. '
+              'Bu sözleşme Tasarruf Planım üyeliğinin kurallarını düzenler. '
               'KVKK Aydınlatma Metni, Gizlilik Politikası ve gerektiğinde '
               'açık rıza süreçleri kendi hukuki amaçları doğrultusunda ayrıca sunulur.',
               style: TextStyle(
@@ -820,9 +820,9 @@ class _LaunchNote extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Text(
-        'Yayın öncesi: Plango’nun nihai ticari unvanı, resmî adresi, '
-        'iletişim bilgileri ve sözleşme sürüm numarası bu metinde '
-        'tamamlanmalı ve metin hukuk uzmanı tarafından son kez kontrol edilmelidir.',
+        'Yayın öncesi: Tasarruf Planım’ın nihai ticari unvanı, resmî adresi ve '
+        'sözleşme sürüm numarası bu metinde tamamlanmalı; metin hukuk uzmanı '
+        'tarafından son kez kontrol edilmelidir.',
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Color(0xFF8A96A3),

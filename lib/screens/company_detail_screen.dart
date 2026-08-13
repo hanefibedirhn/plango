@@ -357,7 +357,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
               ),
               const SizedBox(height: 5),
               const Text(
-                'Bu içerik, ilgili şirketin resmî kurumsal kaynaklarında yer alan bilgiler esas alınarak Plango tarafından özetlenmiştir.',
+                'Bu içerik, ilgili şirketin resmî kurumsal kaynaklarında yer alan bilgiler esas alınarak Tasarruf Planım tarafından özetlenmiştir.',
                 style: TextStyle(
                   color: _muted,
                   fontSize: 10.8,
@@ -510,7 +510,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         border: Border.all(color: _petrol.withOpacity(0.08)),
       ),
       child: const Text(
-        'Plango herhangi bir tasarruf finansman şirketini tavsiye etmez, sıralamaz veya diğer şirketlere üstün göstermez. Güncel ve bağlayıcı bilgiler için şirketin resmî teklifleri ile sözleşme hükümleri esas alınmalıdır.',
+        'Tasarruf Planım herhangi bir tasarruf finansman şirketini tavsiye etmez, sıralamaz veya diğer şirketlere üstün göstermez. Güncel ve bağlayıcı bilgiler için şirketin resmî teklifleri ile sözleşme hükümleri esas alınmalıdır.',
         style: TextStyle(
           color: Color(0xFF5E6D7E),
           fontSize: 11.5,

@@ -120,7 +120,7 @@ class _NotificationCenterScreenState
             icon: Icons.notifications_none_rounded,
             title: 'Henüz bildiriminiz yok',
             message:
-                'Plango’daki yeni içerikler ve önemli '
+                'Tasarruf Planım’daki yeni içerikler ve önemli '
                 'gelişmeler burada görünecek.',
           );
         }
@@ -278,7 +278,7 @@ class _SignedOutNotificationView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Plango’daki yeni içerikleri ve önemli gelişmeleri '
+              'Tasarruf Planım’daki yeni içerikleri ve önemli gelişmeleri '
               'görüntülemek için hesabınıza giriş yapın.',
               textAlign: TextAlign.center,
               style: TextStyle(

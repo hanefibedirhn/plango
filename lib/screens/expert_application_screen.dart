@@ -628,7 +628,7 @@ class _ExpertApplicationScreenState
                 const _InformationNotice(
                   icon: Icons.verified_user_outlined,
                   text:
-                      'Gmail, Hotmail veya benzeri kişisel e-posta adresleri kabul edilmez. Başvurular Plango yönetimi tarafından manuel olarak incelenir.',
+                      'Gmail, Hotmail veya benzeri kişisel e-posta adresleri kabul edilmez. Başvurular Tasarruf Planım yönetimi tarafından manuel olarak incelenir.',
                 ),
                 const SizedBox(height: 18),
                 TextFormField(
@@ -745,7 +745,7 @@ class _ExpertApplicationScreenState
                 vertical: 7,
               ),
               title: const Text(
-                'Başvuru bilgilerimin doğru olduğunu ve Plango tarafından incelenebileceğini kabul ediyorum.',
+                'Başvuru bilgilerimin doğru olduğunu ve Tasarruf Planım tarafından incelenebileceğini kabul ediyorum.',
                 style: TextStyle(
                   color: _textDark,
                   fontSize: 13.5,
@@ -767,7 +767,7 @@ class _ExpertApplicationScreenState
           const _InformationNotice(
             icon: Icons.lock_outline_rounded,
             text:
-                'Başvuru gönderildikten sonra bilgileriniz değiştirilemez. Gerekli durumlarda Plango yönetimi sizden ek bilgi isteyebilir.',
+                'Başvuru gönderildikten sonra bilgileriniz değiştirilemez. Gerekli durumlarda Tasarruf Planım yönetimi sizden ek bilgi isteyebilir.',
           ),
         ],
       ),

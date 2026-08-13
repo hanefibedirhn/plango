@@ -54,7 +54,7 @@ class FaqScreen extends StatelessWidget {
       answer:
           'Teslimat tarihi; finansman tutarı, peşinat, aylık ödeme, ödeme '
           'modeli, sözleşme koşulları ve ilgili şirketin uygulamalarına göre '
-          'belirlenir. Plango tarafından gösterilen süreler yalnızca tahmini '
+          'belirlenir. Tasarruf Planım tarafından gösterilen süreler yalnızca tahmini '
           've bilgilendirme amaçlıdır.',
     ),
     _FaqItem(
@@ -82,7 +82,7 @@ class FaqScreen extends StatelessWidget {
       question: 'Taksitler daha sonra düşebilir mi?',
       answer:
           'Artışlı ödeme modellerinde temel beklenti taksitlerin belirlenen '
-          'artış yapısına göre ilerlemesidir. Plango hesaplamalarında taksit '
+          'artış yapısına göre ilerlemesidir. Tasarruf Planım hesaplamalarında taksit '
           'düşüşü varsayılmaz. Resmî ödeme planı ilgili şirket tarafından '
           'belirlenir.',
     ),
@@ -122,16 +122,16 @@ class FaqScreen extends StatelessWidget {
           'teslim tarihi ilgili tasarruf finansman şirketi tarafından belirlenir.',
     ),
     _FaqItem(
-      question: 'Plango herhangi bir şirketi temsil ediyor mu?',
+      question: 'Tasarruf Planım herhangi bir şirketi temsil ediyor mu?',
       answer:
-          'Hayır. Plango bağımsız bir karar destek platformudur. Herhangi bir '
+          'Hayır. Tasarruf Planım bağımsız bir karar destek platformudur. Herhangi bir '
           'tasarruf finansman şirketi adına sözleşme düzenlemez, satış yapmaz '
           've bağlayıcı teslimat taahhüdünde bulunmaz.',
     ),
     _FaqItem(
-      question: 'Plango üzerinden sözleşme yapılabilir mi?',
+      question: 'Tasarruf Planım üzerinden sözleşme yapılabilir mi?',
       answer:
-          'Hayır. Plango hesaplama, karşılaştırma, bilgilendirme ve kullanıcıyı '
+          'Hayır. Tasarruf Planım hesaplama, karşılaştırma, bilgilendirme ve kullanıcıyı '
           'uzmanlarla buluşturma amacı taşır. Resmî sözleşme işlemleri ilgili '
           'şirket üzerinden gerçekleştirilir.',
     ),
@@ -139,7 +139,7 @@ class FaqScreen extends StatelessWidget {
       question: 'Uzmanlar nasıl seçilir?',
       answer:
           'Uzmanlar başvuru ve değerlendirme süreçlerinden geçer. Kullanıcıya '
-          'gösterilen uzman profilleri, Plango içindeki yetki ve profil '
+          'gösterilen uzman profilleri, Tasarruf Planım içindeki yetki ve profil '
           'durumuna göre listelenir.',
     ),
     _FaqItem(
@@ -315,7 +315,7 @@ class _FaqHeroCard extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Tasarruf finansmanı, Plango ve hesap işlemleriyle ilgili '
+                      'Tasarruf finansmanı, Tasarruf Planım ve hesap işlemleriyle ilgili '
                       'sık sorulan soruların yanıtlarını burada bulabilirsiniz.',
                       style: TextStyle(
                         color: Color(0xFFD8E7E8),

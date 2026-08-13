@@ -392,137 +392,118 @@ class _SavedPlansScreenState
   }
 
   @override
-  Widget build(BuildContext context) {
-    final User? user =
-        _currentUser;
-
-    return Scaffold(
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: _background,
+    appBar: AppBar(
       backgroundColor: _background,
-      appBar: AppBar(
-        backgroundColor: _background,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        foregroundColor: _navy,
-        title: const Text(
-          'Kayıtlı Planlarım',
-          style: TextStyle(
-            color: _navy,
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.35,
-          ),
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      foregroundColor: _navy,
+      title: const Text(
+        'Kayıtlı Planlarım',
+        style: TextStyle(
+          color: _navy,
+          fontSize: 20,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.35,
         ),
       ),
-      body: user == null
-          ? _buildSignedOutState()
-          : StreamBuilder<List<SavedPlan>>(
-              stream: _savedPlanRepository
-                  .watchSavedPlans(
-                userId: user.uid,
-              ),
-              builder: (
-                context,
-                snapshot,
-              ) {
-                if (snapshot.connectionState ==
-                        ConnectionState.waiting &&
-                    !snapshot.hasData) {
-                  return const Center(
-                    child:
-                        CircularProgressIndicator(
-                      color: _teal,
-                    ),
-                  );
-                }
+    ),
+    body: StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      initialData: FirebaseAuth.instance.currentUser,
+      builder: (context, authSnapshot) {
+        final User? user = authSnapshot.data;
 
-                if (snapshot.hasError) {
-                  return _buildErrorState();
-                }
+        if (authSnapshot.connectionState == ConnectionState.waiting &&
+            user == null) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: _teal,
+            ),
+          );
+        }
 
-                final List<SavedPlan> plans =
-                    snapshot.data ??
-                        <SavedPlan>[];
+        if (user == null || user.isAnonymous) {
+          return _buildSignedOutState();
+        }
 
-                if (plans.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                final List<SavedPlan> sortedPlans =
-                    List<SavedPlan>.from(
-                  plans,
-                )
-                      ..sort(
-                        (
-                          a,
-                          b,
-                        ) {
-                          final DateTime aDate =
-                              a.createdAt ??
-                                  DateTime
-                                      .fromMillisecondsSinceEpoch(
-                                    0,
-                                  );
-
-                          final DateTime bDate =
-                              b.createdAt ??
-                                  DateTime
-                                      .fromMillisecondsSinceEpoch(
-                                    0,
-                                  );
-
-                          return bDate
-                              .compareTo(
-                            aDate,
-                          );
-                        },
-                      );
-
-                return RefreshIndicator(
+        return StreamBuilder<List<SavedPlan>>(
+          key: ValueKey<String>(user.uid),
+          stream: _savedPlanRepository.watchSavedPlans(
+            userId: user.uid,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                !snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(
                   color: _teal,
-                  onRefresh: () async {
-                    await Future<void>.delayed(
-                      const Duration(
-                        milliseconds: 400,
-                      ),
-                    );
-                  },
-                  child: ListView.separated(
-                    physics:
-                        const AlwaysScrollableScrollPhysics(),
-                    padding:
-                        const EdgeInsets.fromLTRB(
-                      16,
-                      8,
-                      16,
-                      34,
-                    ),
-                    itemCount:
-                        sortedPlans.length,
-                    separatorBuilder:
-                        (
-                      context,
-                      index,
-                    ) {
-                      return const SizedBox(
-                        height: 12,
-                      );
+                ),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return _buildErrorState();
+            }
+
+            final List<SavedPlan> plans =
+                snapshot.data ?? <SavedPlan>[];
+
+            if (plans.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            final List<SavedPlan> sortedPlans =
+                List<SavedPlan>.from(plans)
+                  ..sort(
+                    (a, b) {
+                      final DateTime aDate =
+                          a.createdAt ??
+                          DateTime.fromMillisecondsSinceEpoch(0);
+
+                      final DateTime bDate =
+                          b.createdAt ??
+                          DateTime.fromMillisecondsSinceEpoch(0);
+
+                      return bDate.compareTo(aDate);
                     },
-                    itemBuilder:
-                        (
-                      context,
-                      index,
-                    ) {
-                      return _buildPlanCard(
-                        sortedPlans[index],
-                      );
-                    },
-                  ),
+                  );
+
+            return RefreshIndicator(
+              color: _teal,
+              onRefresh: () async {
+                await Future<void>.delayed(
+                  const Duration(milliseconds: 400),
                 );
               },
-            ),
-    );
-  }
+              child: ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  34,
+                ),
+                itemCount: sortedPlans.length,
+                separatorBuilder: (context, index) {
+                  return const SizedBox(height: 12);
+                },
+                itemBuilder: (context, index) {
+                  return _buildPlanCard(
+                    sortedPlans[index],
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildPlanCard(
     SavedPlan plan,

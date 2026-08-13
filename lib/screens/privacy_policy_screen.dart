@@ -23,32 +23,32 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.shield_outlined,
       title: 'Gizlilik Politikamızın Amacı',
       body:
-          'Bu Gizlilik Politikası, Plango’yu kullanan kişilerin hangi tür kişisel verilerinin hangi amaçlarla işlenebileceğini, bu verilerin korunmasına ilişkin yaklaşımımızı ve kullanıcıların gizlilik haklarını anlaşılır bir dille açıklamak amacıyla hazırlanmıştır.\n\n'
-          'Plango’nun temel yaklaşımı; yalnızca hizmetin sunulması, güvenliğinin sağlanması ve geliştirilmesi için gerekli olan verileri işlemek, gereksiz veri toplamamak ve kullanıcıya verileri üzerinde mümkün olduğunca açık kontrol sağlamaktır.\n\n'
-          'Bu metin, Plango’nun genel gizlilik yaklaşımını açıklar. Kişisel verilerin elde edilmesi sırasında yerine getirilmesi gereken KVKK aydınlatma yükümlülüğü ve açık rıza gerektiren özel işlemler, gerekli olduğu ölçüde ayrıca ve ilgili işlem bağlamında sunulabilir.',
+          'Bu Gizlilik Politikası, Tasarruf Planım’ı kullanan kişilerin hangi tür kişisel verilerinin hangi amaçlarla işlenebileceğini, bu verilerin korunmasına ilişkin yaklaşımımızı ve kullanıcıların gizlilik haklarını anlaşılır bir dille açıklamak amacıyla hazırlanmıştır.\n\n'
+          'Tasarruf Planım’ın temel yaklaşımı; yalnızca hizmetin sunulması, güvenliğinin sağlanması ve geliştirilmesi için gerekli olan verileri işlemek, gereksiz veri toplamamak ve kullanıcıya verileri üzerinde mümkün olduğunca açık kontrol sağlamaktır.\n\n'
+          'Bu metin, Tasarruf Planım’ın genel gizlilik yaklaşımını açıklar. Kişisel verilerin elde edilmesi sırasında yerine getirilmesi gereken KVKK aydınlatma yükümlülüğü ve açık rıza gerektiren özel işlemler, gerekli olduğu ölçüde ayrıca ve ilgili işlem bağlamında sunulabilir.',
     ),
     _PrivacySection(
       icon: Icons.layers_outlined,
       title: 'Kapsam',
       body:
-          'Bu politika; Plango mobil uygulaması, uygulama içerisindeki kullanıcı hesapları, FP Engine, kayıtlı planlar, danışma sistemi, doğrulanmış uzman sistemi, şirket bilgi ekranları, bildirim merkezi, geri bildirim alanları ve Plango tarafından sunulan diğer dijital özellikler bakımından uygulanır.\n\n'
-          'Bir özellik Plango dışındaki üçüncü taraf bir internet sitesine, uygulamaya veya hizmete yönlendiriyorsa, o hizmetin kendi gizlilik politikası ve kullanım koşulları geçerli olabilir.\n\n'
-          'Plango’nun gelecekte yeni özellikler sunması halinde, bu politika yeni veri işleme faaliyetlerini yansıtacak şekilde güncellenebilir.',
+          'Bu politika; Tasarruf Planım mobil uygulaması, uygulama içerisindeki kullanıcı hesapları, FP Engine, kayıtlı planlar, danışma sistemi, doğrulanmış uzman sistemi, şirket bilgi ekranları, bildirim merkezi, geri bildirim alanları ve Tasarruf Planım tarafından sunulan diğer dijital özellikler bakımından uygulanır.\n\n'
+          'Bir özellik Tasarruf Planım dışındaki üçüncü taraf bir internet sitesine, uygulamaya veya hizmete yönlendiriyorsa, o hizmetin kendi gizlilik politikası ve kullanım koşulları geçerli olabilir.\n\n'
+          'Tasarruf Planım’ın gelecekte yeni özellikler sunması halinde, bu politika yeni veri işleme faaliyetlerini yansıtacak şekilde güncellenebilir.',
     ),
     _PrivacySection(
       icon: Icons.verified_user_outlined,
       title: 'Temel Gizlilik İlkelerimiz',
       body:
-          'Plango kişisel verilerin işlenmesinde hukuka ve dürüstlük kurallarına uygunluk, doğruluk ve gerektiğinde güncellik, belirli ve meşru amaçlarla işleme, amaçla bağlantılı ve ölçülü olma ve gerekli süre kadar saklama ilkelerini esas almayı hedefler.\n\n'
-          'Veri minimizasyonu Plango’nun önemli ürün ilkelerinden biridir. Bir özelliğin çalışması için gerekli olmayan kişisel verilerin talep edilmemesi ve işlenmemesi hedeflenir.\n\n'
-          'Kullanıcı verilerinin ticari değer üretmek amacıyla gereksiz şekilde toplanması Plango’nun ürün yaklaşımıyla bağdaşmaz.',
+          'Tasarruf Planım kişisel verilerin işlenmesinde hukuka ve dürüstlük kurallarına uygunluk, doğruluk ve gerektiğinde güncellik, belirli ve meşru amaçlarla işleme, amaçla bağlantılı ve ölçülü olma ve gerekli süre kadar saklama ilkelerini esas almayı hedefler.\n\n'
+          'Veri minimizasyonu Tasarruf Planım’ın önemli ürün ilkelerinden biridir. Bir özelliğin çalışması için gerekli olmayan kişisel verilerin talep edilmemesi ve işlenmemesi hedeflenir.\n\n'
+          'Kullanıcı verilerinin ticari değer üretmek amacıyla gereksiz şekilde toplanması Tasarruf Planım’ın ürün yaklaşımıyla bağdaşmaz.',
     ),
     _PrivacySection(
       icon: Icons.person_add_alt_1_outlined,
       title: 'Hesap Oluştururken İşlenebilecek Bilgiler',
       body:
-          'Kullanıcı Plango’da hesap oluşturduğunda ad, soyad, e-posta adresi, kullanıcı kimliği ve hesap güvenliğiyle ilişkili teknik bilgiler işlenebilir.\n\n'
-          'Parola doğrulama işlemleri Plango’nun kullandığı kimlik doğrulama altyapısı üzerinden yürütülebilir. Plango’nun kullanıcı parolasını okunabilir biçimde saklamaması hedeflenir.\n\n'
+          'Kullanıcı Tasarruf Planım’da hesap oluşturduğunda ad, soyad, e-posta adresi, kullanıcı kimliği ve hesap güvenliğiyle ilişkili teknik bilgiler işlenebilir.\n\n'
+          'Parola doğrulama işlemleri Tasarruf Planım’ın kullandığı kimlik doğrulama altyapısı üzerinden yürütülebilir. Tasarruf Planım’ın kullanıcı parolasını okunabilir biçimde saklamaması hedeflenir.\n\n'
           'Hesap bilgileri; kullanıcı hesabının oluşturulması, oturum açılması, hesap güvenliğinin sağlanması, profil bilgilerinin görüntülenmesi ve kullanıcıya hesapla bağlantılı özelliklerin sunulması amacıyla kullanılabilir.',
     ),
     _PrivacySection(
@@ -57,7 +57,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Kullanıcı profilinde paylaşılan ad, soyad, e-posta ve benzeri bilgiler hesap yönetimi amacıyla işlenebilir.\n\n'
           'Kullanıcı tarafından güncellenebilen profil bilgilerinin mümkün olduğunca güncel tutulması kullanıcının sorumluluğundadır.\n\n'
-          'Plango, profil özelliğinin gerektirmediği kişisel bilgileri zorunlu hale getirmemeyi hedefler.',
+          'Tasarruf Planım, profil özelliğinin gerektirmediği kişisel bilgileri zorunlu hale getirmemeyi hedefler.',
     ),
     _PrivacySection(
       icon: Icons.memory_outlined,
@@ -71,7 +71,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.history_rounded,
       title: 'Son Hesaplanan Plan',
       body:
-          'Plango, kullanıcı deneyimini kolaylaştırmak amacıyla cihaz üzerinde veya uygulamanın uygun veri alanlarında en son hesaplanan plana ilişkin sınırlı bilgileri tutabilir.\n\n'
+          'Tasarruf Planım, kullanıcı deneyimini kolaylaştırmak amacıyla cihaz üzerinde veya uygulamanın uygun veri alanlarında en son hesaplanan plana ilişkin sınırlı bilgileri tutabilir.\n\n'
           'Bu kayıt, kullanıcının ana sayfada son çalıştığı plana hızlı şekilde ulaşmasını sağlamak amacıyla kullanılabilir.\n\n'
           'Son hesaplanan plan ile kullanıcı tarafından özellikle kaydedilen plan birbirinden farklı veri kayıtları olabilir.',
     ),
@@ -87,15 +87,15 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.picture_as_pdf_outlined,
       title: 'Ödeme Planı ve PDF Verileri',
       body:
-          'Plango, kullanıcının hesaplama sonucu oluşan ödeme planını ekranda gösterebilir ve kullanıcı talep ederse PDF benzeri bir çıktı oluşturabilir.\n\n'
+          'Tasarruf Planım, kullanıcının hesaplama sonucu oluşan ödeme planını ekranda gösterebilir ve kullanıcı talep ederse PDF benzeri bir çıktı oluşturabilir.\n\n'
           'PDF oluşturma işlemi sırasında plan verileri belgenin hazırlanması için geçici olarak işlenebilir. Kullanıcının cihazına kaydettiği veya başka bir uygulamayla paylaştığı dosyaların daha sonraki kullanımı, cihazın ve seçilen üçüncü taraf uygulamanın kendi koşullarına tabi olabilir.\n\n'
-          'Plango, kullanıcı tarafından cihaz dışına aktarılan dosyaların sonradan kimlerle paylaşılacağını kontrol edemez.',
+          'Tasarruf Planım, kullanıcı tarafından cihaz dışına aktarılan dosyaların sonradan kimlerle paylaşılacağını kontrol edemez.',
     ),
     _PrivacySection(
       icon: Icons.support_agent_outlined,
       title: 'Danışma Talepleri',
       body:
-          'Kullanıcı Plango üzerinden danışma talebi gönderdiğinde ad, soyad, iletişim bilgileri, kullanıcı notu, ilgili plan bilgileri ve talebin yönetilmesi için gerekli diğer bilgiler işlenebilir.\n\n'
+          'Kullanıcı Tasarruf Planım üzerinden danışma talebi gönderdiğinde ad, soyad, iletişim bilgileri, kullanıcı notu, ilgili plan bilgileri ve talebin yönetilmesi için gerekli diğer bilgiler işlenebilir.\n\n'
           'Bu verilerin amacı kullanıcının talebini uygun uzman veya ilgili süreçle eşleştirmek, talep durumunu yönetmek ve kullanıcı ile uzman arasındaki iletişimi kontrollü biçimde kolaylaştırmaktır.\n\n'
           'Danışma talebinde gereksiz veya özel nitelikli kişisel verilerin paylaşılmaması önerilir.',
     ),
@@ -104,7 +104,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       title: 'Danışma Talebi İletişim Bilgileri',
       body:
           'Danışma sürecinde kullanıcının telefon numarası veya e-posta adresi gibi iletişim bilgileri, yalnızca ilgili sürecin gerektirdiği aşamada ve yetkilendirilmiş uzmanla paylaşılabilir.\n\n'
-          'Plango, danışma talebi oluşturulduğu anda tüm iletişim bilgilerini herkes tarafından görülebilir hale getirmemeyi hedefler.\n\n'
+          'Tasarruf Planım, danışma talebi oluşturulduğu anda tüm iletişim bilgilerini herkes tarafından görülebilir hale getirmemeyi hedefler.\n\n'
           'İletişim bilgilerinin erişimi, kullanıcı güvenliği ve danışma sürecinin işleyişi dikkate alınarak sınırlandırılabilir.',
     ),
     _PrivacySection(
@@ -119,7 +119,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.domain_verification_outlined,
       title: 'Uzman Doğrulama Verileri',
       body:
-          'Uzman doğrulaması şirket e-posta alan adı, doğrulama kodu, yönetici incelemesi veya Plango tarafından belirlenen başka güvenli yöntemlerle gerçekleştirilebilir.\n\n'
+          'Uzman doğrulaması şirket e-posta alan adı, doğrulama kodu, yönetici incelemesi veya Tasarruf Planım tarafından belirlenen başka güvenli yöntemlerle gerçekleştirilebilir.\n\n'
           'Doğrulama sürecinde işlenen veriler yalnızca uzmanın ilgili kurumla bağlantısının veya başvuru bilgilerinin doğrulanması amacıyla kullanılmalıdır.\n\n'
           'Doğrulama işlemi tamamlandıktan sonra doğrulama amacıyla artık gerekli olmayan verilerin saklanma ihtiyacı ayrıca değerlendirilir.',
     ),
@@ -136,14 +136,14 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       title: 'Şikayet ve Öneri Verileri',
       body:
           'Kullanıcı Şikayet ve Öneri alanı üzerinden geri bildirim gönderdiğinde mesaj içeriği, hesap bilgileri ve bildirimin yönetilmesi için gerekli teknik bilgiler işlenebilir.\n\n'
-          'Bu bilgiler kullanıcının geri bildirimini incelemek, gerektiğinde kullanıcıya dönüş yapmak, teknik veya içerik hatalarını düzeltmek ve Plango’yu geliştirmek amacıyla kullanılabilir.\n\n'
+          'Bu bilgiler kullanıcının geri bildirimini incelemek, gerektiğinde kullanıcıya dönüş yapmak, teknik veya içerik hatalarını düzeltmek ve Tasarruf Planım’ı geliştirmek amacıyla kullanılabilir.\n\n'
           'Kullanıcının geri bildirim alanına gereksiz kişisel veya özel nitelikli veri yazmaması önerilir.',
     ),
     _PrivacySection(
       icon: Icons.notifications_none_rounded,
       title: 'Bildirim Merkezi',
       body:
-          'Plango Bildirim Merkezi, kullanıcıya genel içerik güncellemeleri, hesapla ilgili durumlar veya uygulama içindeki önemli gelişmeleri göstermek amacıyla bildirim kayıtları oluşturabilir.\n\n'
+          'Tasarruf Planım Bildirim Merkezi, kullanıcıya genel içerik güncellemeleri, hesapla ilgili durumlar veya uygulama içindeki önemli gelişmeleri göstermek amacıyla bildirim kayıtları oluşturabilir.\n\n'
           'Bildirim kayıtları; bildirim türü, oluşturulma zamanı, okunma durumu ve ilgili içeriğe yönlendirme bilgisi gibi teknik verileri içerebilir.\n\n'
           'Bildirim sisteminin kullanıcı davranışlarını gereksiz şekilde profillemek amacıyla kullanılmaması hedeflenir.',
     ),
@@ -159,23 +159,23 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.phonelink_lock_outlined,
       title: 'Cihaz İzinleri',
       body:
-          'Plango’nun bazı özellikleri cihaz üzerinde belirli izinlere ihtiyaç duyabilir. Böyle bir durumda izin talebi özelliğin ihtiyaç duyduğu anda ve mümkün olduğunca açık bir açıklamayla sunulmalıdır.\n\n'
-          'Plango, özelliğin çalışması için gerekli olmayan cihaz izinlerini zorunlu tutmamayı hedefler.\n\n'
+          'Tasarruf Planım’ın bazı özellikleri cihaz üzerinde belirli izinlere ihtiyaç duyabilir. Böyle bir durumda izin talebi özelliğin ihtiyaç duyduğu anda ve mümkün olduğunca açık bir açıklamayla sunulmalıdır.\n\n'
+          'Tasarruf Planım, özelliğin çalışması için gerekli olmayan cihaz izinlerini zorunlu tutmamayı hedefler.\n\n'
           'Kullanıcı cihaz ayarları üzerinden verdiği izinleri işletim sisteminin sunduğu imkanlar çerçevesinde yönetebilir.',
     ),
     _PrivacySection(
       icon: Icons.location_off_outlined,
       title: 'Konum Verileri',
       body:
-          'Plango’nun mevcut temel hizmetleri için hassas veya sürekli konum takibi yapılması amaçlanmamaktadır.\n\n'
+          'Tasarruf Planım’ın mevcut temel hizmetleri için hassas veya sürekli konum takibi yapılması amaçlanmamaktadır.\n\n'
           'Gelecekte şehir bazlı uzman veya şirket filtreleri gibi bir özellik için konum erişimi gerekirse, kullanıcıdan ilgili özellik bağlamında izin istenmesi ve konum verisinin yalnızca gerekli ölçüde kullanılması hedeflenir.\n\n'
-          'Açık bir ihtiyaç olmadan hassas konum verisi toplanmaması Plango’nun veri minimizasyonu yaklaşımının bir parçasıdır.',
+          'Açık bir ihtiyaç olmadan hassas konum verisi toplanmaması Tasarruf Planım’ın veri minimizasyonu yaklaşımının bir parçasıdır.',
     ),
     _PrivacySection(
       icon: Icons.health_and_safety_outlined,
       title: 'Özel Nitelikli Kişisel Veriler',
       body:
-          'Plango’nun temel hizmetlerinin sunulması için sağlık bilgisi, biyometrik veri, siyasi düşünce, dinî inanç veya benzeri özel nitelikli kişisel verilerin kullanıcıdan talep edilmesi hedeflenmemektedir.\n\n'
+          'Tasarruf Planım’ın temel hizmetlerinin sunulması için sağlık bilgisi, biyometrik veri, siyasi düşünce, dinî inanç veya benzeri özel nitelikli kişisel verilerin kullanıcıdan talep edilmesi hedeflenmemektedir.\n\n'
           'Kullanıcıların serbest metin alanlarına veya danışma notlarına bu tür bilgileri yazmaması önerilir.\n\n'
           'İleride özel nitelikli veri işlenmesini gerektiren yeni bir özellik geliştirilirse, bu faaliyet ayrı hukuki değerlendirmeye ve gerekli güvenlik önlemlerine tabi tutulmalıdır.',
     ),
@@ -183,8 +183,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.child_care_outlined,
       title: 'Çocuklara İlişkin Veriler',
       body:
-          'Plango’nun tasarruf finansmanı karar destek hizmetleri esas olarak kendi adına finansal değerlendirme yapabilecek yetişkin kullanıcılar için tasarlanmıştır.\n\n'
-          'Çocuklara ait kişisel verilerin bilinçli ve sistematik şekilde toplanması Plango’nun temel hizmetinin amacı değildir.\n\n'
+          'Tasarruf Planım’ın tasarruf finansmanı karar destek hizmetleri esas olarak kendi adına finansal değerlendirme yapabilecek yetişkin kullanıcılar için tasarlanmıştır.\n\n'
+          'Çocuklara ait kişisel verilerin bilinçli ve sistematik şekilde toplanması Tasarruf Planım’ın temel hizmetinin amacı değildir.\n\n'
           'Çocuklara ilişkin bir veri işlendiğinin fark edilmesi halinde, ilgili durum yürürlükteki mevzuat ve hizmet gereklilikleri çerçevesinde ayrıca değerlendirilebilir.',
     ),
     _PrivacySection(
@@ -193,7 +193,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Kişisel veriler; kullanıcı hesabını oluşturmak ve yönetmek, kimlik doğrulamak, FP Engine hesaplamalarını gerçekleştirmek, kayıtlı planları saklamak, danışma taleplerini yönetmek, uzman doğrulaması yapmak, bildirimleri göstermek, geri bildirimleri değerlendirmek, güvenliği sağlamak ve hizmet kalitesini geliştirmek gibi amaçlarla işlenebilir.\n\n'
           'Her veri işleme faaliyetinin belirli, açık ve meşru bir amaca dayanması hedeflenir.\n\n'
-          'Bir amaç için toplanan verinin, kullanıcı açısından beklenmeyen ve ilgisiz başka amaçlarla kullanılmaması Plango’nun gizlilik yaklaşımının temel parçasıdır.',
+          'Bir amaç için toplanan verinin, kullanıcı açısından beklenmeyen ve ilgisiz başka amaçlarla kullanılmaması Tasarruf Planım’ın gizlilik yaklaşımının temel parçasıdır.',
     ),
     _PrivacySection(
       icon: Icons.balance_rounded,
@@ -201,7 +201,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Kişisel verilerin işlenmesi, ilgili veri işleme faaliyetinin niteliğine göre 6698 sayılı Kişisel Verilerin Korunması Kanunu’nda öngörülen hukuki sebeplerden uygun olanına dayanmalıdır.\n\n'
           'Bir veri işleme faaliyeti açık rıza gerektiriyorsa, açık rızanın aydınlatma metninden ayrı ve özgür iradeyle verilebilmesi gerekir.\n\n'
-          'Açık rıza gerektirmeyen bir işleme faaliyetinin sırf kolaylık sağlamak amacıyla zorunlu açık rızaya bağlanmaması Plango’nun uyum yaklaşımının parçasıdır.',
+          'Açık rıza gerektirmeyen bir işleme faaliyetinin sırf kolaylık sağlamak amacıyla zorunlu açık rızaya bağlanmaması Tasarruf Planım’ın uyum yaklaşımının parçasıdır.',
     ),
     _PrivacySection(
       icon: Icons.fact_check_outlined,
@@ -210,7 +210,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
           'Aydınlatma yükümlülüğü ile açık rıza aynı işlem değildir.\n\n'
           'Kullanıcıya kişisel verilerinin kim tarafından, hangi amaçla, hangi yöntem ve hukuki sebeple işlendiği, kimlere aktarılabileceği ve haklarının neler olduğu açık biçimde bildirilmelidir.\n\n'
           'Açık rıza gereken faaliyetlerde ise kullanıcıya ayrıca ve özgür iradesiyle seçim yapabileceği bir onay mekanizması sunulmalıdır.\n\n'
-          'Plango, aydınlatma metni ile açık rıza metinlerini gerektiğinde ayrı şekilde sunmayı hedefler.',
+          'Tasarruf Planım, aydınlatma metni ile açık rıza metinlerini gerektiğinde ayrı şekilde sunmayı hedefler.',
     ),
     _PrivacySection(
       icon: Icons.swap_horiz_rounded,
@@ -218,7 +218,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Kişisel veriler, hizmetin sunulması için gerekli olduğu ölçüde yetkilendirilmiş hizmet sağlayıcılar, teknik altyapı sağlayıcıları, ilgili uzmanlar veya hukuken yetkili kurumlarla paylaşılabilir.\n\n'
           'Her aktarımın amacı, kapsamı ve hukuki dayanağı ayrı değerlendirilmelidir.\n\n'
-          'Plango kullanıcı verilerini ilgisiz üçüncü kişilere keyfî biçimde aktarmamayı ve veri paylaşımını hizmetin gerektirdiği ölçüyle sınırlandırmayı hedefler.',
+          'Tasarruf Planım kullanıcı verilerini ilgisiz üçüncü kişilere keyfî biçimde aktarmamayı ve veri paylaşımını hizmetin gerektirdiği ölçüyle sınırlandırmayı hedefler.',
     ),
     _PrivacySection(
       icon: Icons.person_pin_circle_outlined,
@@ -226,21 +226,21 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Danışma sistemi kapsamında kullanıcı verilerinin yalnızca ilgili talebin yürütülmesi için gerekli olan kısmı yetkilendirilmiş uzmanla paylaşılabilir.\n\n'
           'Uzmanın erişebildiği veriler, danışma sürecinin durumuna göre sınırlandırılabilir.\n\n'
-          'Uzmanların Plango üzerinden elde ettiği kullanıcı verilerini danışma amacı dışında kullanmaması, izinsiz olarak üçüncü kişilerle paylaşmaması ve güvenliğini koruması beklenir.',
+          'Uzmanların Tasarruf Planım üzerinden elde ettiği kullanıcı verilerini danışma amacı dışında kullanmaması, izinsiz olarak üçüncü kişilerle paylaşmaması ve güvenliğini koruması beklenir.',
     ),
     _PrivacySection(
       icon: Icons.business_outlined,
       title: 'Şirketlerle Veri Paylaşımı',
       body:
-          'Plango’nun kullanıcı adına otomatik olarak tasarruf finansman şirketine başvuru yapması temel hizmetin parçası değildir.\n\n'
+          'Tasarruf Planım’ın kullanıcı adına otomatik olarak tasarruf finansman şirketine başvuru yapması temel hizmetin parçası değildir.\n\n'
           'Kullanıcının açık şekilde başvuru veya iletişim talebinde bulunacağı gelecekteki özelliklerde, hangi verinin hangi şirkete hangi amaçla aktarılacağı kullanıcıya ayrıca açıklanmalıdır.\n\n'
-          'Kullanıcının bilgisi dışında şirketlere pazarlama amacıyla kişisel veri aktarılması Plango’nun gizlilik yaklaşımıyla bağdaşmaz.',
+          'Kullanıcının bilgisi dışında şirketlere pazarlama amacıyla kişisel veri aktarılması Tasarruf Planım’ın gizlilik yaklaşımıyla bağdaşmaz.',
     ),
     _PrivacySection(
       icon: Icons.account_balance_rounded,
       title: 'Kamu Kurumları ve Yasal Talepler',
       body:
-          'Plango, yürürlükteki mevzuatın gerektirdiği veya yetkili kamu kurumlarının hukuka uygun talebi bulunduğu durumlarda belirli kişisel verileri paylaşmak zorunda kalabilir.\n\n'
+          'Tasarruf Planım, yürürlükteki mevzuatın gerektirdiği veya yetkili kamu kurumlarının hukuka uygun talebi bulunduğu durumlarda belirli kişisel verileri paylaşmak zorunda kalabilir.\n\n'
           'Bu tür paylaşımların talebin kapsamıyla sınırlı olması ve yalnızca hukuken gerekli verilerin aktarılması hedeflenir.\n\n'
           'Mevzuatın izin verdiği ölçüde kullanıcı gizliliğinin korunması esastır.',
     ),
@@ -248,17 +248,17 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.cloud_outlined,
       title: 'Bulut ve Teknik Hizmet Sağlayıcıları',
       body:
-          'Plango; kimlik doğrulama, veri saklama, uygulama altyapısı, hata izleme veya benzeri teknik hizmetlerde üçüncü taraf teknoloji sağlayıcılarından yararlanabilir.\n\n'
-          'Bu sağlayıcılar, sundukları hizmetin niteliğine göre kullanıcı verilerini Plango adına işleyebilir.\n\n'
+          'Tasarruf Planım; kimlik doğrulama, veri saklama, uygulama altyapısı, hata izleme veya benzeri teknik hizmetlerde üçüncü taraf teknoloji sağlayıcılarından yararlanabilir.\n\n'
+          'Bu sağlayıcılar, sundukları hizmetin niteliğine göre kullanıcı verilerini Tasarruf Planım adına işleyebilir.\n\n'
           'Teknik sağlayıcı seçiminde güvenlik, veri koruma yükümlülükleri ve hizmetin gerektirdiği veri kapsamı dikkate alınmalıdır.',
     ),
     _PrivacySection(
       icon: Icons.public_outlined,
       title: 'Yurt Dışına Veri Aktarımı',
       body:
-          'Plango’nun kullandığı bazı teknik altyapı veya bulut hizmetlerinin sunucuları Türkiye dışında bulunabilir ya da hizmet kapsamında yurt dışına veri aktarımı gündeme gelebilir.\n\n'
+          'Tasarruf Planım’ın kullandığı bazı teknik altyapı veya bulut hizmetlerinin sunucuları Türkiye dışında bulunabilir ya da hizmet kapsamında yurt dışına veri aktarımı gündeme gelebilir.\n\n'
           'Yurt dışına kişisel veri aktarımı söz konusu olduğunda yürürlükteki KVKK düzenlemeleri ve uygun aktarım mekanizmaları dikkate alınmalıdır.\n\n'
-          'Plango, yurt dışına aktarım faaliyetlerini gerekli hukuki ve teknik değerlendirmeler yapılmadan gerçekleştirmemeyi hedefler.',
+          'Tasarruf Planım, yurt dışına aktarım faaliyetlerini gerekli hukuki ve teknik değerlendirmeler yapılmadan gerçekleştirmemeyi hedefler.',
     ),
     _PrivacySection(
       icon: Icons.schedule_outlined,
@@ -272,7 +272,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.delete_outline_rounded,
       title: 'Hesap Silme',
       body:
-          'Plango kullanıcıya hesabını silme imkanı sunmayı hedefler.\n\n'
+          'Tasarruf Planım kullanıcıya hesabını silme imkanı sunmayı hedefler.\n\n'
           'Hesap silme talebi sonrasında, hesabın aktif kullanım için gerekli verileri silinebilir veya erişilemez hale getirilebilir. Ancak yasal saklama zorunluluğu bulunan, güvenlik veya uyuşmazlık çözümü için belirli süre tutulması gereken kayıtlar ilgili süre boyunca saklanabilir.\n\n'
           'Hesabın silinmesi, kullanıcının cihazına daha önce indirdiği PDF gibi dosyaları otomatik olarak silmez.',
     ),
@@ -288,7 +288,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.lock_rounded,
       title: 'Veri Güvenliği',
       body:
-          'Plango kişisel verilerin hukuka aykırı işlenmesini veya erişilmesini önlemek ve verilerin güvenli şekilde muhafazasını sağlamak amacıyla uygun teknik ve idari önlemler uygulamayı hedefler.\n\n'
+          'Tasarruf Planım kişisel verilerin hukuka aykırı işlenmesini veya erişilmesini önlemek ve verilerin güvenli şekilde muhafazasını sağlamak amacıyla uygun teknik ve idari önlemler uygulamayı hedefler.\n\n'
           'Yetkilendirme kuralları, kullanıcı kimlik doğrulaması, rol bazlı erişim, veri erişim kontrolleri ve güvenli yazılım geliştirme uygulamaları bu yaklaşımın parçaları olabilir.\n\n'
           'Hiçbir dijital sistem mutlak güvenlik garantisi sunamaz. Bu nedenle güvenlik önlemlerinin düzenli olarak gözden geçirilmesi ve geliştirilmesi gerekir.',
     ),
@@ -297,38 +297,38 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       title: 'Hesap Güvenliği',
       body:
           'Kullanıcı kendi hesabının güvenliğini korumak için güçlü ve benzersiz bir parola kullanmalı, doğrulama kodlarını üçüncü kişilerle paylaşmamalı ve hesabına izinsiz erişim şüphesi olduğunda gerekli güvenlik adımlarını uygulamalıdır.\n\n'
-          'Plango hiçbir uzmanın veya çalışan olduğunu iddia eden kişinin kullanıcıdan banka şifresi, kart şifresi veya tek kullanımlık güvenlik kodu istemesini normal bir uygulama olarak kabul etmez.\n\n'
-          'Şüpheli durumların Plango’ya bildirilmesi güvenliğin geliştirilmesine yardımcı olabilir.',
+          'Tasarruf Planım hiçbir uzmanın veya çalışan olduğunu iddia eden kişinin kullanıcıdan banka şifresi, kart şifresi veya tek kullanımlık güvenlik kodu istemesini normal bir uygulama olarak kabul etmez.\n\n'
+          'Şüpheli durumların Tasarruf Planım’a bildirilmesi güvenliğin geliştirilmesine yardımcı olabilir.',
     ),
     _PrivacySection(
       icon: Icons.warning_amber_rounded,
       title: 'Veri İhlali Durumları',
       body:
           'Kişisel verilerin güvenliğini etkileyen bir olay meydana gelmesi halinde olayın kapsamının belirlenmesi, gerekli teknik tedbirlerin alınması ve yürürlükteki mevzuatın gerektirdiği bildirim süreçlerinin değerlendirilmesi gerekir.\n\n'
-          'Plango, olası güvenlik ihlallerini ciddiyetle ele almayı ve gerekli düzeltici önlemleri mümkün olan en kısa sürede uygulamayı hedefler.\n\n'
-          'Kullanıcının hesabıyla ilgili şüpheli bir işlem fark etmesi halinde Plango’ya bildirimde bulunması önerilir.',
+          'Tasarruf Planım, olası güvenlik ihlallerini ciddiyetle ele almayı ve gerekli düzeltici önlemleri mümkün olan en kısa sürede uygulamayı hedefler.\n\n'
+          'Kullanıcının hesabıyla ilgili şüpheli bir işlem fark etmesi halinde Tasarruf Planım’a bildirimde bulunması önerilir.',
     ),
     _PrivacySection(
       icon: Icons.analytics_outlined,
       title: 'Analitik ve Ürün Geliştirme',
       body:
-          'Plango’nun hangi özelliklerinin kullanıldığı, hangi ekranlarda hata oluştuğu veya uygulamanın teknik performansı gibi veriler ürün geliştirme amacıyla analiz edilebilir.\n\n'
+          'Tasarruf Planım’ın hangi özelliklerinin kullanıldığı, hangi ekranlarda hata oluştuğu veya uygulamanın teknik performansı gibi veriler ürün geliştirme amacıyla analiz edilebilir.\n\n'
           'Analitik faaliyetlerin mümkün olduğunca kullanıcı mahremiyetine saygılı, amaçla sınırlı ve ölçülü biçimde yürütülmesi hedeflenir.\n\n'
-          'Kişisel kullanıcı profili oluşturmak veya kullanıcının finansal durumunu gereksiz şekilde sınıflandırmak Plango’nun temel analitik amacı değildir.',
+          'Kişisel kullanıcı profili oluşturmak veya kullanıcının finansal durumunu gereksiz şekilde sınıflandırmak Tasarruf Planım’ın temel analitik amacı değildir.',
     ),
     _PrivacySection(
       icon: Icons.campaign_outlined,
       title: 'Reklam ve Pazarlama',
       body:
-          'Plango gelecekte reklam veya ticari iletişim özellikleri sunarsa, kişisel verilerin pazarlama amacıyla kullanılması ayrı bir değerlendirmeye tabi tutulmalıdır.\n\n'
+          'Tasarruf Planım gelecekte reklam veya ticari iletişim özellikleri sunarsa, kişisel verilerin pazarlama amacıyla kullanılması ayrı bir değerlendirmeye tabi tutulmalıdır.\n\n'
           'Elektronik ticari ileti, hedefli pazarlama veya benzeri faaliyetlerin ilgili mevzuatın gerektirdiği izin ve bilgilendirme süreçleri olmadan yürütülmemesi hedeflenir.\n\n'
-          'FP Engine hesaplama verilerinin kullanıcıyı haberi olmadan belirli bir şirkete pazarlamak amacıyla kullanılmaması Plango’nun bağımsızlık ve gizlilik ilkelerinin bir parçasıdır.',
+          'FP Engine hesaplama verilerinin kullanıcıyı haberi olmadan belirli bir şirkete pazarlamak amacıyla kullanılmaması Tasarruf Planım’ın bağımsızlık ve gizlilik ilkelerinin bir parçasıdır.',
     ),
     _PrivacySection(
       icon: Icons.cookie_outlined,
       title: 'Çerezler ve Benzeri Teknolojiler',
       body:
-          'Plango’nun web tabanlı veya gelecekte sunulabilecek internet hizmetlerinde çerezler, yerel depolama veya benzeri teknolojiler kullanılabilir.\n\n'
+          'Tasarruf Planım’ın web tabanlı veya gelecekte sunulabilecek internet hizmetlerinde çerezler, yerel depolama veya benzeri teknolojiler kullanılabilir.\n\n'
           'Bu teknolojilerin zorunlu, analitik veya pazarlama amaçları birbirinden farklı olabilir.\n\n'
           'Zorunlu olmayan çerez veya benzeri teknolojilerin kullanılması halinde, ilgili hizmetin niteliğine göre kullanıcıya ayrıca bilgi verilmesi ve gerekli tercih mekanizmalarının sunulması değerlendirilecektir.',
     ),
@@ -344,15 +344,15 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.contact_support_outlined,
       title: 'Başvuru ve İletişim',
       body:
-          'Kullanıcılar gizlilik, kişisel veri veya hesap verileriyle ilgili talep ve sorularını Plango tarafından ilan edilen iletişim kanalları üzerinden iletebilir.\n\n'
-          'KVKK kapsamındaki resmî başvurular için veri sorumlusunun kimliği, başvuru yöntemi ve iletişim bilgileri ayrıca açık ve güncel şekilde yayımlanmalıdır.\n\n'
-          'Plango’nun tüzel kişilik, veri sorumlusu ve resmî iletişim bilgileri kesinleştiğinde bu alanların politika ve aydınlatma metinlerinde açıkça belirtilmesi gerekir.',
+          'Kullanıcılar gizlilik, kişisel veri veya hesap verileriyle ilgili talep ve sorularını info@tasarrufplanim.com adresi üzerinden iletebilir.\n\n'
+          'Uygulamanın kullanımı, hesap işlemleri veya teknik destek konularında destek@tasarrufplanim.com adresi kullanılabilir.\n\n'
+          'KVKK kapsamındaki resmî başvurular için veri sorumlusunun kimliği, başvuru yöntemi ve gerekli diğer resmî bilgiler, nihai hukuki yapı doğrultusunda ayrıca açık ve güncel şekilde yayımlanacaktır.',
     ),
     _PrivacySection(
       icon: Icons.update_outlined,
       title: 'Gizlilik Politikasındaki Değişiklikler',
       body:
-          'Plango’nun hizmet kapsamı, teknik altyapısı veya yasal yükümlülükleri değiştikçe bu Gizlilik Politikası güncellenebilir.\n\n'
+          'Tasarruf Planım’ın hizmet kapsamı, teknik altyapısı veya yasal yükümlülükleri değiştikçe bu Gizlilik Politikası güncellenebilir.\n\n'
           'Önemli değişikliklerde kullanıcıların güncel politika hakkında bilgilendirilmesini sağlayacak uygulama içi yöntemler kullanılabilir.\n\n'
           'Güncel politika uygulama içerisinden erişilebilir şekilde tutulmalıdır.',
     ),
@@ -360,17 +360,17 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       icon: Icons.balance_outlined,
       title: 'Gizlilik ve Bağımsızlık İlişkisi',
       body:
-          'Plango’nun bağımsızlık ilkesi yalnızca şirket sıralaması veya hesaplama sonuçlarıyla sınırlı değildir.\n\n'
-          'Kullanıcı verilerinin belirli şirketlerin satış hedefleri için gizli şekilde kullanılması veya kullanıcıların finansal senaryolarının habersiz biçimde pazarlama profiline dönüştürülmesi Plango’nun bağımsızlık yaklaşımıyla bağdaşmaz.\n\n'
-          'Kullanıcının Plango’ya duyduğu güvenin korunması, ürünün uzun vadeli değerinin temel unsurlarından biridir.',
+          'Tasarruf Planım’ın bağımsızlık ilkesi yalnızca şirket sıralaması veya hesaplama sonuçlarıyla sınırlı değildir.\n\n'
+          'Kullanıcı verilerinin belirli şirketlerin satış hedefleri için gizli şekilde kullanılması veya kullanıcıların finansal senaryolarının habersiz biçimde pazarlama profiline dönüştürülmesi Tasarruf Planım’ın bağımsızlık yaklaşımıyla bağdaşmaz.\n\n'
+          'Kullanıcının Tasarruf Planım’a duyduğu güvenin korunması, ürünün uzun vadeli değerinin temel unsurlarından biridir.',
     ),
     _PrivacySection(
       icon: Icons.info_outline_rounded,
       title: 'Son Bilgilendirme',
       body:
-          'Plango’nun gizlilik yaklaşımının temelinde mümkün olduğunca az veri toplamak, toplanan veriyi açık amaçlarla kullanmak, kullanıcı güvenliğini korumak ve veriler üzerinde kullanıcıya şeffaflık sağlamak vardır.\n\n'
-          'Bu politika Plango’nun genel gizlilik çerçevesini açıklar. Belirli veri işleme faaliyetleri için ayrıca KVKK Aydınlatma Metni, açık rıza metni, kullanıcı sözleşmesi veya uzman sözleşmesi sunulabilir.\n\n'
-          'Kullanıcı gizliliği Plango açısından yalnızca yasal bir yükümlülük değil, ürün güveninin temel bir parçasıdır.',
+          'Tasarruf Planım’ın gizlilik yaklaşımının temelinde mümkün olduğunca az veri toplamak, toplanan veriyi açık amaçlarla kullanmak, kullanıcı güvenliğini korumak ve veriler üzerinde kullanıcıya şeffaflık sağlamak vardır.\n\n'
+          'Bu politika Tasarruf Planım’ın genel gizlilik çerçevesini açıklar. Belirli veri işleme faaliyetleri için ayrıca KVKK Aydınlatma Metni, açık rıza metni, kullanıcı sözleşmesi veya uzman sözleşmesi sunulabilir.\n\n'
+          'Kullanıcı gizliliği Tasarruf Planım açısından yalnızca yasal bir yükümlülük değil, ürün güveninin temel bir parçasıdır.',
     ),
   ];
 
@@ -535,7 +535,7 @@ class _PrivacyIntroCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango’nun yaklaşımı; hizmet için gerekli olan veriyi işlemek, '
+              'Tasarruf Planım’ın yaklaşımı; hizmet için gerekli olan veriyi işlemek, '
               'gereksiz veri toplamamak, veriyi amacı dışında kullanmamak ve '
               'kullanıcı güvenliğini ürünün temel parçası olarak ele almaktır.',
               style: TextStyle(
@@ -724,7 +724,7 @@ class _PrivacyFooterCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Kullanıcı gizliliği Plango açısından yalnızca yasal bir '
+              'Kullanıcı gizliliği Tasarruf Planım açısından yalnızca yasal bir '
               'yükümlülük değil; bağımsızlık, güven ve ürün kalitesinin '
               'temel parçalarından biridir.',
               style: TextStyle(
@@ -749,9 +749,9 @@ class _PolicyNote extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Text(
-        'Not: Veri sorumlusunun kesin unvanı, resmî iletişim adresi ve '
-        'KVKK başvuru kanalı yayından önce nihai hukuki yapı doğrultusunda '
-        'bu politika ve Aydınlatma Metni içerisinde tamamlanmalıdır.',
+        'Not: Veri sorumlusunun kesin unvanı ve KVKK kapsamında gerekli resmî başvuru bilgileri, '
+        'yayından önce nihai hukuki yapı doğrultusunda bu politika ve Aydınlatma Metni '
+        'içerisinde tamamlanmalıdır.',
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Color(0xFF8A96A3),

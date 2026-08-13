@@ -386,7 +386,7 @@ AppUser? _currentProfile;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'Plango hesabınız kalıcı olarak silindi.',
+          'Tasarruf Planım hesabınız kalıcı olarak silindi.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -665,7 +665,7 @@ AppUser? _currentProfile;
   title: 'Hesabı Sil',
   subtitle: _isDeletingAccount
       ? 'Hesabınız siliniyor...'
-      : 'Plango hesabınızı kalıcı olarak silin.',
+      : 'Tasarruf Planım hesabınızı kalıcı olarak silin.',
   iconColor: _danger,
   titleColor: _danger,
   backgroundColor: const Color(0xFFFFF4F3),

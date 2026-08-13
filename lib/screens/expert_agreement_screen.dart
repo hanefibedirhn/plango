@@ -24,35 +24,35 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.handshake_outlined,
       title: 'Taraflar',
       body:
-          'İşbu Uzman Sözleşmesi, Plango dijital platformunda uzman olarak başvuru yapan ve uzman hesabı kullanmaya hak kazanan gerçek kişi ile Plango hizmetinin sağlayıcısı arasında elektronik ortamda kurulur.\n\n'
-          'Bu sözleşmede “Uzman”, Plango’nun uzman başvuru ve doğrulama süreçlerini tamamlayan ve uzman rolü verilen kişiyi; “Plango” ise tasarruf finansmanı alanında hesaplama, bilgilendirme, danışma yönlendirmesi ve karar destek hizmetleri sunan dijital platformu ifade eder.\n\n'
-          'Plango’nun nihai ticari unvanı, resmî adresi ve iletişim bilgileri yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.',
+          'İşbu Uzman Sözleşmesi, Tasarruf Planım dijital platformunda uzman olarak başvuru yapan ve uzman hesabı kullanmaya hak kazanan gerçek kişi ile Tasarruf Planım hizmetinin sağlayıcısı arasında elektronik ortamda kurulur.\n\n'
+          'Bu sözleşmede “Uzman”, Tasarruf Planım’ın uzman başvuru ve doğrulama süreçlerini tamamlayan ve uzman rolü verilen kişiyi; “Tasarruf Planım” ise tasarruf finansmanı alanında hesaplama, bilgilendirme, danışma yönlendirmesi ve karar destek hizmetleri sunan dijital platformu ifade eder.\n\n'
+          'Tasarruf Planım’ın nihai ticari unvanı, resmî adresi ve iletişim bilgileri yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.description_outlined,
       title: 'Sözleşmenin Konusu',
       body:
-          'Bu sözleşmenin konusu; uzman başvurusu, uzman doğrulaması, uzman hesabının kullanımı, danışma taleplerinin otomatik atanması, kullanıcılarla iletişim, uzman yükümlülükleri ve Plango uzman sisteminin kullanım esaslarının belirlenmesidir.\n\n'
+          'Bu sözleşmenin konusu; uzman başvurusu, uzman doğrulaması, uzman hesabının kullanımı, danışma taleplerinin otomatik atanması, kullanıcılarla iletişim, uzman yükümlülükleri ve Tasarruf Planım uzman sisteminin kullanım esaslarının belirlenmesidir.\n\n'
           'Sözleşme, uzman ile kullanıcının veya uzman tarafından temsil edilen tasarruf finansman şirketinin arasında kurulabilecek bağımsız ticari ilişkinin şartlarını düzenlemez.\n\n'
-          'Plango, uzman ile kullanıcı arasındaki iletişimi kolaylaştıran ve danışma taleplerinin platform üzerinden yönetilmesini sağlayan bağımsız dijital aracı konumundadır.',
+          'Tasarruf Planım, uzman ile kullanıcı arasındaki iletişimi kolaylaştıran ve danışma taleplerinin platform üzerinden yönetilmesini sağlayan bağımsız dijital aracı konumundadır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.menu_book_outlined,
       title: 'Tanımlar',
       body:
-          'Uzman Başvurusu: Kullanıcının Plango’da uzman rolü elde etmek amacıyla gerçekleştirdiği başvuru sürecidir.\n\n'
-          'Doğrulanmış Uzman: Plango’nun belirlediği doğrulama kriterlerini karşılayan ve uzman hesabı onaylanan kişidir.\n\n'
-          'Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Plango üzerinden oluşturduğu talep kaydıdır.\n\n'
-          'Otomatik Uzman Ataması: Kullanıcının belirli bir uzmanı seçmediği, uygunluk ve sistem kurallarına göre danışma talebinin Plango tarafından uygun uzmana yönlendirildiği atama yöntemidir.\n\n'
+          'Uzman Başvurusu: Kullanıcının Tasarruf Planım’da uzman rolü elde etmek amacıyla gerçekleştirdiği başvuru sürecidir.\n\n'
+          'Doğrulanmış Uzman: Tasarruf Planım’ın belirlediği doğrulama kriterlerini karşılayan ve uzman hesabı onaylanan kişidir.\n\n'
+          'Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Tasarruf Planım üzerinden oluşturduğu talep kaydıdır.\n\n'
+          'Otomatik Uzman Ataması: Kullanıcının belirli bir uzmanı seçmediği, uygunluk ve sistem kurallarına göre danışma talebinin Tasarruf Planım tarafından uygun uzmana yönlendirildiği atama yöntemidir.\n\n'
           'Uzman Paneli: Uzmanın kendisine atanan talepleri ve uzman işlemlerini yönettiği uygulama alanıdır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.person_add_alt_1_outlined,
       title: 'Uzman Başvurusunun Niteliği',
       body:
-          'Uzman başvurusu, Plango’da uzman hesabı kullanabilmek amacıyla yapılan platform içi başvurudur.\n\n'
+          'Uzman başvurusu, Tasarruf Planım’da uzman hesabı kullanabilmek amacıyla yapılan platform içi başvurudur.\n\n'
           'Başvuru yapılması uzman statüsünün otomatik olarak kazanıldığı anlamına gelmez.\n\n'
-          'Plango, uzman başvurusunu doğrulama, güvenlik, uygunluk ve platform standartları bakımından inceleyebilir ve başvuruyu onaylayabilir veya reddedebilir.',
+          'Tasarruf Planım, uzman başvurusunu doğrulama, güvenlik, uygunluk ve platform standartları bakımından inceleyebilir ve başvuruyu onaylayabilir veya reddedebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.fact_check_outlined,
@@ -60,22 +60,22 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman; adı, soyadı, iletişim bilgileri, çalıştığı kurum, şehir ve başvuru kapsamında verdiği diğer bilgilerin doğru, güncel ve kendisine ait olduğunu beyan eder.\n\n'
           'Yanlış, yanıltıcı veya başkasına ait bilgiyle yapılan başvurular reddedilebilir.\n\n'
-          'Uzmanlık statüsü kazanıldıktan sonra ilgili bilgilerde önemli bir değişiklik olması halinde uzmanın bu bilgileri güncellemesi veya Plango’ya bildirmesi beklenir.',
+          'Uzmanlık statüsü kazanıldıktan sonra ilgili bilgilerde önemli bir değişiklik olması halinde uzmanın bu bilgileri güncellemesi veya Tasarruf Planım’a bildirmesi beklenir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.verified_user_outlined,
       title: 'Uzman Doğrulama Yöntemleri',
       body:
-          'Plango, uzman başvurularında şirket e-posta alan adı üzerinden doğrulama, doğrulama kodu, yönetici incelemesi veya platform tarafından uygun görülen diğer yöntemleri kullanabilir.\n\n'
+          'Tasarruf Planım, uzman başvurularında şirket e-posta alan adı üzerinden doğrulama, doğrulama kodu, yönetici incelemesi veya platform tarafından uygun görülen diğer yöntemleri kullanabilir.\n\n'
           'Doğrulama süreci, uzmanın beyan ettiği kurum bağlantısını veya uzmanlık statüsünü makul ölçüde doğrulamayı amaçlar.\n\n'
-          'Plango, doğrulama yöntemlerini güvenlik ihtiyaçları ve sektör koşullarına göre güncelleyebilir.',
+          'Tasarruf Planım, doğrulama yöntemlerini güvenlik ihtiyaçları ve sektör koşullarına göre güncelleyebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.domain_verification_outlined,
       title: 'Doğrulamanın Sınırı',
       body:
-          'Plango’da doğrulanmış uzman olarak görünmek, uzmanın tüm beyanlarının veya gelecekteki davranışlarının Plango tarafından garanti edildiği anlamına gelmez.\n\n'
-          'Doğrulama, Plango’nun belirlediği kriterlerin yerine getirildiğini gösterir.\n\n'
+          'Tasarruf Planım’da doğrulanmış uzman olarak görünmek, uzmanın tüm beyanlarının veya gelecekteki davranışlarının Tasarruf Planım tarafından garanti edildiği anlamına gelmez.\n\n'
+          'Doğrulama, Tasarruf Planım’ın belirlediği kriterlerin yerine getirildiğini gösterir.\n\n'
           'Bu statü; kamu kurumu tarafından verilmiş mesleki ruhsat, devlet garantisi veya bağımsız yeterlilik belgesi anlamına gelmez.',
     ),
     _ExpertAgreementSection(
@@ -83,7 +83,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Uzman Rolünün Verilmesi',
       body:
           'Başvurusu onaylanan kullanıcıya sistem üzerinde uzman rolü tanımlanabilir.\n\n'
-          'Uzman rolü, Plango’nun normal kullanıcı özelliklerinin yanı sıra uzman paneline ve danışma talebi yönetimiyle ilgili yetkili alanlara erişim sağlayabilir.\n\n'
+          'Uzman rolü, Tasarruf Planım’ın normal kullanıcı özelliklerinin yanı sıra uzman paneline ve danışma talebi yönetimiyle ilgili yetkili alanlara erişim sağlayabilir.\n\n'
           'Uzman rolü yalnızca ilgili kişiye aittir ve üçüncü kişilere devredilemez.',
     ),
     _ExpertAgreementSection(
@@ -99,16 +99,16 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Hesap Güvenliği',
       body:
           'Uzman, parolasını ve doğrulama bilgilerini korumalıdır.\n\n'
-          'Şirket e-posta hesabı, doğrulama kodu veya Plango giriş bilgileri üçüncü kişilerle paylaşılmamalıdır.\n\n'
-          'Hesap güvenliğinin ihlal edildiği şüphesinde uzman gerekli güvenlik adımlarını uygulamalı ve mümkün olan en kısa sürede Plango’ya bildirimde bulunmalıdır.',
+          'Şirket e-posta hesabı, doğrulama kodu veya Tasarruf Planım giriş bilgileri üçüncü kişilerle paylaşılmamalıdır.\n\n'
+          'Hesap güvenliğinin ihlal edildiği şüphesinde uzman gerekli güvenlik adımlarını uygulamalı ve mümkün olan en kısa sürede Tasarruf Planım’a bildirimde bulunmalıdır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.alt_route_outlined,
       title: 'Otomatik Uzman Atama Sistemi',
       body:
-          'Plango’nun danışma sisteminde kullanıcı belirli bir uzmanı seçmek zorunda değildir.\n\n'
+          'Tasarruf Planım’ın danışma sisteminde kullanıcı belirli bir uzmanı seçmek zorunda değildir.\n\n'
           'Kullanıcı tarafından oluşturulan danışma talebi, platformun güncel atama kuralları çerçevesinde uygun uzmana otomatik olarak yönlendirilebilir.\n\n'
-          'Atama; uzman uygunluğu, talep durumu, şirket bağlantısı, operasyonel sıra veya Plango tarafından belirlenen diğer sistemsel kriterler dikkate alınarak gerçekleştirilebilir.',
+          'Atama; uzman uygunluğu, talep durumu, şirket bağlantısı, operasyonel sıra veya Tasarruf Planım tarafından belirlenen diğer sistemsel kriterler dikkate alınarak gerçekleştirilebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.task_alt_outlined,
@@ -147,7 +147,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Kullanıcıyla İlk İletişim',
       body:
           'Uzman, danışma talebi kapsamında kullanıcıyla ilk iletişimde kendisini ve çalıştığı kurumu açık biçimde tanıtmalıdır.\n\n'
-          'Uzman, kullanıcının Plango üzerinden bir danışma talebi oluşturduğunu belirtmeli ve iletişimin amacını net şekilde açıklamalıdır.\n\n'
+          'Uzman, kullanıcının Tasarruf Planım üzerinden bir danışma talebi oluşturduğunu belirtmeli ve iletişimin amacını net şekilde açıklamalıdır.\n\n'
           'Kullanıcı üzerinde baskı kuran, yanıltıcı veya agresif satış dili kullanılamaz.',
     ),
     _ExpertAgreementSection(
@@ -186,7 +186,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.calculate_outlined,
       title: 'FP Engine Sonuçları Hakkında İletişim',
       body:
-          'Uzman, kullanıcının Plango FP Engine üzerinden oluşturduğu tahmini hesaplamaları görebildiği veya bu hesaplamalar hakkında görüşme yaptığı durumlarda, sonuçların bilgilendirme amaçlı olduğunu dikkate almalıdır.\n\n'
+          'Uzman, kullanıcının Tasarruf Planım FP Engine üzerinden oluşturduğu tahmini hesaplamaları görebildiği veya bu hesaplamalar hakkında görüşme yaptığı durumlarda, sonuçların bilgilendirme amaçlı olduğunu dikkate almalıdır.\n\n'
           'FP Engine sonucu şirketin resmî teklifine dönüştürülemez veya kullanıcıya resmî şirket sonucu gibi sunulamaz.\n\n'
           'Uzman, şirketin güncel ve bağlayıcı teklifini kendi resmî süreçleri üzerinden ayrıca açıklamalıdır.',
     ),
@@ -211,7 +211,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Israrlı İletişim Yasağı',
       body:
           'Kullanıcı açıkça iletişim kurulmasını istemediğini belirttiğinde uzman, danışma sürecinin gerektirmediği ısrarlı arama veya mesajlaşmayı sürdürmemelidir.\n\n'
-          'Tekrarlanan, rahatsız edici veya baskı oluşturan iletişim Plango uzman standartlarına aykırıdır.\n\n'
+          'Tekrarlanan, rahatsız edici veya baskı oluşturan iletişim Tasarruf Planım uzman standartlarına aykırıdır.\n\n'
           'Kullanıcının iletişim tercihleri ilgili mevzuat ve kullanıcı iradesi çerçevesinde dikkate alınmalıdır.',
     ),
     _ExpertAgreementSection(
@@ -220,22 +220,22 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Danışma talebi, uzmana sınırsız ticari iletişim hakkı vermez.\n\n'
           'Uzman, elektronik ticari ileti ve pazarlama faaliyetlerinde yürürlükteki mevzuata uygun davranmakla sorumludur.\n\n'
-          'Plango üzerinden edinilen kullanıcı iletişim bilgileri, danışma amacı dışında bağımsız pazarlama listelerine eklenemez.',
+          'Tasarruf Planım üzerinden edinilen kullanıcı iletişim bilgileri, danışma amacı dışında bağımsız pazarlama listelerine eklenemez.',
     ),
     _ExpertAgreementSection(
       icon: Icons.open_in_new_off_outlined,
-      title: 'Kullanıcıyı Plango Dışına Zorla Yönlendirme',
+      title: 'Kullanıcıyı Tasarruf Planım Dışına Zorla Yönlendirme',
       body:
-          'Uzman, danışma sürecinin doğal devamı dışında kullanıcıyı Plango dışındaki kişisel veya yetkisiz kanallara yönlendirmek için baskı kuramaz.\n\n'
+          'Uzman, danışma sürecinin doğal devamı dışında kullanıcıyı Tasarruf Planım dışındaki kişisel veya yetkisiz kanallara yönlendirmek için baskı kuramaz.\n\n'
           'Resmî şirket sürecinin gerektirdiği yönlendirmeler açık biçimde ve kullanıcıya doğru bilgi verilerek yapılabilir.\n\n'
-          'Plango’nun danışma sistemini bilinçli şekilde etkisiz hale getirmeyi amaçlayan davranışlar platform kurallarına aykırıdır.',
+          'Tasarruf Planım’ın danışma sistemini bilinçli şekilde etkisiz hale getirmeyi amaçlayan davranışlar platform kurallarına aykırıdır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.money_off_csred_outlined,
       title: 'Kullanıcıdan Para Talep Etmeme',
       body:
-          'Uzman, Plango danışma hizmetinin kullanılması karşılığında kullanıcıdan Plango adına ücret talep edemez.\n\n'
-          'Plango adına ödeme, komisyon, ön ödeme veya benzeri tahsilat yapılamaz.\n\n'
+          'Uzman, Tasarruf Planım danışma hizmetinin kullanılması karşılığında kullanıcıdan Tasarruf Planım adına ücret talep edemez.\n\n'
+          'Tasarruf Planım adına ödeme, komisyon, ön ödeme veya benzeri tahsilat yapılamaz.\n\n'
           'Tasarruf finansman şirketiyle yapılacak resmî ödemeler yalnızca ilgili şirketin yetkili ve resmî ödeme kanalları üzerinden yürütülmelidir.',
     ),
     _ExpertAgreementSection(
@@ -244,7 +244,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman, danışma sürecinin amacıyla ilgisi olmayan kimlik belgesi, banka şifresi, kart şifresi, doğrulama kodu veya benzeri hassas bilgileri kullanıcıdan talep etmemelidir.\n\n'
           'Resmî şirket işlemleri için belge gerekmesi halinde kullanıcı, ilgili şirketin resmî süreçleri hakkında bilgilendirilmelidir.\n\n'
-          'Plango üzerinden hassas güvenlik bilgisi toplanması uzman tarafından talep edilemez.',
+          'Tasarruf Planım üzerinden hassas güvenlik bilgisi toplanması uzman tarafından talep edilemez.',
     ),
     _ExpertAgreementSection(
       icon: Icons.privacy_tip_outlined,
@@ -258,7 +258,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.policy_outlined,
       title: 'KVKK Yükümlülükleri',
       body:
-          'Uzman, Plango üzerinden eriştiği kişisel veriler bakımından kendisine düşen veri koruma yükümlülüklerine uygun davranmalıdır.\n\n'
+          'Uzman, Tasarruf Planım üzerinden eriştiği kişisel veriler bakımından kendisine düşen veri koruma yükümlülüklerine uygun davranmalıdır.\n\n'
           'Kullanıcı verilerinin danışma amacı dışında kopyalanması, aktarılması veya farklı veri tabanlarına eklenmesi yasaktır.\n\n'
           'Uzmanın kendi çalıştığı kurum adına ayrıca veri işleme yapması gereken durumlarda, ilgili şirketin hukuki ve kurumsal süreçleri ayrıca uygulanır.',
     ),
@@ -266,7 +266,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.lock_person_outlined,
       title: 'Gizli Bilgiler',
       body:
-          'Uzman, Plango’nun kamuya açık olmayan sistem bilgilerini, kullanıcı verilerini, danışma kayıtlarını ve uzman paneline özgü operasyonel bilgileri gizli tutmalıdır.\n\n'
+          'Uzman, Tasarruf Planım’ın kamuya açık olmayan sistem bilgilerini, kullanıcı verilerini, danışma kayıtlarını ve uzman paneline özgü operasyonel bilgileri gizli tutmalıdır.\n\n'
           'Bu bilgiler rakip platformlara, yetkisiz kişilere veya kamuya açık kanallara izinsiz olarak aktarılamaz.\n\n'
           'Gizlilik yükümlülüğü uzman hesabı sona erdikten sonra da niteliği gereği devam edebilir.',
     ),
@@ -282,7 +282,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.analytics_outlined,
       title: 'Uzman Performans Verileri',
       body:
-          'Plango; kabul edilen, reddedilen, cevaplanan, tamamlanan ve süresi dolan talepler gibi uzman performans verilerini sistemin sağlıklı çalışması amacıyla değerlendirebilir.\n\n'
+          'Tasarruf Planım; kabul edilen, reddedilen, cevaplanan, tamamlanan ve süresi dolan talepler gibi uzman performans verilerini sistemin sağlıklı çalışması amacıyla değerlendirebilir.\n\n'
           'Bu veriler otomatik atama mantığının iyileştirilmesi, kullanıcı deneyiminin korunması ve uzman hesabının uygunluğunun değerlendirilmesinde kullanılabilir.\n\n'
           'Performans değerlendirmeleri tek başına cezalandırma amacıyla değil, platform kalitesini koruma amacıyla kullanılmalıdır.',
     ),
@@ -300,7 +300,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman kendi performansını artırmak, sistemde görünürlük kazanmak veya atama algoritmasını etkilemek amacıyla sahte kullanıcı hesapları veya danışma talepleri oluşturamaz.\n\n'
           'Üçüncü kişilere bu amaçla hesap veya talep oluşturtmak da aynı kapsamda değerlendirilir.\n\n'
-          'Plango şüpheli talepleri güvenlik amacıyla inceleyebilir.',
+          'Tasarruf Planım şüpheli talepleri güvenlik amacıyla inceleyebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.record_voice_over_outlined,
@@ -308,30 +308,30 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman, kullanıcıyı etkilemek amacıyla diğer uzmanlar veya tasarruf finansman şirketleri hakkında doğrulanmamış, yanıltıcı veya itibar zedeleyici beyanda bulunmamalıdır.\n\n'
           'Objektif ve doğrulanabilir karşılaştırmalar yapılabilir; ancak kötüleme veya manipülasyon amaçlı iletişim kabul edilmez.\n\n'
-          'Plango’nun tarafsızlık yaklaşımına aykırı davranışlar uzman uygunluğu bakımından değerlendirilebilir.',
+          'Tasarruf Planım’ın tarafsızlık yaklaşımına aykırı davranışlar uzman uygunluğu bakımından değerlendirilebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.balance_outlined,
-      title: 'Plango’nun Bağımsızlığına Saygı',
+      title: 'Tasarruf Planım’ın Bağımsızlığına Saygı',
       body:
-          'Uzman, Plango’nun herhangi bir tasarruf finansman şirketinin resmî uygulaması olmadığını kabul eder.\n\n'
-          'Uzman kendisini Plango çalışanı, Plango adına satış yetkilisi veya Plango’nun resmî temsilcisi gibi tanıtamaz.\n\n'
-          'Uzman, Plango ile kendi çalıştığı şirket arasındaki ilişkiyi kullanıcıya yanlış veya yanıltıcı biçimde aktaramaz.',
+          'Uzman, Tasarruf Planım’ın herhangi bir tasarruf finansman şirketinin resmî uygulaması olmadığını kabul eder.\n\n'
+          'Uzman kendisini Tasarruf Planım çalışanı, Tasarruf Planım adına satış yetkilisi veya Tasarruf Planım’ın resmî temsilcisi gibi tanıtamaz.\n\n'
+          'Uzman, Tasarruf Planım ile kendi çalıştığı şirket arasındaki ilişkiyi kullanıcıya yanlış veya yanıltıcı biçimde aktaramaz.',
     ),
     _ExpertAgreementSection(
       icon: Icons.copyright_outlined,
-      title: 'Plango Adı ve Markasının Kullanımı',
+      title: 'Tasarruf Planım Adı ve Markasının Kullanımı',
       body:
-          'Uzman, Plango adını veya görsel kimliğini yalnızca platformun izin verdiği ölçüde kullanabilir.\n\n'
-          'Plango logosu, adı veya ekran görüntüleri kullanılarak izinsiz reklam, kampanya veya ortaklık algısı oluşturulamaz.\n\n'
-          'Uzmanın Plango’da doğrulanmış olması, Plango adına konuşma yetkisi vermez.',
+          'Uzman, Tasarruf Planım adını veya görsel kimliğini yalnızca platformun izin verdiği ölçüde kullanabilir.\n\n'
+          'Tasarruf Planım logosu, adı veya ekran görüntüleri kullanılarak izinsiz reklam, kampanya veya ortaklık algısı oluşturulamaz.\n\n'
+          'Uzmanın Tasarruf Planım’da doğrulanmış olması, Tasarruf Planım adına konuşma yetkisi vermez.',
     ),
     _ExpertAgreementSection(
       icon: Icons.badge_outlined,
       title: 'Uzman Profil Bilgileri',
       body:
           'Uzman profilinde yer alan ad, çalışılan şirket, şehir ve doğrulama durumu gibi bilgiler doğru ve güncel tutulmalıdır.\n\n'
-          'Kurum değişikliği veya uzmanlık statüsünü etkileyen önemli değişiklikler Plango’ya bildirilmelidir.\n\n'
+          'Kurum değişikliği veya uzmanlık statüsünü etkileyen önemli değişiklikler Tasarruf Planım’a bildirilmelidir.\n\n'
           'Yanlış veya güncelliğini yitirmiş kurum bilgisinin bilinçli şekilde kullanılmaya devam edilmesi uzman doğrulamasının yeniden incelenmesine neden olabilir.',
     ),
     _ExpertAgreementSection(
@@ -340,7 +340,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzmanın çalıştığı tasarruf finansman şirketinin değişmesi halinde uzman doğrulaması yeniden değerlendirilebilir.\n\n'
           'Eski şirket bilgisiyle kullanıcılarla iletişim kurulamaz.\n\n'
-          'Yeni kurum bağlantısının doğrulanması için Plango ek doğrulama isteyebilir.',
+          'Yeni kurum bağlantısının doğrulanması için Tasarruf Planım ek doğrulama isteyebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.pause_circle_outline_rounded,
@@ -355,14 +355,14 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Uzman Statüsünün Sonlandırılması',
       body:
           'Ağır veya tekrarlanan sözleşme ihlali, kullanıcı verilerinin kötüye kullanılması, sahte belge veya bilgi sunulması, güvenlik ihlali veya yanıltıcı ticari davranış halinde uzman statüsü sonlandırılabilir.\n\n'
-          'Uzman statüsünün sona ermesi, kullanıcının normal Plango hesabının her durumda otomatik olarak silineceği anlamına gelmez.\n\n'
+          'Uzman statüsünün sona ermesi, kullanıcının normal Tasarruf Planım hesabının her durumda otomatik olarak silineceği anlamına gelmez.\n\n'
           'Olayın niteliğine göre normal kullanıcı hesabı ayrıca değerlendirilebilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.logout_outlined,
       title: 'Uzmanın Kendi Talebiyle Ayrılması',
       body:
-          'Uzman, Plango tarafından sunulan uygun kanal üzerinden uzman statüsünden ayrılma talebinde bulunabilir.\n\n'
+          'Uzman, Tasarruf Planım tarafından sunulan uygun kanal üzerinden uzman statüsünden ayrılma talebinde bulunabilir.\n\n'
           'Ayrılma talebi sırasında açık danışma talepleri varsa bu taleplerin kullanıcı mağduriyeti yaratmayacak şekilde yeniden atanması veya kapatılması sağlanabilir.\n\n'
           'Uzmanın ayrılması, gizlilik ve kişisel veri yükümlülüklerini geriye dönük olarak ortadan kaldırmaz.',
     ),
@@ -386,7 +386,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.report_problem_outlined,
       title: 'Kullanıcı Şikayetlerinin İncelenmesi',
       body:
-          'Uzman hakkında kullanıcı şikayeti oluşması halinde Plango ilgili talep ve sistem kayıtlarını inceleyebilir.\n\n'
+          'Uzman hakkında kullanıcı şikayeti oluşması halinde Tasarruf Planım ilgili talep ve sistem kayıtlarını inceleyebilir.\n\n'
           'Uzmandan açıklama veya ek bilgi istenebilir.\n\n'
           'İnceleme süreci, kullanıcı güvenliği ve uzmanın adil değerlendirilmesi ilkeleri birlikte gözetilerek yürütülmelidir.',
     ),
@@ -396,13 +396,13 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman hesabını etkileyebilecek ciddi bir değerlendirmede, olayın niteliği uygun olduğu ölçüde uzmana açıklama yapma imkanı verilebilir.\n\n'
           'Uzmanın sunduğu açıklamalar ve sistem kayıtları birlikte değerlendirilebilir.\n\n'
-          'Acil güvenlik risklerinde Plango öncelikle geçici koruma tedbiri uygulayabilir.',
+          'Acil güvenlik risklerinde Tasarruf Planım öncelikle geçici koruma tedbiri uygulayabilir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.route_outlined,
-      title: 'Plango’nun Uzman Atama Yetkisi',
+      title: 'Tasarruf Planım’ın Uzman Atama Yetkisi',
       body:
-          'Danışma taleplerinin hangi uzmana, hangi sırada ve hangi kriterlerle atanacağı Plango’nun güncel sistem kurallarına göre belirlenir.\n\n'
+          'Danışma taleplerinin hangi uzmana, hangi sırada ve hangi kriterlerle atanacağı Tasarruf Planım’ın güncel sistem kurallarına göre belirlenir.\n\n'
           'Uzman belirli sayıda talep, belirli kullanıcı veya belirli bir atama sırası üzerinde kazanılmış hak iddia edemez.\n\n'
           'Atama sistemi kullanıcı deneyimini, adaleti, uygunluğu ve operasyonel sürekliliği geliştirmek amacıyla güncellenebilir.',
     ),
@@ -412,21 +412,21 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman hesabının onaylanması belirli sayıda danışma talebi alınacağını garanti etmez.\n\n'
           'Talep sayısı kullanıcı talebi, şirket bağlantısı, şehir, uygunluk, sistem sırası ve diğer operasyonel koşullara bağlı olabilir.\n\n'
-          'Plango uzmanlara satış, müşteri veya gelir garantisi vermez.',
+          'Tasarruf Planım uzmanlara satış, müşteri veya gelir garantisi vermez.',
     ),
     _ExpertAgreementSection(
       icon: Icons.link_off_outlined,
-      title: 'Plango’nun Ticari İlişkinin Tarafı Olmaması',
+      title: 'Tasarruf Planım’ın Ticari İlişkinin Tarafı Olmaması',
       body:
-          'Uzman ile kullanıcı arasında tasarruf finansman şirketi kapsamında sözleşme kurulması halinde bu ilişkinin tarafı Plango değildir.\n\n'
-          'Plango kullanıcıdan şirket adına ödeme almaz ve uzman adına satış sözleşmesi düzenlemez.\n\n'
+          'Uzman ile kullanıcı arasında tasarruf finansman şirketi kapsamında sözleşme kurulması halinde bu ilişkinin tarafı Tasarruf Planım değildir.\n\n'
+          'Tasarruf Planım kullanıcıdan şirket adına ödeme almaz ve uzman adına satış sözleşmesi düzenlemez.\n\n'
           'Şirket sözleşmeleri ve tahsilat süreçleri ilgili şirketin kendi resmî kanalları üzerinden yürütülmelidir.',
     ),
     _ExpertAgreementSection(
       icon: Icons.payments_outlined,
       title: 'Ücret ve Komisyon',
       body:
-          'Plango’nun uzmanlara yönelik mevcut veya gelecekteki ücret, üyelik veya komisyon modeli ayrıca belirlenebilir.\n\n'
+          'Tasarruf Planım’ın uzmanlara yönelik mevcut veya gelecekteki ücret, üyelik veya komisyon modeli ayrıca belirlenebilir.\n\n'
           'İşbu sözleşmenin kabulü, henüz açıklanmamış bir ücret veya komisyonun uzman tarafından peşinen kabul edildiği anlamına gelmez.\n\n'
           'Ücretli bir uzman özelliği sunulması halinde temel ticari şartlar ayrıca bildirilmelidir.',
     ),
@@ -436,13 +436,13 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'Uzman paneli veya danışma sistemi bakım, güncelleme veya teknik arıza nedeniyle geçici olarak kullanılamayabilir.\n\n'
           'Uzman, sistemin her an kesintisiz çalışacağına ilişkin garanti bulunmadığını kabul eder.\n\n'
-          'Plango teknik sorunları makul sürede gidermek için gerekli çabayı göstermeyi hedefler.',
+          'Tasarruf Planım teknik sorunları makul sürede gidermek için gerekli çabayı göstermeyi hedefler.',
     ),
     _ExpertAgreementSection(
       icon: Icons.system_update_alt_outlined,
       title: 'Sistem Güncellemeleri',
       body:
-          'Plango uzman panelinin yapısını, talep durumlarını, atama mantığını veya doğrulama süreçlerini kullanıcı güvenliği ve hizmet kalitesi amacıyla güncelleyebilir.\n\n'
+          'Tasarruf Planım uzman panelinin yapısını, talep durumlarını, atama mantığını veya doğrulama süreçlerini kullanıcı güvenliği ve hizmet kalitesi amacıyla güncelleyebilir.\n\n'
           'Esaslı değişikliklerin uzman hak ve yükümlülüklerini etkilediği durumlarda gerekli bilgilendirme yapılmalıdır.\n\n'
           'Güncel sistem kurallarına uyum uzman hesabının devamı bakımından önemlidir.',
     ),
@@ -450,15 +450,15 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.code_outlined,
       title: 'Fikri Mülkiyet Hakları',
       body:
-          'Plango yazılımı, tasarım sistemi, uzman paneli, özgün içerikler ve diğer platform unsurları üzerindeki haklar ilgili hak sahiplerine aittir.\n\n'
+          'Tasarruf Planım yazılımı, tasarım sistemi, uzman paneli, özgün içerikler ve diğer platform unsurları üzerindeki haklar ilgili hak sahiplerine aittir.\n\n'
           'Uzman hesabı, bu unsurlar üzerinde mülkiyet veya sınırsız kullanım hakkı sağlamaz.\n\n'
-          'Plango’nun teknik veya görsel unsurları izinsiz kopyalanamaz veya başka bir hizmette kullanılamaz.',
+          'Tasarruf Planım’ın teknik veya görsel unsurları izinsiz kopyalanamaz veya başka bir hizmette kullanılamaz.',
     ),
     _ExpertAgreementSection(
       icon: Icons.shield_outlined,
       title: 'Kişisel Veriler ve Gizlilik Politikası',
       body:
-          'Uzmanın kendi kişisel verilerinin Plango tarafından işlenmesine ilişkin ayrıntılar Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.\n\n'
+          'Uzmanın kendi kişisel verilerinin Tasarruf Planım tarafından işlenmesine ilişkin ayrıntılar Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.\n\n'
           'İşbu Uzman Sözleşmesinin kabulü, açık rıza gereken tüm veri işleme faaliyetlerine otomatik olarak rıza verildiği anlamına gelmez.\n\n'
           'Gerekli durumlarda açık rıza süreçleri ayrıca yürütülür.',
     ),
@@ -466,7 +466,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.history_toggle_off_outlined,
       title: 'Sözleşme Sürümü ve Kabul Kaydı',
       body:
-          'Plango, uzmanın hangi Uzman Sözleşmesi sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.\n\n'
+          'Tasarruf Planım, uzmanın hangi Uzman Sözleşmesi sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.\n\n'
           'Bu kayıt uzman hesabı yönetimi, uyuşmazlıkların değerlendirilmesi ve yasal yükümlülüklerin yerine getirilmesi amacıyla kullanılabilir.\n\n'
           'Sözleşmenin esaslı biçimde değişmesi halinde yeniden kabul istenebilir.',
     ),
@@ -482,7 +482,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.update_outlined,
       title: 'Sözleşme Değişiklikleri',
       body:
-          'Plango, mevzuat, uzman sistemi veya operasyonel ihtiyaçlar doğrultusunda işbu sözleşmeyi güncelleyebilir.\n\n'
+          'Tasarruf Planım, mevzuat, uzman sistemi veya operasyonel ihtiyaçlar doğrultusunda işbu sözleşmeyi güncelleyebilir.\n\n'
           'Uzmanın hak ve yükümlülüklerini esaslı biçimde etkileyen değişikliklerde güncel metin uzmana sunulmalı ve gerektiğinde yeniden kabul alınmalıdır.\n\n'
           'Güncel sözleşme uygulama içerisinden erişilebilir tutulmalıdır.',
     ),
@@ -491,8 +491,8 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       title: 'Sorumluluk',
       body:
           'Uzman kendi beyan, iletişim ve eylemlerinden sorumludur.\n\n'
-          'Plango, uzman tarafından verilen yanlış veya yetkisiz şirket taahhütlerinin tarafı değildir.\n\n'
-          'Bununla birlikte işbu sözleşmedeki hiçbir hüküm, Plango’nun kendi kusurundan veya emredici mevzuattan doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.',
+          'Tasarruf Planım, uzman tarafından verilen yanlış veya yetkisiz şirket taahhütlerinin tarafı değildir.\n\n'
+          'Bununla birlikte işbu sözleşmedeki hiçbir hüküm, Tasarruf Planım’ın kendi kusurundan veya emredici mevzuattan doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.',
     ),
     _ExpertAgreementSection(
       icon: Icons.gavel_outlined,
@@ -506,7 +506,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.account_balance_outlined,
       title: 'Uyuşmazlıkların Çözümü',
       body:
-          'Uzman ile Plango arasında işbu sözleşmeden kaynaklanan bir uyuşmazlık oluşması halinde öncelikle Plango’nun ilan ettiği iletişim kanalları üzerinden çözüm aranabilir.\n\n'
+          'Uzman ile Tasarruf Planım arasında işbu sözleşmeden kaynaklanan bir uyuşmazlık oluşması halinde öncelikle Tasarruf Planım’ın ilan ettiği iletişim kanalları üzerinden çözüm aranabilir.\n\n'
           'Tarafların kanunen yetkili yargı mercilerine ve diğer başvuru yollarına ilişkin hakları saklıdır.\n\n'
           'Yetki ve görev konularında yürürlükteki emredici hukuk kuralları uygulanır.',
     ),
@@ -530,15 +530,15 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.mail_outline_rounded,
       title: 'İletişim',
       body:
-          'Uzman, başvuru, doğrulama, hesap güvenliği ve sözleşmeyle ilgili taleplerini Plango tarafından ilan edilen resmî iletişim kanalları üzerinden iletebilir.\n\n'
-          'Plango’nun nihai ticari unvanı, resmî e-posta adresi ve bildirim kanalları yayın öncesinde bu metinde tamamlanmalıdır.\n\n'
+          'Uzman, uzman başvurusu, doğrulama ve sözleşmeyle ilgili genel taleplerini info@tasarrufplanim.com adresi üzerinden iletebilir.\n\n'
+          'Uzman hesabı, giriş, hesap güvenliği veya teknik sorunlara ilişkin destek talepleri destek@tasarrufplanim.com adresi üzerinden iletilebilir.\n\n'
           'Kişisel verilere ilişkin başvurular ilgili KVKK metinlerinde belirtilen kanallardan yürütülür.',
     ),
     _ExpertAgreementSection(
       icon: Icons.play_circle_outline_rounded,
       title: 'Yürürlük',
       body:
-          'İşbu Uzman Sözleşmesi, uzman adayının elektronik ortamda sözleşmeyi kabul etmesi ve uzman rolünün Plango tarafından onaylanmasıyla ilgili hükümler bakımından yürürlüğe girer.\n\n'
+          'İşbu Uzman Sözleşmesi, uzman adayının elektronik ortamda sözleşmeyi kabul etmesi ve uzman rolünün Tasarruf Planım tarafından onaylanmasıyla ilgili hükümler bakımından yürürlüğe girer.\n\n'
           'Uzman statüsü devam ettiği sürece güncel sözleşme hükümleri uygulanır.\n\n'
           'Esaslı bir değişiklikte yeniden kabul gerekebilir.',
     ),
@@ -546,8 +546,8 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       icon: Icons.verified_user_outlined,
       title: 'Son Hüküm',
       body:
-          'Uzman, Plango uzman sisteminin kullanıcıya baskı kurmak veya otomatik atama mekanizmasını satış amacıyla manipüle etmek için değil, tasarruf finansmanı hakkında güvenli ve profesyonel iletişim sağlamak amacıyla oluşturulduğunu kabul eder.\n\n'
-          'Uzmanın temel yükümlülüğü; doğru bilgi vermek, kullanıcı verilerini korumak, kullanıcıya saygılı davranmak ve Plango’nun bağımsızlık ile tarafsızlık yaklaşımına uygun hareket etmektir.\n\n'
+          'Uzman, Tasarruf Planım uzman sisteminin kullanıcıya baskı kurmak veya otomatik atama mekanizmasını satış amacıyla manipüle etmek için değil, tasarruf finansmanı hakkında güvenli ve profesyonel iletişim sağlamak amacıyla oluşturulduğunu kabul eder.\n\n'
+          'Uzmanın temel yükümlülüğü; doğru bilgi vermek, kullanıcı verilerini korumak, kullanıcıya saygılı davranmak ve Tasarruf Planım’ın bağımsızlık ile tarafsızlık yaklaşımına uygun hareket etmektir.\n\n'
           'İşbu sözleşme, uzman ile kullanıcının veya uzman tarafından temsil edilen tasarruf finansman şirketinin arasında kurulabilecek bağımsız sözleşmenin yerine geçmez.',
     ),
   ];
@@ -712,7 +712,7 @@ class _ExpertAgreementIntroCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango’da kullanıcılar belirli bir uzman seçmez. Danışma '
+              'Tasarruf Planım’da kullanıcılar belirli bir uzman seçmez. Danışma '
               'talepleri uygun uzmanlara sistem kuralları doğrultusunda '
               'otomatik olarak atanır. Uzmanın temel yükümlülüğü doğru, '
               'güvenli ve profesyonel iletişim yürütmektir.',
@@ -903,7 +903,7 @@ class _ExpertAgreementFooterCard extends StatelessWidget {
           Expanded(
             child: Text(
               'Uzman statüsünün temeli satış baskısı değil; doğru bilgi, '
-              'kullanıcı güvenliği, mesleki özen ve Plango’nun bağımsızlık '
+              'kullanıcı güvenliği, mesleki özen ve Tasarruf Planım’ın bağımsızlık '
               'ilkelerine uygun iletişimdir.',
               style: TextStyle(
                 color: Color(0xFFD9E7E9),
@@ -927,10 +927,10 @@ class _LaunchNote extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Text(
-        'Yayın öncesi: Plango’nun nihai ticari unvanı, resmî iletişim '
-        'bilgileri, sözleşme sürümü ve uzman doğrulama süreçlerinin son '
-        'operasyonel hali bu metinle karşılaştırılmalı; metin hukuk '
-        'uzmanı tarafından son kez kontrol edilmelidir.',
+        'Yayın öncesi: Tasarruf Planım’ın nihai ticari unvanı, resmî adresi, '
+        'sözleşme sürümü ve uzman doğrulama süreçlerinin son operasyonel '
+        'hali bu metinle karşılaştırılmalı; metin hukuk uzmanı tarafından '
+        'son kez kontrol edilmelidir.',
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Color(0xFF8A96A3),

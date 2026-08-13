@@ -86,7 +86,7 @@ class ExpertApplicationSuccessScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     const Text(
                       'Şirket, şube, pozisyon ve kurumsal e-posta '
-                      'bilgileriniz Plango yönetimi tarafından '
+                      'bilgileriniz Tasarruf Planım yönetimi tarafından '
                       'incelenecektir. Başvuru sonucunuz uygulama '
                       'içerisinden size bildirilecektir.',
                       textAlign: TextAlign.center,

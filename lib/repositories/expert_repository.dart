@@ -297,7 +297,7 @@ class ExpertRepository {
 
   /// Uzmanlığı sistemden kalıcı olarak kaldırır.
 ///
-/// Bu işlem kullanıcının normal Plango hesabını silmez.
+/// Bu işlem kullanıcının normal Tasarruf Planım hesabını silmez.
 /// Sadece uzman kayıtlarını kaldırır ve kullanıcı profilini
 /// tekrar normal kullanıcı durumuna döndürür.
 ///

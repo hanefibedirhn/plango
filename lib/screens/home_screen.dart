@@ -202,117 +202,89 @@ _buildHighlightsSection(),
     return AppBar(
       elevation: 0,
       toolbarHeight: 66,
-      backgroundColor: _background,
+      backgroundColor: const Color(0xFFEEF3F5),
       surfaceTintColor: Colors.transparent,
       iconTheme: const IconThemeData(color: _navy, size: 25),
       titleSpacing: 3,
-      title: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PlangoRoadLogo(size: 36),
-          SizedBox(width: 9),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'PLANGO',
-                style: TextStyle(
-                  color: _navy,
-                  fontSize: 20,
-                  height: 1,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.9,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Planla • Karşılaştır • Karar Ver',
-                style: TextStyle(
-                  color: _teal,
-                  fontSize: 8.5,
-                  height: 1,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.35,
-                ),
-              ),
-            ],
+      title: Image.asset(
+        'assets/images/tasarruf_planim_home_logo.png',
+        height: 46,
+        fit: BoxFit.contain,
+        alignment: Alignment.centerLeft,
+        errorBuilder: (_, __, ___) => const Text(
+          'Tasarruf Planım',
+          style: TextStyle(
+            color: _navy,
+            fontSize: 19,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.3,
           ),
-        ],
+        ),
       ),
       actions: [
         Builder(
-  builder: (context) {
-    final User? user =
-        FirebaseAuth.instance.currentUser;
+          builder: (context) {
+            final User? user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
-      return IconButton(
-        tooltip: 'Bildirim Merkezi',
-        onPressed: _openNotificationCenter,
-        icon: const Icon(
-          Icons.notifications_none_rounded,
-        ),
-      );
-    }
-
-    return StreamBuilder<int>(
-      stream: _notificationRepository
-          .watchUnreadCount(user.uid),
-      builder: (context, snapshot) {
-        final int unreadCount =
-            snapshot.data ?? 0;
-
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            IconButton(
-              tooltip: 'Bildirim Merkezi',
-              onPressed: _openNotificationCenter,
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-              ),
-            ),
-            if (unreadCount > 0)
-              Positioned(
-                right: 3,
-                top: 4,
-                child: Container(
-                  constraints:
-                      const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(
-                    horizontal: 4,
-                  ),
-                  alignment: Alignment.center,
-                  decoration:
-                      const BoxDecoration(
-                    color: Color(0xFFFF5A4F),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    unreadCount > 99
-                        ? '99+'
-                        : '$unreadCount',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                      height: 1,
-                      fontWeight:
-                          FontWeight.w900,
-                    ),
-                  ),
+            if (user == null) {
+              return IconButton(
+                tooltip: 'Bildirim Merkezi',
+                onPressed: _openNotificationCenter,
+                icon: const Icon(
+                  Icons.notifications_none_rounded,
                 ),
-              ),
-          ],
-        );
-      },
-    );
-  },
-),
+              );
+            }
+
+            return StreamBuilder<int>(
+              stream: _notificationRepository.watchUnreadCount(user.uid),
+              builder: (context, snapshot) {
+                final int unreadCount = snapshot.data ?? 0;
+
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      tooltip: 'Bildirim Merkezi',
+                      onPressed: _openNotificationCenter,
+                      icon: const Icon(
+                        Icons.notifications_none_rounded,
+                      ),
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: 3,
+                        top: 4,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                          ),
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFF5A4F),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            unreadCount > 99 ? '99+' : '$unreadCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              height: 1,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
         const SizedBox(width: 7),
       ],
     );
@@ -1460,115 +1432,6 @@ DateTime? _findDeliveryDate(SavedPlan plan) {
 
 }
 
-
-class PlangoRoadLogo extends StatelessWidget {
-  const PlangoRoadLogo({
-    super.key,
-    this.size = 48,
-  });
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _PlangoLogoPainter(),
-      ),
-    );
-  }
-}
-
-class _PlangoLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Rect rect = Offset.zero & size;
-
-    final Paint gradientPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF17C9B0),
-          Color(0xFF087C72),
-          Color(0xFF0A3451),
-        ],
-      ).createShader(rect);
-
-    final RRect body = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        size.width * 0.12,
-        size.height * 0.06,
-        size.width * 0.72,
-        size.height * 0.88,
-      ),
-      Radius.circular(size.width * 0.22),
-    );
-
-    canvas.drawRRect(body, gradientPaint);
-
-    final Paint cutPaint = Paint()
-      ..color = const Color(0xFFF7F9FB)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.15
-      ..strokeCap = StrokeCap.round;
-
-    final Path road = Path()
-      ..moveTo(
-        size.width * 0.30,
-        size.height * 0.88,
-      )
-      ..cubicTo(
-        size.width * 0.30,
-        size.height * 0.68,
-        size.width * 0.67,
-        size.height * 0.69,
-        size.width * 0.67,
-        size.height * 0.42,
-      )
-      ..cubicTo(
-        size.width * 0.67,
-        size.height * 0.24,
-        size.width * 0.49,
-        size.height * 0.23,
-        size.width * 0.31,
-        size.height * 0.34,
-      );
-
-    canvas.drawPath(road, cutPaint);
-
-    final Paint centerLinePaint = Paint()
-      ..color = const Color(0xFF26D6BF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.035
-      ..strokeCap = StrokeCap.round;
-
-    final Path centerLine = Path()
-      ..moveTo(
-        size.width * 0.31,
-        size.height * 0.86,
-      )
-      ..cubicTo(
-        size.width * 0.35,
-        size.height * 0.68,
-        size.width * 0.60,
-        size.height * 0.65,
-        size.width * 0.60,
-        size.height * 0.43,
-      );
-
-    canvas.drawPath(centerLine, centerLinePaint);
-  }
-
-  @override
-  bool shouldRepaint(
-    covariant CustomPainter oldDelegate,
-  ) {
-    return false;
-  }
-}
 
 
 class _HeroFallbackArtwork extends StatelessWidget {

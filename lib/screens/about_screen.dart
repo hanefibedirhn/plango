@@ -21,21 +21,21 @@ class _AboutScreenState extends State<AboutScreen> {
   final List<_AboutSection> _sections = const [
     _AboutSection(
       icon: Icons.explore_outlined,
-      title: 'Plango Nedir?',
+      title: 'Tasarruf Planım Nedir?',
       body:
-          'Plango; tasarruf finansmanı sistemini araştıran, farklı ödeme senaryolarını değerlendirmek isteyen ve karar sürecinde daha fazla bilgiye ihtiyaç duyan kullanıcılar için geliştirilmiş bağımsız bir dijital karar destek platformudur.\n\n'
+          'Tasarruf Planım; tasarruf finansmanı sistemini araştıran, farklı ödeme senaryolarını değerlendirmek isteyen ve karar sürecinde daha fazla bilgiye ihtiyaç duyan kullanıcılar için geliştirilmiş bağımsız bir dijital karar destek platformudur.\n\n'
           'Platformun temel amacı, tasarruf finansmanı alanındaki karmaşık bilgileri daha anlaşılır hale getirmek; kullanıcıların finansman tutarı, peşinat, aylık ödeme, teslim süresi, vade ve ödeme modeli gibi başlıklarda kendi senaryolarını oluşturabilmesini sağlamaktır.\n\n'
-          'Plango herhangi bir tasarruf finansman şirketinin resmî uygulaması değildir. Herhangi bir şirket adına sözleşme düzenlemez, ödeme tahsil etmez, finansman sağlamaz ve kullanıcı adına karar vermez.\n\n'
-          'Plango’nun rolü; bilgi sunmak, hesaplama yapmak, seçenekleri görünür hale getirmek ve kullanıcının kendi kararını daha bilinçli şekilde verebilmesine destek olmaktır.',
+          'Tasarruf Planım herhangi bir tasarruf finansman şirketinin resmî uygulaması değildir. Herhangi bir şirket adına sözleşme düzenlemez, ödeme tahsil etmez, finansman sağlamaz ve kullanıcı adına karar vermez.\n\n'
+          'Tasarruf Planım’ın rolü; bilgi sunmak, hesaplama yapmak, seçenekleri görünür hale getirmek ve kullanıcının kendi kararını daha bilinçli şekilde verebilmesine destek olmaktır.',
     ),
     _AboutSection(
       icon: Icons.lightbulb_outline_rounded,
-      title: 'Plango Neden Geliştirildi?',
+      title: 'Tasarruf Planım Neden Geliştirildi?',
       body:
           'Tasarruf finansmanı sistemi; ev, araç ve benzeri finansman ihtiyaçlarını faizsiz modeller üzerinden planlamak isteyen kullanıcılar için önemli bir alternatif haline gelmiştir.\n\n'
           'Ancak kullanıcı açısından sistem her zaman kolay anlaşılır değildir. Finansman tutarı, peşinat, aylık taksit, teslim süresi, toplam vade, organizasyon ücreti, artışlı ödeme modelleri, şirket uygulamaları ve mevzuat gibi çok sayıda değişken aynı anda değerlendirilmek zorundadır.\n\n'
           'Kullanıcı çoğu zaman yalnızca “Ne kadar öderim?” sorusuna değil; “Ne zaman teslim alırım?”, “Peşinatı artırırsam ne değişir?”, “Taksiti yükseltirsem vade ne kadar kısalır?”, “Artışlı plan benim için nasıl sonuç verir?” gibi sorulara da cevap arar.\n\n'
-          'Plango bu ihtiyacı karşılamak için geliştirildi. Amaç; kullanıcının farklı senaryoları tekrar tekrar hesaplayabileceği, sistemin mantığını daha kolay anlayabileceği ve resmî karar vermeden önce kendi alternatiflerini değerlendirebileceği bağımsız bir dijital alan oluşturmaktır.',
+          'Tasarruf Planım bu ihtiyacı karşılamak için geliştirildi. Amaç; kullanıcının farklı senaryoları tekrar tekrar hesaplayabileceği, sistemin mantığını daha kolay anlayabileceği ve resmî karar vermeden önce kendi alternatiflerini değerlendirebileceği bağımsız bir dijital alan oluşturmaktır.',
     ),
     _AboutSection(
       icon: Icons.troubleshoot_outlined,
@@ -43,15 +43,15 @@ class _AboutScreenState extends State<AboutScreen> {
       body:
           'Tasarruf finansmanı sektöründe bilgi çoğu zaman farklı şirket ekranlarında, satış görüşmelerinde, sözleşme metinlerinde, kampanya duyurularında ve mevzuat kaynaklarında dağınık şekilde bulunur.\n\n'
           'Bu da kullanıcıların aynı anda birden fazla kaynağı takip etmesini, farklı hesaplama yöntemlerini anlamasını ve kendi mali durumuna göre karşılaştırma yapmasını zorlaştırabilir.\n\n'
-          'Plango; bilgiye erişim, hesaplama ve değerlendirme süreçlerini tek bir dijital deneyim içinde bir araya getirmeyi hedefler.\n\n'
+          'Tasarruf Planım; bilgiye erişim, hesaplama ve değerlendirme süreçlerini tek bir dijital deneyim içinde bir araya getirmeyi hedefler.\n\n'
           'Buradaki amaç sektörü veya şirketleri tek bir kalıba sokmak değil; kullanıcıya kendi kararını verebilmesi için daha anlaşılır bir çerçeve sunmaktır.',
     ),
     _AboutSection(
       icon: Icons.flag_outlined,
       title: 'Misyonumuz',
       body:
-          'Plango’nun misyonu; tasarruf finansmanı sistemine ilişkin hesaplama, bilgilendirme ve değerlendirme süreçlerini sadeleştirerek kullanıcıların daha bilinçli karar verebilmesine destek olmaktır.\n\n'
-          'Plango, kullanıcıya nihai karar sunmaz. Kullanıcı adına şirket seçmez. Kullanıcı adına plan belirlemez.\n\n'
+          'Tasarruf Planım’ın misyonu; tasarruf finansmanı sistemine ilişkin hesaplama, bilgilendirme ve değerlendirme süreçlerini sadeleştirerek kullanıcıların daha bilinçli karar verebilmesine destek olmaktır.\n\n'
+          'Tasarruf Planım, kullanıcıya nihai karar sunmaz. Kullanıcı adına şirket seçmez. Kullanıcı adına plan belirlemez.\n\n'
           'Bunun yerine; kullanıcının kendi verileriyle hesaplama yapabilmesini, farklı senaryoları görebilmesini, sektörel bilgileri okuyabilmesini ve resmî karar öncesinde daha güçlü bir değerlendirme zemini oluşturabilmesini sağlar.\n\n'
           'Misyonumuzun merkezinde kullanıcıyı yönlendirmek değil, kullanıcıyı güçlendirmek vardır.',
     ),
@@ -59,33 +59,33 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.public_rounded,
       title: 'Vizyonumuz',
       body:
-          'Plango’nun vizyonu; tasarruf finansmanı alanında kullanıcıların hesaplama yapabildiği, sistemi anlayabildiği, güncel gelişmeleri takip edebildiği, şirket bilgilerine erişebildiği ve uygun olduğunda doğrulanmış sektör uzmanlarıyla iletişim kurabildiği kapsamlı bir karar destek platformu olmaktır.\n\n'
-          'Plango, sektördeki şirketlerin veya uzmanların yerine geçmeyi değil; kullanıcı ile bilgi arasında daha sade, anlaşılır ve tarafsız bir köprü kurmayı hedefler.\n\n'
+          'Tasarruf Planım’ın vizyonu; tasarruf finansmanı alanında kullanıcıların hesaplama yapabildiği, sistemi anlayabildiği, güncel gelişmeleri takip edebildiği, şirket bilgilerine erişebildiği ve uygun olduğunda doğrulanmış sektör uzmanlarıyla iletişim kurabildiği kapsamlı bir karar destek platformu olmaktır.\n\n'
+          'Tasarruf Planım, sektördeki şirketlerin veya uzmanların yerine geçmeyi değil; kullanıcı ile bilgi arasında daha sade, anlaşılır ve tarafsız bir köprü kurmayı hedefler.\n\n'
           'Uzun vadede hedefimiz, tasarruf finansmanı karar sürecinin kullanıcı açısından daha şeffaf, daha erişilebilir ve daha anlaşılır hale gelmesine katkı sunmaktır.',
     ),
     _AboutSection(
       icon: Icons.balance_outlined,
       title: 'Bağımsızlık İlkemiz',
       body:
-          'Bağımsızlık, Plango’nun temel ürün ilkelerinden biridir.\n\n'
-          'Plango herhangi bir tasarruf finansman şirketine bağlı olarak faaliyet göstermez. Hesaplama sonuçları belirli bir şirketi öne çıkarmak, belirli bir kampanyayı avantajlı göstermek veya kullanıcıyı belirli bir kuruluşa yönlendirmek amacıyla hazırlanmaz.\n\n'
-          'Bir şirketin Plango’da yer alması, o şirketin Plango tarafından tavsiye edildiği anlamına gelmez. Benzer şekilde bir uzmanın Plango’da doğrulanmış olması da o uzmanın diğer uzmanlardan daha iyi olduğu anlamına gelmez.\n\n'
-          'Plango’nun bağımsızlık anlayışı; hesaplama, bilgilendirme, şirket görünürlüğü, uzman sistemi ve içerik yayınlama süreçlerinin tamamında kullanıcıya açık ve dürüst bir karar destek deneyimi sunmayı hedefler.',
+          'Bağımsızlık, Tasarruf Planım’ın temel ürün ilkelerinden biridir.\n\n'
+          'Tasarruf Planım herhangi bir tasarruf finansman şirketine bağlı olarak faaliyet göstermez. Hesaplama sonuçları belirli bir şirketi öne çıkarmak, belirli bir kampanyayı avantajlı göstermek veya kullanıcıyı belirli bir kuruluşa yönlendirmek amacıyla hazırlanmaz.\n\n'
+          'Bir şirketin Tasarruf Planım’da yer alması, o şirketin Tasarruf Planım tarafından tavsiye edildiği anlamına gelmez. Benzer şekilde bir uzmanın Tasarruf Planım’da doğrulanmış olması da o uzmanın diğer uzmanlardan daha iyi olduğu anlamına gelmez.\n\n'
+          'Tasarruf Planım’ın bağımsızlık anlayışı; hesaplama, bilgilendirme, şirket görünürlüğü, uzman sistemi ve içerik yayınlama süreçlerinin tamamında kullanıcıya açık ve dürüst bir karar destek deneyimi sunmayı hedefler.',
     ),
     _AboutSection(
       icon: Icons.compare_arrows_rounded,
       title: 'Tarafsızlık İlkemiz',
       body:
-          'Plango, tasarruf finansman şirketleri, uzmanlar, ödeme modelleri ve kampanyalar arasında taraflı bir değerlendirme yapmayı amaçlamaz.\n\n'
+          'Tasarruf Planım, tasarruf finansman şirketleri, uzmanlar, ödeme modelleri ve kampanyalar arasında taraflı bir değerlendirme yapmayı amaçlamaz.\n\n'
           'Platformda yer alan bilgilerin mümkün olduğunca nesnel, doğrulanabilir ve açıklayıcı biçimde sunulması hedeflenir.\n\n'
-          'Plango’nun amacı “en iyi şirketi” veya “en iyi planı” ilan etmek değildir. Çünkü kullanıcıların mali durumları, ihtiyaçları, hedefleri ve öncelikleri birbirinden farklıdır.\n\n'
-          'Bir seçenek bir kullanıcı için uygunken başka bir kullanıcı için uygun olmayabilir. Bu nedenle Plango, mutlak sıralama yapmak yerine kullanıcıya kendi koşullarına göre değerlendirme yapabileceği bir yapı sunmayı tercih eder.',
+          'Tasarruf Planım’ın amacı “en iyi şirketi” veya “en iyi planı” ilan etmek değildir. Çünkü kullanıcıların mali durumları, ihtiyaçları, hedefleri ve öncelikleri birbirinden farklıdır.\n\n'
+          'Bir seçenek bir kullanıcı için uygunken başka bir kullanıcı için uygun olmayabilir. Bu nedenle Tasarruf Planım, mutlak sıralama yapmak yerine kullanıcıya kendi koşullarına göre değerlendirme yapabileceği bir yapı sunmayı tercih eder.',
     ),
     _AboutSection(
       icon: Icons.visibility_outlined,
       title: 'Şeffaflık Anlayışımız',
       body:
-          'Plango, kullanıcıya sunduğu hesaplama ve bilgilendirme araçlarının niteliğini açık biçimde belirtmeyi temel bir sorumluluk olarak görür.\n\n'
+          'Tasarruf Planım, kullanıcıya sunduğu hesaplama ve bilgilendirme araçlarının niteliğini açık biçimde belirtmeyi temel bir sorumluluk olarak görür.\n\n'
           'FP Engine sonuçlarının tahmini olduğu, resmî teklif veya sözleşme niteliğinde olmadığı ve resmî süreçlerin ilgili şirket tarafından yürütüldüğü açıkça ifade edilir.\n\n'
           'Benzer şekilde şirket bilgileri, uzman profilleri ve bilgilendirici içerikler kullanıcıya olduğu gibi sunulmaya çalışılır; mümkün olduğunca yorum ile resmî bilgi birbirinden ayrılır.\n\n'
           'Şeffaflık yaklaşımımızın amacı, kullanıcının neye baktığını ve gördüğü bilginin ne anlama geldiğini net şekilde anlayabilmesini sağlamaktır.',
@@ -94,7 +94,7 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.memory_outlined,
       title: 'FP Engine Teknolojisi',
       body:
-          'FP Engine, Plango içerisinde kullanılan bağımsız hesaplama motorudur.\n\n'
+          'FP Engine, Tasarruf Planım içerisinde kullanılan bağımsız hesaplama motorudur.\n\n'
           'Kullanıcı tarafından girilen finansman tutarı, peşinat, aylık ödeme, ödeme modeli, artış oranı, artış periyodu ve benzeri parametreleri kullanarak tahmini ödeme planları ve teslim süresi analizleri oluşturur.\n\n'
           'FP Engine’in temel amacı şirket adına resmî teklif üretmek değil; kullanıcının farklı senaryoların muhtemel etkilerini görmesine yardımcı olacak standartlaştırılmış bir karar destek yaklaşımı sunmaktır.\n\n'
           'Kullanıcı aynı finansman tutarını farklı peşinat, taksit ve artış modelleriyle tekrar tekrar hesaplayabilir. Böylece tek bir planı görmek yerine alternatifler arasındaki farkları değerlendirebilir.\n\n'
@@ -104,16 +104,16 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.person_search_outlined,
       title: 'Kullanıcıya Sağladığımız Değer',
       body:
-          'Plango’nun kullanıcıya sunduğu temel değer, karar sürecini daha anlaşılır hale getirmektir.\n\n'
+          'Tasarruf Planım’ın kullanıcıya sunduğu temel değer, karar sürecini daha anlaşılır hale getirmektir.\n\n'
           'Kullanıcı; farklı finansman senaryolarını tek tek hesaplayabilir, tahmini teslim süresini görebilir, ödeme planını inceleyebilir, planını kaydedebilir ve ihtiyaç duyduğu bilgileri tekrar görüntüleyebilir.\n\n'
           'Bu yapı, kullanıcının yalnızca satış görüşmesi sırasında duyduğu bilgilerle hareket etmek yerine kendi hesabını yapabilmesine destek olur.\n\n'
-          'Plango’nun amacı kullanıcıyı bir seçeneğe yönlendirmek değil; kullanıcının seçenekleri daha bilinçli biçimde değerlendirebilmesine yardımcı olmaktır.',
+          'Tasarruf Planım’ın amacı kullanıcıyı bir seçeneğe yönlendirmek değil; kullanıcının seçenekleri daha bilinçli biçimde değerlendirebilmesine yardımcı olmaktır.',
     ),
     _AboutSection(
       icon: Icons.account_balance_outlined,
       title: 'Tasarruf Finansmanı Bilgilendirmesi',
       body:
-          'Plango yalnızca hesaplama aracı değildir.\n\n'
+          'Tasarruf Planım yalnızca hesaplama aracı değildir.\n\n'
           'Tasarruf finansman sistemi hakkında temel kavramlar, sistemin çalışma mantığı, ödeme modelleri, teslim süreci, organizasyon ücreti, sözleşme ve kullanıcıların dikkat etmesi gereken başlıklar hakkında bilgilendirici içerikler sunmayı hedefler.\n\n'
           'Bu içeriklerin amacı kullanıcıların sistemle ilk kez karşılaştığında temel kavramları anlayabilmesini sağlamaktır.\n\n'
           'Resmî ve bağlayıcı bilgiler için yürürlükteki mevzuat, yetkili kurumlar ve ilgili tasarruf finansman şirketlerinin resmî açıklamaları esas alınmalıdır.',
@@ -122,71 +122,71 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.apartment_outlined,
       title: 'Şirket Bilgileri Yaklaşımımız',
       body:
-          'Plango’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller yer alabilir.\n\n'
+          'Tasarruf Planım’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller yer alabilir.\n\n'
           'Bu profillerin amacı kullanıcıya şirketler hakkında temel ve doğrulanabilir bilgileri daha kolay erişilebilir biçimde sunmaktır.\n\n'
-          'Plango bir şirketi diğerinden üstün göstermeyi amaçlamaz. Şirket profillerinde yer alan bilgiler mümkün olduğunca nesnel bir çerçevede sunulmaya çalışılır.\n\n'
+          'Tasarruf Planım bir şirketi diğerinden üstün göstermeyi amaçlamaz. Şirket profillerinde yer alan bilgiler mümkün olduğunca nesnel bir çerçevede sunulmaya çalışılır.\n\n'
           'Şirketlerin kampanyaları, ürün koşulları ve uygulamaları zaman içinde değişebileceğinden kullanıcıların nihai karar öncesinde ilgili şirketin resmî kanallarını kontrol etmesi önemlidir.',
     ),
     _AboutSection(
       icon: Icons.verified_user_outlined,
       title: 'Doğrulanmış Uzman Sistemi',
       body:
-          'Plango’da yer alan uzman profilleri, platform tarafından belirlenen doğrulama ve onay süreçlerinden geçmiş sektör profesyonellerinden oluşabilir.\n\n'
+          'Tasarruf Planım’da yer alan uzman profilleri, platform tarafından belirlenen doğrulama ve onay süreçlerinden geçmiş sektör profesyonellerinden oluşabilir.\n\n'
           'Bu sistemin amacı kullanıcıların tasarruf finansmanı alanında çalışan uzmanlara daha düzenli ve güvenli bir şekilde ulaşabilmesini kolaylaştırmaktır.\n\n'
-          'Doğrulanmış uzman ifadesi, ilgili kişinin Plango doğrulama kriterlerini tamamladığını gösterir; devlet tarafından verilmiş bağımsız bir mesleki yeterlilik belgesi veya Plango tarafından verilmiş performans garantisi anlamına gelmez.\n\n'
+          'Doğrulanmış uzman ifadesi, ilgili kişinin Tasarruf Planım doğrulama kriterlerini tamamladığını gösterir; devlet tarafından verilmiş bağımsız bir mesleki yeterlilik belgesi veya Tasarruf Planım tarafından verilmiş performans garantisi anlamına gelmez.\n\n'
           'Uzmanlar tarafından sunulan bilgiler ilgili uzmanın kendi mesleki sorumluluğu kapsamındadır.',
     ),
     _AboutSection(
       icon: Icons.support_agent_outlined,
       title: 'Danışma Deneyimi',
       body:
-          'Plango’nun danışma sistemi, kullanıcıların tasarruf finansmanı hakkında soru sormak veya bilgi almak üzere uygun uzmanlarla iletişim kurmasını kolaylaştırmayı amaçlar.\n\n'
+          'Tasarruf Planım’ın danışma sistemi, kullanıcıların tasarruf finansmanı hakkında soru sormak veya bilgi almak üzere uygun uzmanlarla iletişim kurmasını kolaylaştırmayı amaçlar.\n\n'
           'Danışma talebi finansman başvurusu, sözleşme, ön onay veya satın alma işlemi değildir.\n\n'
-          'Plango’nun rolü kullanıcı ile uzman arasındaki iletişimi kolaylaştırmaktır. Kullanıcı ile uzman veya uzman tarafından temsil edilen şirket arasında kurulabilecek ticari ilişkinin tarafı Plango değildir.\n\n'
+          'Tasarruf Planım’ın rolü kullanıcı ile uzman arasındaki iletişimi kolaylaştırmaktır. Kullanıcı ile uzman veya uzman tarafından temsil edilen şirket arasında kurulabilecek ticari ilişkinin tarafı Tasarruf Planım değildir.\n\n'
           'Danışma deneyiminin temelinde saygı, doğru bilgi, kullanıcı güvenliği ve şeffaf iletişim ilkeleri bulunur.',
     ),
     _AboutSection(
       icon: Icons.shield_outlined,
       title: 'Kullanıcı Güvenliği',
       body:
-          'Plango, kullanıcıların güvenli bir dijital deneyim yaşamasını önemli bir ürün sorumluluğu olarak görür.\n\n'
+          'Tasarruf Planım, kullanıcıların güvenli bir dijital deneyim yaşamasını önemli bir ürün sorumluluğu olarak görür.\n\n'
           'Kullanıcı hesapları, uzman doğrulama süreçleri, veri erişim kuralları ve uygulama içi yetkilendirmeler bu yaklaşımın parçalarıdır.\n\n'
           'Bununla birlikte dijital güvenlik yalnızca teknik önlemlerden oluşmaz. Kullanıcıların parola, doğrulama kodu, banka şifresi veya benzeri hassas bilgileri üçüncü kişilerle paylaşmaması gerekir.\n\n'
-          'Plango, kullanıcıların önemli finansal veya sözleşmesel işlemlerde ilgili kişi ve kuruluşların kimliğini resmî kanallardan doğrulamasını önerir.',
+          'Tasarruf Planım, kullanıcıların önemli finansal veya sözleşmesel işlemlerde ilgili kişi ve kuruluşların kimliğini resmî kanallardan doğrulamasını önerir.',
     ),
     _AboutSection(
       icon: Icons.lock_outline_rounded,
       title: 'Veri ve Gizlilik Yaklaşımımız',
       body:
-          'Plango, kullanıcı verilerinin yalnızca hizmetin sunulması ve geliştirilmesi için gerekli olduğu ölçüde işlenmesini hedefler.\n\n'
+          'Tasarruf Planım, kullanıcı verilerinin yalnızca hizmetin sunulması ve geliştirilmesi için gerekli olduğu ölçüde işlenmesini hedefler.\n\n'
           'Kullanıcının hesap bilgileri, kayıtlı planları veya uygulama içi işlemleri; ilgili özelliklerin çalışabilmesi amacıyla saklanabilir.\n\n'
-          'Kişisel verilerin korunması, erişim yetkilerinin sınırlandırılması ve kullanıcıların hesaplarını yönetebilmesi Plango’nun ürün yaklaşımının önemli parçalarıdır.\n\n'
+          'Kişisel verilerin korunması, erişim yetkilerinin sınırlandırılması ve kullanıcıların hesaplarını yönetebilmesi Tasarruf Planım’ın ürün yaklaşımının önemli parçalarıdır.\n\n'
           'Veri işleme ve kullanıcı haklarına ilişkin detaylar Gizlilik Politikası ve ilgili yasal metinlerde açıklanır.',
     ),
     _AboutSection(
       icon: Icons.hub_outlined,
       title: 'Sektöre Bakışımız',
       body:
-          'Plango tasarruf finansmanı sektörüne karşı veya sektörün yerine konumlanan bir yapı değildir.\n\n'
+          'Tasarruf Planım tasarruf finansmanı sektörüne karşı veya sektörün yerine konumlanan bir yapı değildir.\n\n'
           'Amacımız, sektörde faaliyet gösteren şirketler ile kullanıcılar arasındaki bilgi akışını daha anlaşılır hale getiren bağımsız bir dijital katman oluşturmaktır.\n\n'
-          'Tasarruf finansman şirketlerinin kendi ürünleri, operasyonları ve sözleşme süreçleri bulunur. Plango bu süreçlerin yerine geçmez.\n\n'
-          'Plango’nun hedefi, kullanıcıların sektörü daha iyi anlayabilmesine ve resmî karar öncesinde daha fazla bilgiyle hareket edebilmesine katkı sağlamaktır.',
+          'Tasarruf finansman şirketlerinin kendi ürünleri, operasyonları ve sözleşme süreçleri bulunur. Tasarruf Planım bu süreçlerin yerine geçmez.\n\n'
+          'Tasarruf Planım’ın hedefi, kullanıcıların sektörü daha iyi anlayabilmesine ve resmî karar öncesinde daha fazla bilgiyle hareket edebilmesine katkı sağlamaktır.',
     ),
     _AboutSection(
       icon: Icons.handshake_outlined,
       title: 'Sektöre Saygılı Yaklaşım',
       body:
-          'Plango’nun bağımsızlığı, şirketlere veya sektör profesyonellerine karşı olumsuz bir yaklaşım anlamına gelmez.\n\n'
+          'Tasarruf Planım’ın bağımsızlığı, şirketlere veya sektör profesyonellerine karşı olumsuz bir yaklaşım anlamına gelmez.\n\n'
           'Platform, sektörde faaliyet gösteren kuruluşlara ve uzmanlara tarafsız, saygılı ve doğrulanabilir bilgi temelli bir çerçevede yaklaşmayı hedefler.\n\n'
-          'Yanlış veya doğrulanamayan iddialarla şirketleri ya da uzmanları itibarsızlaştırmak Plango’nun yaklaşımıyla bağdaşmaz.\n\n'
-          'Aynı şekilde kullanıcıların da doğru, anlaşılır ve güncel bilgiye ulaşabilmesi önemlidir. Plango bu iki yaklaşım arasında dengeli bir bilgi ortamı kurmayı amaçlar.',
+          'Yanlış veya doğrulanamayan iddialarla şirketleri ya da uzmanları itibarsızlaştırmak Tasarruf Planım’ın yaklaşımıyla bağdaşmaz.\n\n'
+          'Aynı şekilde kullanıcıların da doğru, anlaşılır ve güncel bilgiye ulaşabilmesi önemlidir. Tasarruf Planım bu iki yaklaşım arasında dengeli bir bilgi ortamı kurmayı amaçlar.',
     ),
     _AboutSection(
       icon: Icons.autorenew_rounded,
       title: 'Sürekli Gelişim Anlayışımız',
       body:
-          'Plango tamamlanmış ve değişmeyecek bir ürün olarak görülmez.\n\n'
-          'Tasarruf finansmanı sektörü, mevzuat, kullanıcı alışkanlıkları ve dijital ürün standartları zaman içinde değişir. Plango da bu değişimlere uyum sağlayacak şekilde gelişmeyi hedefler.\n\n'
+          'Tasarruf Planım tamamlanmış ve değişmeyecek bir ürün olarak görülmez.\n\n'
+          'Tasarruf finansmanı sektörü, mevzuat, kullanıcı alışkanlıkları ve dijital ürün standartları zaman içinde değişir. Tasarruf Planım da bu değişimlere uyum sağlayacak şekilde gelişmeyi hedefler.\n\n'
           'Kullanıcı geri bildirimleri, teknik performans, yeni mevzuat, sektör uygulamaları ve ürün kullanım verileri geliştirme sürecinde dikkate alınabilir.\n\n'
           'Sürekli gelişim yaklaşımımızın temel amacı daha fazla özellik eklemek değil; kullanıcı için gerçekten değer üreten özellikleri daha iyi hale getirmektir.',
     ),
@@ -194,7 +194,7 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.design_services_outlined,
       title: 'Ürün Tasarım Anlayışımız',
       body:
-          'Plango’nun tasarım yaklaşımı; sadelik, güven, okunabilirlik ve işlevsellik üzerine kuruludur.\n\n'
+          'Tasarruf Planım’ın tasarım yaklaşımı; sadelik, güven, okunabilirlik ve işlevsellik üzerine kuruludur.\n\n'
           'Kullanıcıya gereksiz bilgi yüklemek yerine ihtiyaç duyduğu bilgiyi doğru zamanda ve anlaşılır biçimde sunmak hedeflenir.\n\n'
           'Hesaplama ekranları, ödeme planları, bilgi sayfaları ve profil alanları aynı tasarım dili içerisinde oluşturulur.\n\n'
           'Amaç yalnızca güzel görünen bir uygulama üretmek değil; kullanıcıyı yormayan, yönünü kaybettirmeyen ve karar sürecini kolaylaştıran bir deneyim oluşturmaktır.',
@@ -203,42 +203,42 @@ class _AboutScreenState extends State<AboutScreen> {
       icon: Icons.rocket_launch_outlined,
       title: 'Gelecek Hedeflerimiz',
       body:
-          'Plango’nun uzun vadeli hedefi, tasarruf finansmanı alanında kapsamlı ve güvenilir bir dijital karar destek ekosistemi oluşturmaktır.\n\n'
+          'Tasarruf Planım’ın uzun vadeli hedefi, tasarruf finansmanı alanında kapsamlı ve güvenilir bir dijital karar destek ekosistemi oluşturmaktır.\n\n'
           'Gelecekte hesaplama altyapısının geliştirilmesi, daha fazla bilgilendirici içerik, daha güçlü şirket veri yapıları, kullanıcı deneyimini destekleyen yeni karşılaştırma araçları ve uzman sisteminin geliştirilmesi değerlendirilebilir.\n\n'
           'Ancak her yeni özellik aynı temel ilkelere bağlı kalmalıdır: bağımsızlık, tarafsızlık, şeffaflık, kullanıcı güvenliği ve kararın kullanıcıya ait olması.\n\n'
-          'Plango’nun büyümesi, bu ilkelerden uzaklaşmak değil; bu ilkeleri daha geniş bir kullanıcı kitlesine taşıyabilmek anlamına gelmelidir.',
+          'Tasarruf Planım’ın büyümesi, bu ilkelerden uzaklaşmak değil; bu ilkeleri daha geniş bir kullanıcı kitlesine taşıyabilmek anlamına gelmelidir.',
     ),
     _AboutSection(
       icon: Icons.block_outlined,
-      title: 'Plango’nun Yapmadıkları',
+      title: 'Tasarruf Planım’ın Yapmadıkları',
       body:
-          'Plango’nun ne yaptığını anlatmak kadar ne yapmadığını açıkça belirtmek de önemlidir.\n\n'
-          'Plango finansman sağlamaz.\n\n'
-          'Plango şirket adına sözleşme düzenlemez.\n\n'
-          'Plango kullanıcıdan tasarruf finansmanı taksiti veya organizasyon ücreti tahsil etmez.\n\n'
-          'Plango kesin teslim tarihi taahhüdünde bulunmaz.\n\n'
-          'Plango kullanıcı adına şirket seçmez.\n\n'
-          'Plango herhangi bir şirketi veya uzmanı mutlak şekilde tavsiye etmez.\n\n'
-          'Plango resmî hukuki, yatırım veya finansal danışmanlık hizmeti sunmaz.\n\n'
-          'Bu sınırlar, Plango’nun bağımsız karar destek platformu niteliğinin temel parçasıdır.',
+          'Tasarruf Planım’ın ne yaptığını anlatmak kadar ne yapmadığını açıkça belirtmek de önemlidir.\n\n'
+          'Tasarruf Planım finansman sağlamaz.\n\n'
+          'Tasarruf Planım şirket adına sözleşme düzenlemez.\n\n'
+          'Tasarruf Planım kullanıcıdan tasarruf finansmanı taksiti veya organizasyon ücreti tahsil etmez.\n\n'
+          'Tasarruf Planım kesin teslim tarihi taahhüdünde bulunmaz.\n\n'
+          'Tasarruf Planım kullanıcı adına şirket seçmez.\n\n'
+          'Tasarruf Planım herhangi bir şirketi veya uzmanı mutlak şekilde tavsiye etmez.\n\n'
+          'Tasarruf Planım resmî hukuki, yatırım veya finansal danışmanlık hizmeti sunmaz.\n\n'
+          'Bu sınırlar, Tasarruf Planım’ın bağımsız karar destek platformu niteliğinin temel parçasıdır.',
     ),
     _AboutSection(
       icon: Icons.volunteer_activism_outlined,
       title: 'Kullanıcıya Verdiğimiz Söz',
       body:
-          'Plango’nun kullanıcıya verdiği temel söz şudur: Kullanıcıya mümkün olduğunca anlaşılır, tarafsız ve şeffaf bir karar destek deneyimi sunmak.\n\n'
+          'Tasarruf Planım’ın kullanıcıya verdiği temel söz şudur: Kullanıcıya mümkün olduğunca anlaşılır, tarafsız ve şeffaf bir karar destek deneyimi sunmak.\n\n'
           'Hesaplama sonuçlarının niteliğini gizlememek, resmî süreç ile tahmini hesaplama arasındaki farkı açıkça belirtmek, şirket veya uzmanları kullanıcıya zorla yönlendirmemek ve kullanıcı güvenliğini ürün kararlarının merkezinde tutmak bu sözün parçalarıdır.\n\n'
-          'Plango’nun başarısı yalnızca kaç kişinin uygulamayı kullandığıyla değil, kullanıcıların karar sürecinde ne kadar fayda sağladığıyla ölçülmelidir.',
+          'Tasarruf Planım’ın başarısı yalnızca kaç kişinin uygulamayı kullandığıyla değil, kullanıcıların karar sürecinde ne kadar fayda sağladığıyla ölçülmelidir.',
     ),
     _AboutSection(
       icon: Icons.favorite_border_rounded,
       title: 'Son Söz',
       body:
-          'Plango; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır şekilde değerlendirebilmesi için geliştirilmiş bağımsız bir karar destek platformudur.\n\n'
+          'Tasarruf Planım; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır şekilde değerlendirebilmesi için geliştirilmiş bağımsız bir karar destek platformudur.\n\n'
           'Bilgi sunar, hesaplama yapar, farklı senaryoları görünür hale getirir ve kullanıcıların kendi karar süreçlerini daha bilinçli yönetmesine yardımcı olur.\n\n'
           'Resmî süreç, sözleşme, ödeme planı ve teslim şartları her zaman kullanıcı ile ilgili tasarruf finansman şirketi arasında yürütülür.\n\n'
-          'Plango’nun amacı karar vermek değildir.\n\n'
-          'Plango’nun amacı, kullanıcının kararını daha bilinçli verebilmesine yardımcı olmaktır.',
+          'Tasarruf Planım’ın amacı karar vermek değildir.\n\n'
+          'Tasarruf Planım’ın amacı, kullanıcının kararını daha bilinçli verebilmesine yardımcı olmaktır.',
     ),
   ];
 
@@ -348,7 +348,7 @@ class _AboutHeroCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PLANGO',
+                  'TASARRUF PLANIM',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -409,7 +409,7 @@ class _AboutIntroCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır '
+              'Tasarruf Planım; kullanıcıların tasarruf finansmanı sürecini daha anlaşılır '
               'şekilde değerlendirebilmesi için geliştirilmiş bağımsız, tarafsız '
               've bilgilendirme odaklı bir karar destek platformudur.',
               style: TextStyle(
@@ -440,7 +440,7 @@ class _SectionLabel extends StatelessWidget {
         ),
         SizedBox(width: 7),
         Text(
-          'Plango’yu Yakından Tanıyın',
+          'Tasarruf Planım’ı Yakından Tanıyın',
           style: TextStyle(
             color: _AboutScreenState._navy,
             fontSize: 16,
@@ -600,7 +600,7 @@ class _AboutFooterCard extends StatelessWidget {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango’nun amacı karar vermek değil; kullanıcıların kendi karar '
+              'Tasarruf Planım’ın amacı karar vermek değil; kullanıcıların kendi karar '
               'süreçlerini daha bilinçli, anlaşılır ve şeffaf şekilde yönetmesine '
               'destek olmaktır.',
               style: TextStyle(

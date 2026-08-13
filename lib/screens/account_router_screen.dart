@@ -491,7 +491,7 @@ class GuestProfileScreen extends StatelessWidget {
             const SizedBox(height: 22),
 
             Text(
-              'Plango Hakkında',
+              'Tasarruf Planım Hakkında',
               style: TextStyle(
                 color: primaryText,
                 fontSize: 13,

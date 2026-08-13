@@ -748,7 +748,7 @@ class _AdminFeedbackScreenState extends State<AdminFeedbackScreen> {
               ),
               SizedBox(width: 8),
               Text(
-                'Plango Yanıtı',
+                'Tasarruf Planım Yanıtı',
                 style: TextStyle(
                   color: _navy,
                   fontSize: 14,

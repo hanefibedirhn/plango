@@ -55,7 +55,7 @@ class LoginSelectionScreen extends StatelessWidget {
 
               const _SectionLabel(
                 title: 'Giriş Yap',
-                subtitle: 'Plango hesabınıza giriş yaparak devam edin.',
+                subtitle: 'Tasarruf Planım hesabınıza giriş yaparak devam edin.',
               ),
               const SizedBox(height: 10),
 
@@ -76,7 +76,7 @@ class LoginSelectionScreen extends StatelessWidget {
               const SizedBox(height: 25),
 
               const _SectionLabel(
-                title: 'Plango’ya yeni misiniz?',
+                title: 'Tasarruf Planım’ya yeni misiniz?',
                 subtitle:
                     'Ücretsiz hesabınızı oluşturarak planlarınızı kaydedebilirsiniz.',
               ),
@@ -136,7 +136,7 @@ class _WelcomeSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Plango’ya Hoş Geldiniz',
+                  'Tasarruf Planım’ya Hoş Geldiniz',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 19,
@@ -402,7 +402,7 @@ class _CreateAccountCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'Planlarınızı kaydetmek ve Plango '
+                      'Planlarınızı kaydetmek ve Tasarruf Planım '
                       'özelliklerinden daha fazla yararlanmak '
                       'için hesabınızı oluşturun.',
                       style: TextStyle(

@@ -75,7 +75,7 @@ class NotificationService {
   }) async {
     await _repository.createNotification(
       userId: userId,
-      title: 'Plango Güncellendi',
+      title: 'Tasarruf Planım Güncellendi',
       message: message,
       type: 'system',
       targetScreen: 'system',

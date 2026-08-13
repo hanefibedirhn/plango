@@ -838,7 +838,7 @@ class _ImportantNotice extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'Plango tarafından sunulan hesaplamalar tahmini ve '
+                  'Tasarruf Planım tarafından sunulan hesaplamalar tahmini ve '
                   'bilgilendirme amaçlıdır. Kesin plan, ödeme ve teslimat '
                   'koşulları ilgili şirketin resmî teklifi ve sözleşmesiyle '
                   'belirlenir.',

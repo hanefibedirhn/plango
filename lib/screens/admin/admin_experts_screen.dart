@@ -928,7 +928,7 @@ class _AdminExpertsScreenState extends State<AdminExpertsScreen> {
               ),
               content: Text(
                 '${expert.firstName} ${expert.lastName} uzman ağından '
-                'kalıcı olarak kaldırılacak. Normal Plango kullanıcı '
+                'kalıcı olarak kaldırılacak. Normal Tasarruf Planım kullanıcı '
                 'hesabı korunacak.',
                 style: const TextStyle(
                   color: _muted,
@@ -1336,7 +1336,7 @@ class _AdminExpertsScreenState extends State<AdminExpertsScreen> {
                             ),
                             const SizedBox(height: 6),
                             const Text(
-                              'Uzman hesabını Plango uzman ağından '
+                              'Uzman hesabını Tasarruf Planım uzman ağından '
                               'kalıcı olarak kaldırır. Normal kullanıcı '
                               'hesabı korunur.',
                               style: TextStyle(

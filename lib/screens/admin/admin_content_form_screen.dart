@@ -21,7 +21,7 @@ class AdminContentFormScreen extends StatefulWidget {
 class _AdminContentFormScreenState
     extends State<AdminContentFormScreen> {
   // ============================================================
-  // PLANGO DESIGN SYSTEM
+  // TASARRUF PLANIM DESIGN SYSTEM
   // ============================================================
 
   static const Color _navy = Color(0xFF0B2239);
@@ -292,7 +292,7 @@ class _AdminContentFormScreenState
 
             _FormCard(
               children: [
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller: _titleController,
                   label: 'Başlık',
                   hint:
@@ -313,7 +313,7 @@ class _AdminContentFormScreenState
 
                 const SizedBox(height: 15),
 
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller:
                       _summaryController,
                   label: 'Özet',
@@ -337,7 +337,7 @@ class _AdminContentFormScreenState
 
                 const SizedBox(height: 15),
 
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller:
                       _bodyController,
                   label: 'Detay',
@@ -375,7 +375,7 @@ class _AdminContentFormScreenState
 
             _FormCard(
               children: [
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller:
                       _categoryController,
                   label: 'Kategori',
@@ -389,7 +389,7 @@ class _AdminContentFormScreenState
 
                 const SizedBox(height: 15),
 
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller:
                       _sourceController,
                   label: 'Kaynak Linki',
@@ -420,7 +420,7 @@ class _AdminContentFormScreenState
 
                 const SizedBox(height: 18),
 
-                _PlangoTextField(
+                _TasarrufPlanimTextField(
                   controller:
                       _priorityController,
                   label: 'Öncelik',
@@ -827,9 +827,9 @@ class _FormCard extends StatelessWidget {
 // TEXT FIELD
 // ============================================================
 
-class _PlangoTextField
+class _TasarrufPlanimTextField
     extends StatelessWidget {
-  const _PlangoTextField({
+  const _TasarrufPlanimTextField({
     required this.controller,
     required this.label,
     required this.hint,

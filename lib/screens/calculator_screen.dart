@@ -908,7 +908,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango sonuçları tahmini ve bilgilendirme amaçlıdır. Kesin plan, sözleşme ve teslimat koşulları ilgili tasarruf finansman kuruluşu tarafından belirlenir.',
+              'Tasarruf Planım sonuçları tahmini ve bilgilendirme amaçlıdır. Kesin plan, sözleşme ve teslimat koşulları ilgili tasarruf finansman kuruluşu tarafından belirlenir.',
               style: TextStyle(
                 color: Color(0xFF5E6D7E),
                 fontSize: 12,

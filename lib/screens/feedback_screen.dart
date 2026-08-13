@@ -252,7 +252,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
           const Text(
             'Giriş yaptıktan sonra şikayet, öneri veya teknik sorun '
-            'talebi oluşturabilir; talebinizin durumunu ve Plango '
+            'talebi oluşturabilir; talebinizin durumunu ve Tasarruf Planım '
             'tarafından verilen cevabı buradan takip edebilirsiniz.',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -417,7 +417,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Talebiniz Plango yönetim ekibine iletilir. '
+                        'Talebiniz Tasarruf Planım yönetim ekibine iletilir. '
                         'Yanıt verildiğinde cevabı Taleplerim bölümünden '
                         'görüntüleyebilirsiniz.',
                         style: TextStyle(
@@ -690,7 +690,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         ),
                         SizedBox(width: 7),
                         Text(
-                          'Plango Yanıtı',
+                          'Tasarruf Planım Yanıtı',
                           style: TextStyle(
                             color: _navy,
                             fontSize: 11.5,
@@ -972,7 +972,7 @@ class _FeedbackHeroCard extends StatelessWidget {
 
                 Text(
                   'Önerilerinizi, şikayetlerinizi ve karşılaştığınız '
-                  'sorunları Plango ekibine iletebilirsiniz.',
+                  'sorunları Tasarruf Planım ekibine iletebilirsiniz.',
                   style: TextStyle(
                     color: Color(0xFFD9E7E9),
                     fontSize: 12.3,

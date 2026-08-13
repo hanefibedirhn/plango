@@ -11,7 +11,7 @@ class AdminDashboardScreen extends StatelessWidget {
   });
 
   // ============================================================
-  // PLANGO DESIGN SYSTEM
+  // TASARRUF PLANIM DESIGN SYSTEM
   // ============================================================
 
   static const Color _navy = Color(0xFF0B2239);
@@ -268,7 +268,7 @@ class _AdminHeroCard extends StatelessWidget {
                       ),
                       SizedBox(width: 5),
                       Text(
-                        'PLANGO ADMIN',
+                        'TASARRUF PLANIM ADMIN',
                         style: TextStyle(
                           color: Color(0xFFDDF7F3),
                           fontSize: 9.5,
@@ -296,7 +296,7 @@ class _AdminHeroCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 const Text(
-                  'Plango operasyonlarını ve platform '
+                  'Tasarruf Planım operasyonlarını ve platform '
                   'içeriklerini tek merkezden yönetin.',
                   style: TextStyle(
                     color: Color(0xFFD6E6E8),

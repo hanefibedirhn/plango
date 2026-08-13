@@ -269,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           content: Text(
             widget.completeAnonymousAccount
                 ? 'Hesabınız tamamlandı. Danışma talebiniz korunuyor.'
-                : 'Plango hesabınız başarıyla oluşturuldu.',
+                : 'Tasarruf Planım hesabınız başarıyla oluşturuldu.',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -326,46 +326,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
 
-  String get _membershipAgreementText => '''PLANGO KULLANICI SÖZLEŞMESİ
+  String get _membershipAgreementText => '''TASARRUF PLANIM KULLANICI SÖZLEŞMESİ
 
 1. Taraflar
-İşbu Kullanıcı Sözleşmesi, Plango dijital platformunu kullanan gerçek kişi kullanıcı ile Plango hizmetinin veri sorumlusu ve/veya hizmet sağlayıcısı sıfatıyla faaliyet gösterecek gerçek veya tüzel kişi arasında, kullanıcının üyelik işlemini tamamlaması ve sözleşmeyi elektronik ortamda kabul etmesiyle kurulur.
+İşbu Kullanıcı Sözleşmesi, Tasarruf Planım dijital platformunu kullanan gerçek kişi kullanıcı ile Tasarruf Planım hizmetinin veri sorumlusu ve/veya hizmet sağlayıcısı sıfatıyla faaliyet gösterecek gerçek veya tüzel kişi arasında, kullanıcının üyelik işlemini tamamlaması ve sözleşmeyi elektronik ortamda kabul etmesiyle kurulur.
 
-Plango’nun nihai ticari unvanı, merkez adresi, iletişim kanalları ve varsa MERSİS/vergi bilgileri yayına çıkmadan önce sözleşmenin bu bölümüne açık biçimde eklenmelidir.
+Tasarruf Planım’ın nihai ticari unvanı, merkez adresi, iletişim kanalları ve varsa MERSİS/vergi bilgileri yayına çıkmadan önce sözleşmenin bu bölümüne açık biçimde eklenmelidir.
 
-Bu sözleşmede “Kullanıcı”, Plango’da hesap oluşturan veya üyelik kapsamında sunulan hizmetlerden yararlanan kişiyi; “Plango” ise uygulama, hesaplama altyapısı ve ilgili dijital hizmetlerin bütününü ifade eder.
+Bu sözleşmede “Kullanıcı”, Tasarruf Planım’da hesap oluşturan veya üyelik kapsamında sunulan hizmetlerden yararlanan kişiyi; “Tasarruf Planım” ise uygulama, hesaplama altyapısı ve ilgili dijital hizmetlerin bütününü ifade eder.
 
 2. Sözleşmenin Konusu
-Bu sözleşmenin konusu, kullanıcının Plango’ya üye olması ve Plango tarafından sunulan dijital özelliklerden yararlanmasına ilişkin temel kullanım şartlarının, tarafların hak ve yükümlülüklerinin ve üyelik ilişkisinin çerçevesinin belirlenmesidir.
+Bu sözleşmenin konusu, kullanıcının Tasarruf Planım’a üye olması ve Tasarruf Planım tarafından sunulan dijital özelliklerden yararlanmasına ilişkin temel kullanım şartlarının, tarafların hak ve yükümlülüklerinin ve üyelik ilişkisinin çerçevesinin belirlenmesidir.
 
-Sözleşme; Plango hesabının kullanımı, FP Engine, kayıtlı planlar, ödeme planı çıktıları, danışma sistemi, doğrulanmış uzmanlarla iletişim, bildirimler ve üyelik kapsamında sunulan diğer işlevler bakımından uygulanır.
+Sözleşme; Tasarruf Planım hesabının kullanımı, FP Engine, kayıtlı planlar, ödeme planı çıktıları, danışma sistemi, doğrulanmış uzmanlarla iletişim, bildirimler ve üyelik kapsamında sunulan diğer işlevler bakımından uygulanır.
 
-Plango’nun herhangi bir tasarruf finansman şirketiyle kullanıcı arasında imzalanan sözleşmenin tarafı olmadığı ve bu sözleşmenin bir tasarruf finansmanı sözleşmesi niteliği taşımadığı taraflarca kabul edilir.
+Tasarruf Planım’ın herhangi bir tasarruf finansman şirketiyle kullanıcı arasında imzalanan sözleşmenin tarafı olmadığı ve bu sözleşmenin bir tasarruf finansmanı sözleşmesi niteliği taşımadığı taraflarca kabul edilir.
 
 3. Tanımlar
-FP Engine: Kullanıcının girdiği finansman ve ödeme parametrelerini kullanarak tahmini planlama sonuçları oluşturan Plango hesaplama motorudur.
+FP Engine: Kullanıcının girdiği finansman ve ödeme parametrelerini kullanarak tahmini planlama sonuçları oluşturan Tasarruf Planım hesaplama motorudur.
 
 Kayıtlı Plan: Kullanıcının daha sonra görüntülemek amacıyla hesabına kaydettiği tahmini hesaplama kaydıdır.
 
-Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Plango üzerinden uygun bir doğrulanmış uzmanla iletişim kurulmasını talep ettiği uygulama içi süreçtir.
+Danışma Talebi: Kullanıcının tasarruf finansmanı hakkında bilgi almak amacıyla Tasarruf Planım üzerinden uygun bir doğrulanmış uzmanla iletişim kurulmasını talep ettiği uygulama içi süreçtir.
 
-Doğrulanmış Uzman: Plango tarafından belirlenen doğrulama kriterlerinden geçen sektör profesyonelidir.
+Doğrulanmış Uzman: Tasarruf Planım tarafından belirlenen doğrulama kriterlerinden geçen sektör profesyonelidir.
 
-İçerik: Plango içerisinde yayımlanan metin, haber, bilgi, şirket profili, açıklama, grafik, hesaplama sonucu ve benzeri dijital unsurlardır.
+İçerik: Tasarruf Planım içerisinde yayımlanan metin, haber, bilgi, şirket profili, açıklama, grafik, hesaplama sonucu ve benzeri dijital unsurlardır.
 
 4. Üyeliğin Başlatılması
 Kullanıcı, üyelik formunda talep edilen zorunlu bilgileri doğru ve güncel biçimde girerek ve işbu Kullanıcı Sözleşmesini kabul ederek üyelik başvurusunu tamamlar.
 
-Plango, teknik güvenlik, kötüye kullanımın önlenmesi veya hesap doğrulaması amacıyla e-posta doğrulaması ve benzeri güvenlik adımları uygulayabilir.
+Tasarruf Planım, teknik güvenlik, kötüye kullanımın önlenmesi veya hesap doğrulaması amacıyla e-posta doğrulaması ve benzeri güvenlik adımları uygulayabilir.
 
-Üyelik, kullanıcının Plango üzerindeki her özelliği sınırsız veya süresiz kullanma hakkı kazandığı anlamına gelmez. Özelliklerin kapsamı uygulamanın güncel sürümüne göre değişebilir.
+Üyelik, kullanıcının Tasarruf Planım üzerindeki her özelliği sınırsız veya süresiz kullanma hakkı kazandığı anlamına gelmez. Özelliklerin kapsamı uygulamanın güncel sürümüne göre değişebilir.
 
 5. Üyelik İçin Temel Şartlar
 Kullanıcı, üyelik oluştururken kendi adına işlem yaptığını, verdiği bilgilerin doğru olduğunu ve hesabı hukuka uygun amaçlarla kullanacağını beyan eder.
 
 Başka kişilerin kimlik veya iletişim bilgileriyle izinsiz hesap oluşturulamaz.
 
-Plango’nun hizmetleri, niteliği gereği kendi adına finansal değerlendirme ve sözleşme işlemleri yapabilecek kullanıcılar için tasarlanmıştır. Kullanıcının hukuki işlem ehliyetine ilişkin zorunlu hükümler saklıdır.
+Tasarruf Planım’ın hizmetleri, niteliği gereği kendi adına finansal değerlendirme ve sözleşme işlemleri yapabilecek kullanıcılar için tasarlanmıştır. Kullanıcının hukuki işlem ehliyetine ilişkin zorunlu hükümler saklıdır.
 
 6. Hesap Bilgilerinin Doğruluğu
 Kullanıcı, üyelik ve profil alanlarında sağladığı bilgilerin doğru, güncel ve kendisine ait olmasından sorumludur.
@@ -379,26 +379,26 @@ Kullanıcı kendi hesabının, parolasının ve doğrulama araçlarının güven
 
 Parola, tek kullanımlık doğrulama kodu, e-posta erişimi ve benzeri güvenlik bilgileri üçüncü kişilerle paylaşılmamalıdır.
 
-Hesabın izinsiz kullanıldığından şüphe edilmesi halinde kullanıcı, mümkün olan en kısa sürede parolasını değiştirmeli ve Plango’nun ilan ettiği destek kanalı üzerinden bildirimde bulunmalıdır.
+Hesabın izinsiz kullanıldığından şüphe edilmesi halinde kullanıcı, mümkün olan en kısa sürede parolasını değiştirmeli ve Tasarruf Planım’ın ilan ettiği destek kanalı üzerinden bildirimde bulunmalıdır.
 
 8. Hesabın Kişisel Kullanımı
 Kullanıcı hesabı kişiseldir. Hesabın başka kişilere kiralanması, devredilmesi, satılması veya sistematik olarak ortak kullanılması yasaktır.
 
 Kullanıcı, kendi hesabı üzerinden gerçekleştirilen işlemlerin kendi kontrolünde olmasını sağlamakla yükümlüdür.
 
-Yetkisiz hesap paylaşımının güvenlik riski doğurduğu durumlarda Plango gerekli teknik tedbirleri uygulayabilir.
+Yetkisiz hesap paylaşımının güvenlik riski doğurduğu durumlarda Tasarruf Planım gerekli teknik tedbirleri uygulayabilir.
 
-9. Plango Hizmetinin Niteliği
-Plango, tasarruf finansmanı alanında bilgilendirme, hesaplama ve karar destek amacıyla sunulan bağımsız bir dijital platformdur.
+9. Tasarruf Planım Hizmetinin Niteliği
+Tasarruf Planım, tasarruf finansmanı alanında bilgilendirme, hesaplama ve karar destek amacıyla sunulan bağımsız bir dijital platformdur.
 
-Plango finansman sağlamaz, tasarruf finansmanı sözleşmesi düzenlemez, kullanıcı adına finansman başvurusu yapmaz ve tasarruf finansman şirketi adına bağlayıcı teklif oluşturmaz.
+Tasarruf Planım finansman sağlamaz, tasarruf finansmanı sözleşmesi düzenlemez, kullanıcı adına finansman başvurusu yapmaz ve tasarruf finansman şirketi adına bağlayıcı teklif oluşturmaz.
 
-Plango’nun sunduğu dijital araçlar, kullanıcının kendi değerlendirmesini yapmasına yardımcı olmak amacıyla kullanılır.
+Tasarruf Planım’ın sunduğu dijital araçlar, kullanıcının kendi değerlendirmesini yapmasına yardımcı olmak amacıyla kullanılır.
 
 10. FP Engine Kullanımı
 Kullanıcı, FP Engine’e girdiği finansman tutarı, peşinat, aylık ödeme, ödeme modeli ve diğer parametrelerin doğruluğundan sorumludur.
 
-FP Engine, kullanıcı girdilerine ve Plango tarafından tanımlanan hesaplama kurallarına göre tahmini sonuçlar oluşturur.
+FP Engine, kullanıcı girdilerine ve Tasarruf Planım tarafından tanımlanan hesaplama kurallarına göre tahmini sonuçlar oluşturur.
 
 Kullanıcı, FP Engine’i kişisel planlama ve bilgilendirme amacıyla kullanabilir. Hesaplama sonuçlarının üçüncü kişilere resmî teklif veya şirket taahhüdü gibi sunulması yasaktır.
 
@@ -410,21 +410,21 @@ Kullanıcı, resmî bir tasarruf finansmanı işlemi gerçekleştirmeden önce i
 Bu hüküm, kullanıcının yürürlükteki mevzuattan doğan vazgeçilmez haklarını ortadan kaldırmaz.
 
 12. Tahmini Teslim ve Vade Bilgileri
-Plango’da gösterilen tahmini teslim süresi, tahmini teslim tarihi ve toplam vade sonuçları kullanıcı girdilerine dayalı karar destek verileridir.
+Tasarruf Planım’da gösterilen tahmini teslim süresi, tahmini teslim tarihi ve toplam vade sonuçları kullanıcı girdilerine dayalı karar destek verileridir.
 
 Gerçek teslim ve ödeme koşulları ilgili tasarruf finansman şirketinin sözleşmesi, güncel uygulamaları ve yürürlükteki düzenlemeler kapsamında belirlenir.
 
 Kullanıcı, tahmini sonuçları kesin şirket taahhüdü olarak yorumlamamalıdır.
 
 13. Kayıtlı Planlar
-Kullanıcı, Plango’nun sunduğu özellik kapsamında oluşturduğu tahmini planları hesabına kaydedebilir.
+Kullanıcı, Tasarruf Planım’ın sunduğu özellik kapsamında oluşturduğu tahmini planları hesabına kaydedebilir.
 
 Kayıtlı plan, kullanıcının kendi hesaplama geçmişinin bir parçasıdır ve ilgili planın herhangi bir şirket tarafından kabul edildiği anlamına gelmez.
 
 Kullanıcı, uygulamanın sunduğu imkanlar dahilinde kayıtlı planlarını görüntüleyebilir ve silebilir.
 
 14. Son Hesaplanan Plan
-Plango, kullanıcı deneyimini kolaylaştırmak amacıyla son hesaplanan plana ilişkin bilgileri geçici veya kalıcı olmayan bir kullanıcı deneyimi kaydı olarak gösterebilir.
+Tasarruf Planım, kullanıcı deneyimini kolaylaştırmak amacıyla son hesaplanan plana ilişkin bilgileri geçici veya kalıcı olmayan bir kullanıcı deneyimi kaydı olarak gösterebilir.
 
 Son hesaplanan plan, kullanıcının özellikle “Planı Kaydet” işlemiyle oluşturduğu kayıtlı plandan farklı olabilir.
 
@@ -438,9 +438,9 @@ Taksit tarihleri, toplam birikim, tahmini teslim ayı ve benzeri alanlar hesapla
 Bu ekran ilgili şirketin resmî muhasebe kaydı veya sözleşme eki değildir.
 
 16. PDF ve Dışa Aktarılan Belgeler
-Kullanıcı, Plango tarafından sunulması halinde planını PDF veya benzeri belge formatında dışa aktarabilir.
+Kullanıcı, Tasarruf Planım tarafından sunulması halinde planını PDF veya benzeri belge formatında dışa aktarabilir.
 
-Bu belgeler Plango hesaplamasının kullanıcı tarafından saklanabilen bir çıktısıdır; resmî tasarruf finansmanı teklifi veya sözleşme değildir.
+Bu belgeler Tasarruf Planım hesaplamasının kullanıcı tarafından saklanabilen bir çıktısıdır; resmî tasarruf finansmanı teklifi veya sözleşme değildir.
 
 Kullanıcı, dışa aktardığı belgelerin kendi cihazında saklanmasından ve üçüncü kişilerle paylaşılması halinde bu paylaşımın sonuçlarından sorumludur.
 
@@ -449,7 +449,7 @@ Danışma sistemi, kullanıcının tasarruf finansmanı hakkında bilgi almak am
 
 Danışma talebi oluşturulması, bir tasarruf finansman şirketine resmî başvuru yapılması veya sözleşme kurulması anlamına gelmez.
 
-Plango, kullanıcı ile uzman arasındaki iletişimi kolaylaştıran platform rolündedir.
+Tasarruf Planım, kullanıcı ile uzman arasındaki iletişimi kolaylaştıran platform rolündedir.
 
 18. Danışma Talebi Oluşturma
 Kullanıcı danışma talebi oluştururken yalnızca talebin değerlendirilmesi için gerekli ve doğru bilgileri vermelidir.
@@ -461,75 +461,75 @@ Danışma talebi, sistemin güncel atama veya uzman eşleştirme mantığına g�
 19. Uzmanlarla İletişim
 Kullanıcı, uzmanla iletişiminde saygılı, hukuka uygun ve dürüst davranmalıdır.
 
-Uzmanın Plango’da doğrulanmış olması, ilgili uzmanın her beyanının Plango tarafından garanti edildiği anlamına gelmez.
+Uzmanın Tasarruf Planım’da doğrulanmış olması, ilgili uzmanın her beyanının Tasarruf Planım tarafından garanti edildiği anlamına gelmez.
 
 Kullanıcı, mali yükümlülük veya sözleşme sonucu doğurabilecek önemli bilgileri ilgili şirketin resmî belgelerinden ayrıca doğrulamalıdır.
 
 20. Uzmanların Bağımsız Mesleki Beyanları
 Uzmanların kullanıcıyla paylaştığı yorumlar, açıklamalar ve değerlendirmeler ilgili uzmanın kendi mesleki sorumluluğu kapsamında olabilir.
 
-Plango, uzmanların her iletişimini önceden inceleyen veya onaylayan bir taraf değildir.
+Tasarruf Planım, uzmanların her iletişimini önceden inceleyen veya onaylayan bir taraf değildir.
 
-Plango’nun uzman sistemi; kullanıcıların doğrulanmış sektör profesyonellerine ulaşmasını kolaylaştırmak amacıyla sunulur.
+Tasarruf Planım’ın uzman sistemi; kullanıcıların doğrulanmış sektör profesyonellerine ulaşmasını kolaylaştırmak amacıyla sunulur.
 
 21. Şirket Bilgileri
-Plango’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller ve kamuya açık bilgiler sunulabilir.
+Tasarruf Planım’da tasarruf finansman şirketlerine ilişkin bilgilendirici profiller ve kamuya açık bilgiler sunulabilir.
 
 Kullanıcı, şirket bilgilerini genel araştırma amacıyla kullanabilir; ancak güncel ücret, kampanya, teslim koşulu veya sözleşme hükümleri için ilgili şirketin resmî kaynaklarını kontrol etmelidir.
 
-Plango üzerinde bir şirketin bulunması, o şirketin tavsiye edildiği veya diğer şirketlerden üstün olduğu anlamına gelmez.
+Tasarruf Planım üzerinde bir şirketin bulunması, o şirketin tavsiye edildiği veya diğer şirketlerden üstün olduğu anlamına gelmez.
 
 22. Bildirim Merkezi
-Plango, üyelik kapsamında uygulama içi bildirimler gösterebilir.
+Tasarruf Planım, üyelik kapsamında uygulama içi bildirimler gösterebilir.
 
 Bildirimler genel içerik güncellemeleri, kullanıcı hesabı veya uygulamanın işleyişiyle ilgili uygun bilgilendirmeleri içerebilir.
 
 Ticari elektronik ileti niteliği taşıyan mesajlar bakımından yürürlükteki zorunlu mevzuat hükümleri ayrıca uygulanır.
 
 23. Şikayet ve Öneri Sistemi
-Kullanıcı Plango deneyimi, içerikler, teknik sorunlar veya uzman sistemi hakkında geri bildirimde bulunabilir.
+Kullanıcı Tasarruf Planım deneyimi, içerikler, teknik sorunlar veya uzman sistemi hakkında geri bildirimde bulunabilir.
 
 Geri bildirimler hakaret, tehdit, kişisel saldırı, üçüncü kişilerin kişisel verilerini hukuka aykırı biçimde açıklama veya yanıltıcı bilgi yayma amacıyla kullanılamaz.
 
-Plango, doğrulanabilir geri bildirimleri hizmet kalitesini geliştirmek amacıyla değerlendirebilir.
+Tasarruf Planım, doğrulanabilir geri bildirimleri hizmet kalitesini geliştirmek amacıyla değerlendirebilir.
 
 24. Kullanıcının Genel Yükümlülükleri
-Kullanıcı Plango’yu yürürlükteki mevzuata, işbu sözleşmeye ve dürüstlük kurallarına uygun biçimde kullanmalıdır.
+Kullanıcı Tasarruf Planım’ı yürürlükteki mevzuata, işbu sözleşmeye ve dürüstlük kurallarına uygun biçimde kullanmalıdır.
 
 Kullanıcı, sistemin çalışmasını bozacak girişimlerde bulunmamalı; diğer kullanıcıların, uzmanların veya üçüncü kişilerin haklarını ihlal etmemelidir.
 
 Kullanıcı, uygulamada gördüğü tahmini sonuçları yanıltıcı biçimde resmî belge veya şirket taahhüdü gibi sunmamalıdır.
 
 25. Yasaklanan Kullanımlar
-Plango üzerinde hukuka aykırı içerik paylaşmak, sahte hesap oluşturmak, başka kişilerin hesaplarına izinsiz erişmeye çalışmak, güvenlik önlemlerini aşmak veya hizmeti kötüye kullanmak yasaktır.
+Tasarruf Planım üzerinde hukuka aykırı içerik paylaşmak, sahte hesap oluşturmak, başka kişilerin hesaplarına izinsiz erişmeye çalışmak, güvenlik önlemlerini aşmak veya hizmeti kötüye kullanmak yasaktır.
 
 Otomatik sistemlerle uygulamanın olağan kullanımını bozacak yoğun istek göndermek, veri toplamak veya güvenlik açıklarını istismar etmek yasaktır.
 
-Plango içeriğini üçüncü kişileri yanıltmak, dolandırıcılık yapmak veya yetkisiz ticari faaliyet yürütmek amacıyla kullanmak yasaktır.
+Tasarruf Planım içeriğini üçüncü kişileri yanıltmak, dolandırıcılık yapmak veya yetkisiz ticari faaliyet yürütmek amacıyla kullanmak yasaktır.
 
 26. Kötüye Kullanımın Önlenmesi
-Plango, kullanıcıların ve platformun güvenliğini korumak amacıyla şüpheli kullanım davranışlarını inceleyebilir ve gerekli teknik tedbirleri uygulayabilir.
+Tasarruf Planım, kullanıcıların ve platformun güvenliğini korumak amacıyla şüpheli kullanım davranışlarını inceleyebilir ve gerekli teknik tedbirleri uygulayabilir.
 
 Açık kötüye kullanım, güvenlik ihlali veya hukuka aykırı faaliyet şüphesinde erişim geçici olarak sınırlandırılabilir.
 
 Bu tedbirler uygulanırken olayın niteliği, ölçülülük ve yürürlükteki zorunlu hükümler dikkate alınır.
 
 27. Fikri Mülkiyet Hakları
-Plango adı, uygulama tasarımı, özgün metinler, yazılım bileşenleri, FP Engine yapısı ve Plango’ya ait diğer özgün unsurlar üzerindeki haklar ilgili hak sahiplerine aittir.
+Tasarruf Planım adı, uygulama tasarımı, özgün metinler, yazılım bileşenleri, FP Engine yapısı ve Tasarruf Planım’a ait diğer özgün unsurlar üzerindeki haklar ilgili hak sahiplerine aittir.
 
 Kullanıcıya üyelik verilmesi bu unsurların mülkiyetinin devredildiği anlamına gelmez.
 
 Kullanıcı, yalnızca uygulamanın normal kullanım amacı kapsamında kişisel ve sınırlı kullanım hakkına sahiptir.
 
 28. Şirket Marka ve Logoları
-Plango’da yer alan üçüncü taraf şirketlerin marka, logo ve ticaret unvanları ilgili hak sahiplerine aittir.
+Tasarruf Planım’da yer alan üçüncü taraf şirketlerin marka, logo ve ticaret unvanları ilgili hak sahiplerine aittir.
 
-Bu unsurların bilgilendirme amacıyla gösterilmesi, ilgili şirket ile Plango arasında ortaklık veya temsil ilişkisi bulunduğu anlamına gelmez.
+Bu unsurların bilgilendirme amacıyla gösterilmesi, ilgili şirket ile Tasarruf Planım arasında ortaklık veya temsil ilişkisi bulunduğu anlamına gelmez.
 
 Kullanıcı, üçüncü taraf marka ve logolarını hukuka aykırı biçimde çoğaltmamalı veya kullanmamalıdır.
 
 29. Kişisel Veriler ve Gizlilik
-Üyelik kapsamında kişisel verilerin işlenmesine ilişkin ayrıntılar Plango Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.
+Üyelik kapsamında kişisel verilerin işlenmesine ilişkin ayrıntılar Tasarruf Planım Gizlilik Politikası ve ilgili KVKK Aydınlatma Metninde açıklanır.
 
 Kullanıcı Sözleşmesinin kabulü, açık rıza gerektiren her türlü veri işleme faaliyetine otomatik olarak açık rıza verildiği anlamına gelmez.
 
@@ -543,42 +543,42 @@ Kullanıcının üyelik oluştururken Aydınlatma Metnine erişebilmesi sağlanm
 Aydınlatmanın yapılmış olması için kullanıcıdan “rıza” alınması yerine, aydınlatma yükümlülüğünün kendi kurallarına uygun şekilde yerine getirilmesi esastır.
 
 31. Açık Rıza Gerektiren İşlemler
-Plango’nun belirli bir veri işleme faaliyeti için açık rızaya ihtiyaç duyması halinde, bu rıza işbu sözleşmenin genel kabul kutusuna gizlenmemelidir.
+Tasarruf Planım’ın belirli bir veri işleme faaliyeti için açık rızaya ihtiyaç duyması halinde, bu rıza işbu sözleşmenin genel kabul kutusuna gizlenmemelidir.
 
 Açık rıza belirli bir konuya ilişkin, bilgilendirmeye dayanan ve özgür iradeyle açıklanan ayrı bir kullanıcı tercihi olarak alınmalıdır.
 
 Kullanıcının hizmetten yararlanmasıyla doğrudan ilgili olmayan bir veri işleme amacına rıza vermesi, üyeliğin zorunlu şartı haline getirilmemelidir.
 
 32. Üçüncü Taraf Hizmetler
-Plango; kimlik doğrulama, bulut veri saklama, dosya oluşturma veya teknik altyapı gibi alanlarda üçüncü taraf hizmetlerden yararlanabilir.
+Tasarruf Planım; kimlik doğrulama, bulut veri saklama, dosya oluşturma veya teknik altyapı gibi alanlarda üçüncü taraf hizmetlerden yararlanabilir.
 
 Üçüncü taraf hizmetler kendi teknik ve hukuki koşullarına sahip olabilir.
 
-Kullanıcının Plango dışındaki bağımsız bir web sitesine veya hizmete yönlendirilmesi halinde ilgili üçüncü tarafın kendi şartları uygulanabilir.
+Kullanıcının Tasarruf Planım dışındaki bağımsız bir web sitesine veya hizmete yönlendirilmesi halinde ilgili üçüncü tarafın kendi şartları uygulanabilir.
 
 33. Harici Bağlantılar
-Plango, şirketlerin, kamu kurumlarının veya bilgilendirici kaynakların internet sayfalarına bağlantılar sunabilir.
+Tasarruf Planım, şirketlerin, kamu kurumlarının veya bilgilendirici kaynakların internet sayfalarına bağlantılar sunabilir.
 
-Harici bağlantının sunulması, bağlantı verilen sitenin tüm içeriklerinin Plango tarafından onaylandığı veya garanti edildiği anlamına gelmez.
+Harici bağlantının sunulması, bağlantı verilen sitenin tüm içeriklerinin Tasarruf Planım tarafından onaylandığı veya garanti edildiği anlamına gelmez.
 
 Kullanıcı üçüncü taraf siteye geçtiğinde ilgili sitenin gizlilik ve kullanım koşullarını ayrıca incelemelidir.
 
 34. Hizmetin Geliştirilmesi
-Plango, kullanıcı deneyimini, güvenliği ve hizmet kalitesini geliştirmek amacıyla uygulama özelliklerinde değişiklik yapabilir.
+Tasarruf Planım, kullanıcı deneyimini, güvenliği ve hizmet kalitesini geliştirmek amacıyla uygulama özelliklerinde değişiklik yapabilir.
 
 Yeni özellikler eklenebilir, mevcut özelliklerin çalışma biçimi değiştirilebilir veya artık gerekli olmayan özellikler kaldırılabilir.
 
 Esaslı değişikliklerin kullanıcı haklarını etkilediği durumlarda gerekli bilgilendirme süreçleri uygulanmalıdır.
 
 35. Bakım ve Teknik Kesintiler
-Plango; bakım, güncelleme, güvenlik çalışmaları, internet altyapısı veya üçüncü taraf servislerden kaynaklanan nedenlerle geçici olarak erişilemeyebilir.
+Tasarruf Planım; bakım, güncelleme, güvenlik çalışmaları, internet altyapısı veya üçüncü taraf servislerden kaynaklanan nedenlerle geçici olarak erişilemeyebilir.
 
-Plango hizmetin her an kesintisiz çalışacağını garanti etmez.
+Tasarruf Planım hizmetin her an kesintisiz çalışacağını garanti etmez.
 
 Planlı veya beklenmeyen teknik kesintiler, kullanıcı ile tasarruf finansman şirketi arasındaki bağımsız sözleşme ilişkisini etkilemez.
 
 36. Sürüm ve Uyumluluk
-Plango’nun bazı özellikleri uygulamanın güncel sürümünü gerektirebilir.
+Tasarruf Planım’ın bazı özellikleri uygulamanın güncel sürümünü gerektirebilir.
 
 Eski sürümlerde güvenlik, performans veya özellik uyumsuzlukları oluşabilir.
 
@@ -594,33 +594,33 @@ Zorunlu tüketici ve kullanıcı hakları saklıdır.
 38. Hesabın Sonlandırılması
 Kullanıcı, uygulamanın sunduğu hesap silme özelliği veya ilan edilen uygun kanal üzerinden üyeliğini sonlandırabilir.
 
-Ağır veya tekrarlanan sözleşme ihlali, sahte hesap, hukuka aykırı kullanım veya ciddi güvenlik ihlali durumunda Plango üyeliği sona erdirebilir.
+Ağır veya tekrarlanan sözleşme ihlali, sahte hesap, hukuka aykırı kullanım veya ciddi güvenlik ihlali durumunda Tasarruf Planım üyeliği sona erdirebilir.
 
 Hesabın kapatılması halinde kişisel verilerin akıbeti Gizlilik Politikası ve ilgili veri koruma düzenlemeleri çerçevesinde ele alınır.
 
 39. Kullanıcının Üyelikten Ayrılması
-Kullanıcının Plango üyeliğini sonlandırması, tasarruf finansman şirketleriyle yapmış olduğu bağımsız sözleşmeleri sona erdirmez.
+Kullanıcının Tasarruf Planım üyeliğini sonlandırması, tasarruf finansman şirketleriyle yapmış olduğu bağımsız sözleşmeleri sona erdirmez.
 
 Kullanıcı, üyelikten ayrılmadan önce ihtiyaç duyduğu kayıtlı plan veya dışa aktarılabilir belgeleri uygulamanın sunduğu ölçüde saklayabilir.
 
 Üyelik sona erdikten sonra hesaba bağlı bazı uygulama özelliklerine erişim mümkün olmayabilir.
 
 40. Ücretsiz ve Ücretli Özellikler
-Plango’nun mevcut veya gelecekteki bazı özellikleri ücretsiz, bazı özellikleri ise ileride ücretli olarak sunulabilir.
+Tasarruf Planım’ın mevcut veya gelecekteki bazı özellikleri ücretsiz, bazı özellikleri ise ileride ücretli olarak sunulabilir.
 
 Yeni bir ücretli hizmet sunulması halinde kullanıcı, ücret ve temel koşullar hakkında ödeme öncesinde bilgilendirilmelidir.
 
 İşbu sözleşmenin kabulü, gelecekte oluşturulabilecek ücretli bir hizmetin bedelinin kullanıcı tarafından peşinen kabul edildiği anlamına gelmez.
 
-41. Plango’nun Sorumluluk Alanı
-Plango kendi dijital hizmetinin yürütülmesi, hesaplama altyapısının işletilmesi ve kendi kontrolündeki kullanıcı deneyimi bakımından sorumluluk taşır.
+41. Tasarruf Planım’ın Sorumluluk Alanı
+Tasarruf Planım kendi dijital hizmetinin yürütülmesi, hesaplama altyapısının işletilmesi ve kendi kontrolündeki kullanıcı deneyimi bakımından sorumluluk taşır.
 
-Tasarruf finansman şirketlerinin sözleşmeleri, teslim süreçleri, tahsilatları, şirket çalışanlarının bağımsız beyanları ve şirketlerin kendi operasyonları Plango’nun doğrudan kontrolünde değildir.
+Tasarruf finansman şirketlerinin sözleşmeleri, teslim süreçleri, tahsilatları, şirket çalışanlarının bağımsız beyanları ve şirketlerin kendi operasyonları Tasarruf Planım’ın doğrudan kontrolünde değildir.
 
-Bu hüküm, Plango’nun kendi kusurundan veya emredici hukuk hükümlerinden doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.
+Bu hüküm, Tasarruf Planım’ın kendi kusurundan veya emredici hukuk hükümlerinden doğan sorumluluğunu ortadan kaldıracak şekilde yorumlanamaz.
 
 42. Sorumluluğun Sınırları
-Plango’nun tahmini hesaplama sonuçları, kullanıcı girdilerine ve uygulanan modele bağlıdır.
+Tasarruf Planım’ın tahmini hesaplama sonuçları, kullanıcı girdilerine ve uygulanan modele bağlıdır.
 
 Kullanıcının yanlış veri girmesi, tahmini sonucu resmî teklif gibi yorumlaması veya üçüncü tarafın bağımsız işlemine dayanarak karar vermesi nedeniyle ortaya çıkabilecek sonuçlar somut olayın niteliğine göre değerlendirilir.
 
@@ -629,19 +629,19 @@ Bu sözleşmedeki hiçbir hüküm, tüketici hukukundan veya diğer emredici mev
 43. Mücbir Sebep ve Kontrol Dışı Olaylar
 Doğal afet, savaş, yaygın iletişim kesintisi, kamu otoritesi kararı, büyük ölçekli siber saldırı, altyapı arızası ve tarafların makul kontrolü dışında gelişen benzeri olaylar hizmetin geçici olarak aksamasına neden olabilir.
 
-Bu durumlarda Plango, hizmeti makul sürede yeniden sağlamak için gerekli teknik çabayı göstermeyi hedefler.
+Bu durumlarda Tasarruf Planım, hizmeti makul sürede yeniden sağlamak için gerekli teknik çabayı göstermeyi hedefler.
 
 Emredici mevzuattan doğan hak ve sorumluluklar saklıdır.
 
 44. Sözleşme ve Politika Güncellemeleri
-Plango’nun hizmet kapsamı, mevzuat veya teknik altyapı değiştikçe bu sözleşme güncellenebilir.
+Tasarruf Planım’ın hizmet kapsamı, mevzuat veya teknik altyapı değiştikçe bu sözleşme güncellenebilir.
 
 Kullanıcının hak ve yükümlülüklerini esaslı biçimde etkileyen değişikliklerde, güncel metnin kullanıcıya sunulması ve gerektiğinde yeniden kabul alınması değerlendirilir.
 
 Sadece bilgilendirme niteliğindeki küçük yazım veya açıklama değişiklikleri aynı kapsamda olmayabilir.
 
 45. Sözleşme Sürümü ve Kabul Kaydı
-Plango, kullanıcının hangi sözleşme sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.
+Tasarruf Planım, kullanıcının hangi sözleşme sürümünü hangi tarihte kabul ettiğini teknik olarak kaydedebilir.
 
 Bu kayıt, sözleşme yönetimi, kullanıcı taleplerinin yanıtlanması ve hukuki yükümlülüklerin yerine getirilmesi amacıyla kullanılabilir.
 
@@ -662,7 +662,7 @@ Kullanıcının tüketici sıfatını taşıdığı durumlarda 6502 sayılı Tü
 Sözleşmede emredici mevzuata aykırı olduğu tespit edilen bir hüküm bulunması halinde, ilgili zorunlu düzenleme uygulanır.
 
 48. Uyuşmazlıkların Çözümü
-Taraflar, uyuşmazlık halinde öncelikle Plango’nun ilan ettiği iletişim kanalı üzerinden çözüm arayabilir.
+Taraflar, uyuşmazlık halinde öncelikle Tasarruf Planım’ın ilan ettiği iletişim kanalı üzerinden çözüm arayabilir.
 
 Kullanıcının tüketici sıfatını taşıdığı durumlarda, yürürlükteki mevzuat uyarınca görevli ve yetkili Tüketici Hakem Heyetleri, Tüketici Mahkemeleri ve diğer yetkili mercilere başvuru hakları saklıdır.
 
@@ -683,9 +683,9 @@ Geçersiz hüküm, mümkün olduğu ölçüde ilgili emredici düzenleme ve söz
 Kullanıcının kanundan doğan hakları her durumda saklıdır.
 
 51. İletişim
-Kullanıcı, üyelik ve sözleşmeye ilişkin soru veya taleplerini Plango tarafından uygulama içinde veya resmî kanallarda ilan edilen iletişim adresleri üzerinden iletebilir.
+Kullanıcı, üyelik ve sözleşmeye ilişkin genel soru veya taleplerini info@tasarrufplanim.com adresi üzerinden iletebilir. Uygulama, hesap veya teknik destek talepleri için destek@tasarrufplanim.com adresi kullanılabilir.
 
-Plango’nun nihai ticari unvanı, e-posta adresi ve resmî bildirim kanalları yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.
+Tasarruf Planım’ın nihai ticari unvanı, resmî adresi ve gerekli diğer hukuki bildirim bilgileri yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.
 
 Kişisel verilere ilişkin başvurular ise ilgili KVKK Aydınlatma Metni ve Gizlilik Politikası kapsamında belirtilen kanallardan yürütülür.
 
@@ -697,17 +697,17 @@ Kişisel verilere ilişkin başvurular ise ilgili KVKK Aydınlatma Metni ve Gizl
 Yeniden kabul gerektiren esaslı bir sözleşme değişikliği yapılması halinde kullanıcıdan güncel sürüm için ayrıca onay istenebilir.
 
 53. Son Hüküm
-Kullanıcı, işbu sözleşmenin Plango üyeliğinin kullanım şartlarını düzenlediğini; tasarruf finansman şirketleriyle kuracağı bağımsız sözleşme ilişkilerinin bu sözleşmenin konusu olmadığını kabul eder.
+Kullanıcı, işbu sözleşmenin Tasarruf Planım üyeliğinin kullanım şartlarını düzenlediğini; tasarruf finansman şirketleriyle kuracağı bağımsız sözleşme ilişkilerinin bu sözleşmenin konusu olmadığını kabul eder.
 
-Plango’nun amacı kullanıcı adına finansal karar vermek değil; kullanıcıya kendi kararını destekleyen dijital araçlar ve bilgi sunmaktır.
+Tasarruf Planım’ın amacı kullanıcı adına finansal karar vermek değil; kullanıcıya kendi kararını destekleyen dijital araçlar ve bilgi sunmaktır.
 
 Kullanıcı, üyelik işlemini tamamlamadan önce sözleşmeye erişme ve sözleşme hükümlerini inceleme imkanına sahip olmalıdır.''';
 
   String get _clarificationText => '''
-PLANGO AYDINLATMA METNİ
+TASARRUF PLANIM AYDINLATMA METNİ
 
 1. Amaç
-Plango; hesap oluşturma, profil yönetimi, kayıtlı planlar ve danışma süreçlerinin yürütülmesi için gerekli kişisel verileri işler.
+Tasarruf Planım; hesap oluşturma, profil yönetimi, kayıtlı planlar ve danışma süreçlerinin yürütülmesi için gerekli kişisel verileri işler.
 
 2. İşlenen Veriler
 Ad, soyad, e-posta, telefon, kullanıcı adı, hesap bilgileri, kayıtlı plan verileri ve danışma taleplerine ilişkin bilgiler işlenebilir.
@@ -725,36 +725,36 @@ Veriler, hizmetin gerektirdiği süre boyunca ve yürürlükteki yükümlülükl
 Kullanıcı, yürürlükteki kişisel verilerin korunması mevzuatı kapsamında verileriyle ilgili yasal haklarını kullanabilir.
 
 7. İletişim
-Kişisel verilerle ilgili talepler, Plango tarafından ilan edilen resmi iletişim kanalları üzerinden iletilebilir.
+Kişisel verilerle ilgili genel soru ve talepler info@tasarrufplanim.com adresi üzerinden iletilebilir.
 ''';
 
-  String get _privacyPolicyText => '''PLANGO GİZLİLİK POLİTİKASI
+  String get _privacyPolicyText => '''TASARRUF PLANIM GİZLİLİK POLİTİKASI
 
 1. Gizlilik Politikamızın Amacı
-Bu Gizlilik Politikası, Plango’yu kullanan kişilerin hangi tür kişisel verilerinin hangi amaçlarla işlenebileceğini, bu verilerin korunmasına ilişkin yaklaşımımızı ve kullanıcıların gizlilik haklarını anlaşılır bir dille açıklamak amacıyla hazırlanmıştır.
+Bu Gizlilik Politikası, Tasarruf Planım’ı kullanan kişilerin hangi tür kişisel verilerinin hangi amaçlarla işlenebileceğini, bu verilerin korunmasına ilişkin yaklaşımımızı ve kullanıcıların gizlilik haklarını anlaşılır bir dille açıklamak amacıyla hazırlanmıştır.
 
-Plango’nun temel yaklaşımı; yalnızca hizmetin sunulması, güvenliğinin sağlanması ve geliştirilmesi için gerekli olan verileri işlemek, gereksiz veri toplamamak ve kullanıcıya verileri üzerinde mümkün olduğunca açık kontrol sağlamaktır.
+Tasarruf Planım’ın temel yaklaşımı; yalnızca hizmetin sunulması, güvenliğinin sağlanması ve geliştirilmesi için gerekli olan verileri işlemek, gereksiz veri toplamamak ve kullanıcıya verileri üzerinde mümkün olduğunca açık kontrol sağlamaktır.
 
-Bu metin, Plango’nun genel gizlilik yaklaşımını açıklar. Kişisel verilerin elde edilmesi sırasında yerine getirilmesi gereken KVKK aydınlatma yükümlülüğü ve açık rıza gerektiren özel işlemler, gerekli olduğu ölçüde ayrıca ve ilgili işlem bağlamında sunulabilir.
+Bu metin, Tasarruf Planım’ın genel gizlilik yaklaşımını açıklar. Kişisel verilerin elde edilmesi sırasında yerine getirilmesi gereken KVKK aydınlatma yükümlülüğü ve açık rıza gerektiren özel işlemler, gerekli olduğu ölçüde ayrıca ve ilgili işlem bağlamında sunulabilir.
 
 2. Kapsam
-Bu politika; Plango mobil uygulaması, uygulama içerisindeki kullanıcı hesapları, FP Engine, kayıtlı planlar, danışma sistemi, doğrulanmış uzman sistemi, şirket bilgi ekranları, bildirim merkezi, geri bildirim alanları ve Plango tarafından sunulan diğer dijital özellikler bakımından uygulanır.
+Bu politika; Tasarruf Planım mobil uygulaması, uygulama içerisindeki kullanıcı hesapları, FP Engine, kayıtlı planlar, danışma sistemi, doğrulanmış uzman sistemi, şirket bilgi ekranları, bildirim merkezi, geri bildirim alanları ve Tasarruf Planım tarafından sunulan diğer dijital özellikler bakımından uygulanır.
 
-Bir özellik Plango dışındaki üçüncü taraf bir internet sitesine, uygulamaya veya hizmete yönlendiriyorsa, o hizmetin kendi gizlilik politikası ve kullanım koşulları geçerli olabilir.
+Bir özellik Tasarruf Planım dışındaki üçüncü taraf bir internet sitesine, uygulamaya veya hizmete yönlendiriyorsa, o hizmetin kendi gizlilik politikası ve kullanım koşulları geçerli olabilir.
 
-Plango’nun gelecekte yeni özellikler sunması halinde, bu politika yeni veri işleme faaliyetlerini yansıtacak şekilde güncellenebilir.
+Tasarruf Planım’ın gelecekte yeni özellikler sunması halinde, bu politika yeni veri işleme faaliyetlerini yansıtacak şekilde güncellenebilir.
 
 3. Temel Gizlilik İlkelerimiz
-Plango kişisel verilerin işlenmesinde hukuka ve dürüstlük kurallarına uygunluk, doğruluk ve gerektiğinde güncellik, belirli ve meşru amaçlarla işleme, amaçla bağlantılı ve ölçülü olma ve gerekli süre kadar saklama ilkelerini esas almayı hedefler.
+Tasarruf Planım kişisel verilerin işlenmesinde hukuka ve dürüstlük kurallarına uygunluk, doğruluk ve gerektiğinde güncellik, belirli ve meşru amaçlarla işleme, amaçla bağlantılı ve ölçülü olma ve gerekli süre kadar saklama ilkelerini esas almayı hedefler.
 
-Veri minimizasyonu Plango’nun önemli ürün ilkelerinden biridir. Bir özelliğin çalışması için gerekli olmayan kişisel verilerin talep edilmemesi ve işlenmemesi hedeflenir.
+Veri minimizasyonu Tasarruf Planım’ın önemli ürün ilkelerinden biridir. Bir özelliğin çalışması için gerekli olmayan kişisel verilerin talep edilmemesi ve işlenmemesi hedeflenir.
 
-Kullanıcı verilerinin ticari değer üretmek amacıyla gereksiz şekilde toplanması Plango’nun ürün yaklaşımıyla bağdaşmaz.
+Kullanıcı verilerinin ticari değer üretmek amacıyla gereksiz şekilde toplanması Tasarruf Planım’ın ürün yaklaşımıyla bağdaşmaz.
 
 4. Hesap Oluştururken İşlenebilecek Bilgiler
-Kullanıcı Plango’da hesap oluşturduğunda ad, soyad, e-posta adresi, kullanıcı kimliği ve hesap güvenliğiyle ilişkili teknik bilgiler işlenebilir.
+Kullanıcı Tasarruf Planım’da hesap oluşturduğunda ad, soyad, e-posta adresi, kullanıcı kimliği ve hesap güvenliğiyle ilişkili teknik bilgiler işlenebilir.
 
-Parola doğrulama işlemleri Plango’nun kullandığı kimlik doğrulama altyapısı üzerinden yürütülebilir. Plango’nun kullanıcı parolasını okunabilir biçimde saklamaması hedeflenir.
+Parola doğrulama işlemleri Tasarruf Planım’ın kullandığı kimlik doğrulama altyapısı üzerinden yürütülebilir. Tasarruf Planım’ın kullanıcı parolasını okunabilir biçimde saklamaması hedeflenir.
 
 Hesap bilgileri; kullanıcı hesabının oluşturulması, oturum açılması, hesap güvenliğinin sağlanması, profil bilgilerinin görüntülenmesi ve kullanıcıya hesapla bağlantılı özelliklerin sunulması amacıyla kullanılabilir.
 
@@ -763,7 +763,7 @@ Kullanıcı profilinde paylaşılan ad, soyad, e-posta ve benzeri bilgiler hesap
 
 Kullanıcı tarafından güncellenebilen profil bilgilerinin mümkün olduğunca güncel tutulması kullanıcının sorumluluğundadır.
 
-Plango, profil özelliğinin gerektirmediği kişisel bilgileri zorunlu hale getirmemeyi hedefler.
+Tasarruf Planım, profil özelliğinin gerektirmediği kişisel bilgileri zorunlu hale getirmemeyi hedefler.
 
 6. FP Engine Verileri
 FP Engine kullanılırken kullanıcı tarafından girilen finansman tutarı, peşinat, aylık taksit, ödeme modeli, artış oranı, artış periyodu ve benzeri planlama verileri işlenebilir.
@@ -773,7 +773,7 @@ Bu veriler doğrudan kimlik bilgisi olmak zorunda değildir; ancak bir kullanıc
 FP Engine verileri hesaplama işlemini gerçekleştirmek, ödeme planı üretmek, tahmini teslim ve vade sonuçlarını göstermek ve kullanıcının talep ettiği özellikleri sunmak amacıyla kullanılır.
 
 7. Son Hesaplanan Plan
-Plango, kullanıcı deneyimini kolaylaştırmak amacıyla cihaz üzerinde veya uygulamanın uygun veri alanlarında en son hesaplanan plana ilişkin sınırlı bilgileri tutabilir.
+Tasarruf Planım, kullanıcı deneyimini kolaylaştırmak amacıyla cihaz üzerinde veya uygulamanın uygun veri alanlarında en son hesaplanan plana ilişkin sınırlı bilgileri tutabilir.
 
 Bu kayıt, kullanıcının ana sayfada son çalıştığı plana hızlı şekilde ulaşmasını sağlamak amacıyla kullanılabilir.
 
@@ -787,14 +787,14 @@ Kayıtlı planların amacı, kullanıcının daha önce oluşturduğu planlara t
 Kullanıcı ilgili özellik üzerinden kayıtlı planlarını görüntüleyebilir ve silme işlemi sunulduğu ölçüde bu kayıtları kaldırabilir.
 
 9. Ödeme Planı ve PDF Verileri
-Plango, kullanıcının hesaplama sonucu oluşan ödeme planını ekranda gösterebilir ve kullanıcı talep ederse PDF benzeri bir çıktı oluşturabilir.
+Tasarruf Planım, kullanıcının hesaplama sonucu oluşan ödeme planını ekranda gösterebilir ve kullanıcı talep ederse PDF benzeri bir çıktı oluşturabilir.
 
 PDF oluşturma işlemi sırasında plan verileri belgenin hazırlanması için geçici olarak işlenebilir. Kullanıcının cihazına kaydettiği veya başka bir uygulamayla paylaştığı dosyaların daha sonraki kullanımı, cihazın ve seçilen üçüncü taraf uygulamanın kendi koşullarına tabi olabilir.
 
-Plango, kullanıcı tarafından cihaz dışına aktarılan dosyaların sonradan kimlerle paylaşılacağını kontrol edemez.
+Tasarruf Planım, kullanıcı tarafından cihaz dışına aktarılan dosyaların sonradan kimlerle paylaşılacağını kontrol edemez.
 
 10. Danışma Talepleri
-Kullanıcı Plango üzerinden danışma talebi gönderdiğinde ad, soyad, iletişim bilgileri, kullanıcı notu, ilgili plan bilgileri ve talebin yönetilmesi için gerekli diğer bilgiler işlenebilir.
+Kullanıcı Tasarruf Planım üzerinden danışma talebi gönderdiğinde ad, soyad, iletişim bilgileri, kullanıcı notu, ilgili plan bilgileri ve talebin yönetilmesi için gerekli diğer bilgiler işlenebilir.
 
 Bu verilerin amacı kullanıcının talebini uygun uzman veya ilgili süreçle eşleştirmek, talep durumunu yönetmek ve kullanıcı ile uzman arasındaki iletişimi kontrollü biçimde kolaylaştırmaktır.
 
@@ -803,7 +803,7 @@ Danışma talebinde gereksiz veya özel nitelikli kişisel verilerin paylaşılm
 11. Danışma Talebi İletişim Bilgileri
 Danışma sürecinde kullanıcının telefon numarası veya e-posta adresi gibi iletişim bilgileri, yalnızca ilgili sürecin gerektirdiği aşamada ve yetkilendirilmiş uzmanla paylaşılabilir.
 
-Plango, danışma talebi oluşturulduğu anda tüm iletişim bilgilerini herkes tarafından görülebilir hale getirmemeyi hedefler.
+Tasarruf Planım, danışma talebi oluşturulduğu anda tüm iletişim bilgilerini herkes tarafından görülebilir hale getirmemeyi hedefler.
 
 İletişim bilgilerinin erişimi, kullanıcı güvenliği ve danışma sürecinin işleyişi dikkate alınarak sınırlandırılabilir.
 
@@ -815,7 +815,7 @@ Uzman doğrulamasının amacı kullanıcıların sektörde çalışan kişilerle
 Doğrulama amacı dışında gerekli olmayan belgelerin veya kişisel verilerin saklanmaması hedeflenir.
 
 13. Uzman Doğrulama Verileri
-Uzman doğrulaması şirket e-posta alan adı, doğrulama kodu, yönetici incelemesi veya Plango tarafından belirlenen başka güvenli yöntemlerle gerçekleştirilebilir.
+Uzman doğrulaması şirket e-posta alan adı, doğrulama kodu, yönetici incelemesi veya Tasarruf Planım tarafından belirlenen başka güvenli yöntemlerle gerçekleştirilebilir.
 
 Doğrulama sürecinde işlenen veriler yalnızca uzmanın ilgili kurumla bağlantısının veya başvuru bilgilerinin doğrulanması amacıyla kullanılmalıdır.
 
@@ -831,12 +831,12 @@ Değerlendirme sisteminin kişileri haksız şekilde itibarsızlaştıracak biç
 15. Şikayet ve Öneri Verileri
 Kullanıcı Şikayet ve Öneri alanı üzerinden geri bildirim gönderdiğinde mesaj içeriği, hesap bilgileri ve bildirimin yönetilmesi için gerekli teknik bilgiler işlenebilir.
 
-Bu bilgiler kullanıcının geri bildirimini incelemek, gerektiğinde kullanıcıya dönüş yapmak, teknik veya içerik hatalarını düzeltmek ve Plango’yu geliştirmek amacıyla kullanılabilir.
+Bu bilgiler kullanıcının geri bildirimini incelemek, gerektiğinde kullanıcıya dönüş yapmak, teknik veya içerik hatalarını düzeltmek ve Tasarruf Planım’ı geliştirmek amacıyla kullanılabilir.
 
 Kullanıcının geri bildirim alanına gereksiz kişisel veya özel nitelikli veri yazmaması önerilir.
 
 16. Bildirim Merkezi
-Plango Bildirim Merkezi, kullanıcıya genel içerik güncellemeleri, hesapla ilgili durumlar veya uygulama içindeki önemli gelişmeleri göstermek amacıyla bildirim kayıtları oluşturabilir.
+Tasarruf Planım Bildirim Merkezi, kullanıcıya genel içerik güncellemeleri, hesapla ilgili durumlar veya uygulama içindeki önemli gelişmeleri göstermek amacıyla bildirim kayıtları oluşturabilir.
 
 Bildirim kayıtları; bildirim türü, oluşturulma zamanı, okunma durumu ve ilgili içeriğe yönlendirme bilgisi gibi teknik verileri içerebilir.
 
@@ -850,30 +850,30 @@ Bu veriler güvenlik olaylarının tespit edilmesi, yetkisiz erişimin önlenmes
 Teknik veri toplama, hizmetin gerektirdiği ölçüyle sınırlı tutulmalıdır.
 
 18. Cihaz İzinleri
-Plango’nun bazı özellikleri cihaz üzerinde belirli izinlere ihtiyaç duyabilir. Böyle bir durumda izin talebi özelliğin ihtiyaç duyduğu anda ve mümkün olduğunca açık bir açıklamayla sunulmalıdır.
+Tasarruf Planım’ın bazı özellikleri cihaz üzerinde belirli izinlere ihtiyaç duyabilir. Böyle bir durumda izin talebi özelliğin ihtiyaç duyduğu anda ve mümkün olduğunca açık bir açıklamayla sunulmalıdır.
 
-Plango, özelliğin çalışması için gerekli olmayan cihaz izinlerini zorunlu tutmamayı hedefler.
+Tasarruf Planım, özelliğin çalışması için gerekli olmayan cihaz izinlerini zorunlu tutmamayı hedefler.
 
 Kullanıcı cihaz ayarları üzerinden verdiği izinleri işletim sisteminin sunduğu imkanlar çerçevesinde yönetebilir.
 
 19. Konum Verileri
-Plango’nun mevcut temel hizmetleri için hassas veya sürekli konum takibi yapılması amaçlanmamaktadır.
+Tasarruf Planım’ın mevcut temel hizmetleri için hassas veya sürekli konum takibi yapılması amaçlanmamaktadır.
 
 Gelecekte şehir bazlı uzman veya şirket filtreleri gibi bir özellik için konum erişimi gerekirse, kullanıcıdan ilgili özellik bağlamında izin istenmesi ve konum verisinin yalnızca gerekli ölçüde kullanılması hedeflenir.
 
-Açık bir ihtiyaç olmadan hassas konum verisi toplanmaması Plango’nun veri minimizasyonu yaklaşımının bir parçasıdır.
+Açık bir ihtiyaç olmadan hassas konum verisi toplanmaması Tasarruf Planım’ın veri minimizasyonu yaklaşımının bir parçasıdır.
 
 20. Özel Nitelikli Kişisel Veriler
-Plango’nun temel hizmetlerinin sunulması için sağlık bilgisi, biyometrik veri, siyasi düşünce, dinî inanç veya benzeri özel nitelikli kişisel verilerin kullanıcıdan talep edilmesi hedeflenmemektedir.
+Tasarruf Planım’ın temel hizmetlerinin sunulması için sağlık bilgisi, biyometrik veri, siyasi düşünce, dinî inanç veya benzeri özel nitelikli kişisel verilerin kullanıcıdan talep edilmesi hedeflenmemektedir.
 
 Kullanıcıların serbest metin alanlarına veya danışma notlarına bu tür bilgileri yazmaması önerilir.
 
 İleride özel nitelikli veri işlenmesini gerektiren yeni bir özellik geliştirilirse, bu faaliyet ayrı hukuki değerlendirmeye ve gerekli güvenlik önlemlerine tabi tutulmalıdır.
 
 21. Çocuklara İlişkin Veriler
-Plango’nun tasarruf finansmanı karar destek hizmetleri esas olarak kendi adına finansal değerlendirme yapabilecek yetişkin kullanıcılar için tasarlanmıştır.
+Tasarruf Planım’ın tasarruf finansmanı karar destek hizmetleri esas olarak kendi adına finansal değerlendirme yapabilecek yetişkin kullanıcılar için tasarlanmıştır.
 
-Çocuklara ait kişisel verilerin bilinçli ve sistematik şekilde toplanması Plango’nun temel hizmetinin amacı değildir.
+Çocuklara ait kişisel verilerin bilinçli ve sistematik şekilde toplanması Tasarruf Planım’ın temel hizmetinin amacı değildir.
 
 Çocuklara ilişkin bir veri işlendiğinin fark edilmesi halinde, ilgili durum yürürlükteki mevzuat ve hizmet gereklilikleri çerçevesinde ayrıca değerlendirilebilir.
 
@@ -882,14 +882,14 @@ Kişisel veriler; kullanıcı hesabını oluşturmak ve yönetmek, kimlik doğru
 
 Her veri işleme faaliyetinin belirli, açık ve meşru bir amaca dayanması hedeflenir.
 
-Bir amaç için toplanan verinin, kullanıcı açısından beklenmeyen ve ilgisiz başka amaçlarla kullanılmaması Plango’nun gizlilik yaklaşımının temel parçasıdır.
+Bir amaç için toplanan verinin, kullanıcı açısından beklenmeyen ve ilgisiz başka amaçlarla kullanılmaması Tasarruf Planım’ın gizlilik yaklaşımının temel parçasıdır.
 
 23. Hukuki Sebepler
 Kişisel verilerin işlenmesi, ilgili veri işleme faaliyetinin niteliğine göre 6698 sayılı Kişisel Verilerin Korunması Kanunu’nda öngörülen hukuki sebeplerden uygun olanına dayanmalıdır.
 
 Bir veri işleme faaliyeti açık rıza gerektiriyorsa, açık rızanın aydınlatma metninden ayrı ve özgür iradeyle verilebilmesi gerekir.
 
-Açık rıza gerektirmeyen bir işleme faaliyetinin sırf kolaylık sağlamak amacıyla zorunlu açık rızaya bağlanmaması Plango’nun uyum yaklaşımının parçasıdır.
+Açık rıza gerektirmeyen bir işleme faaliyetinin sırf kolaylık sağlamak amacıyla zorunlu açık rızaya bağlanmaması Tasarruf Planım’ın uyum yaklaşımının parçasıdır.
 
 24. Aydınlatma ve Açık Rıza Ayrımı
 Aydınlatma yükümlülüğü ile açık rıza aynı işlem değildir.
@@ -898,49 +898,49 @@ Kullanıcıya kişisel verilerinin kim tarafından, hangi amaçla, hangi yöntem
 
 Açık rıza gereken faaliyetlerde ise kullanıcıya ayrıca ve özgür iradesiyle seçim yapabileceği bir onay mekanizması sunulmalıdır.
 
-Plango, aydınlatma metni ile açık rıza metinlerini gerektiğinde ayrı şekilde sunmayı hedefler.
+Tasarruf Planım, aydınlatma metni ile açık rıza metinlerini gerektiğinde ayrı şekilde sunmayı hedefler.
 
 25. Verilerin Aktarılması
 Kişisel veriler, hizmetin sunulması için gerekli olduğu ölçüde yetkilendirilmiş hizmet sağlayıcılar, teknik altyapı sağlayıcıları, ilgili uzmanlar veya hukuken yetkili kurumlarla paylaşılabilir.
 
 Her aktarımın amacı, kapsamı ve hukuki dayanağı ayrı değerlendirilmelidir.
 
-Plango kullanıcı verilerini ilgisiz üçüncü kişilere keyfî biçimde aktarmamayı ve veri paylaşımını hizmetin gerektirdiği ölçüyle sınırlandırmayı hedefler.
+Tasarruf Planım kullanıcı verilerini ilgisiz üçüncü kişilere keyfî biçimde aktarmamayı ve veri paylaşımını hizmetin gerektirdiği ölçüyle sınırlandırmayı hedefler.
 
 26. Uzmanlarla Veri Paylaşımı
 Danışma sistemi kapsamında kullanıcı verilerinin yalnızca ilgili talebin yürütülmesi için gerekli olan kısmı yetkilendirilmiş uzmanla paylaşılabilir.
 
 Uzmanın erişebildiği veriler, danışma sürecinin durumuna göre sınırlandırılabilir.
 
-Uzmanların Plango üzerinden elde ettiği kullanıcı verilerini danışma amacı dışında kullanmaması, izinsiz olarak üçüncü kişilerle paylaşmaması ve güvenliğini koruması beklenir.
+Uzmanların Tasarruf Planım üzerinden elde ettiği kullanıcı verilerini danışma amacı dışında kullanmaması, izinsiz olarak üçüncü kişilerle paylaşmaması ve güvenliğini koruması beklenir.
 
 27. Şirketlerle Veri Paylaşımı
-Plango’nun kullanıcı adına otomatik olarak tasarruf finansman şirketine başvuru yapması temel hizmetin parçası değildir.
+Tasarruf Planım’ın kullanıcı adına otomatik olarak tasarruf finansman şirketine başvuru yapması temel hizmetin parçası değildir.
 
 Kullanıcının açık şekilde başvuru veya iletişim talebinde bulunacağı gelecekteki özelliklerde, hangi verinin hangi şirkete hangi amaçla aktarılacağı kullanıcıya ayrıca açıklanmalıdır.
 
-Kullanıcının bilgisi dışında şirketlere pazarlama amacıyla kişisel veri aktarılması Plango’nun gizlilik yaklaşımıyla bağdaşmaz.
+Kullanıcının bilgisi dışında şirketlere pazarlama amacıyla kişisel veri aktarılması Tasarruf Planım’ın gizlilik yaklaşımıyla bağdaşmaz.
 
 28. Kamu Kurumları ve Yasal Talepler
-Plango, yürürlükteki mevzuatın gerektirdiği veya yetkili kamu kurumlarının hukuka uygun talebi bulunduğu durumlarda belirli kişisel verileri paylaşmak zorunda kalabilir.
+Tasarruf Planım, yürürlükteki mevzuatın gerektirdiği veya yetkili kamu kurumlarının hukuka uygun talebi bulunduğu durumlarda belirli kişisel verileri paylaşmak zorunda kalabilir.
 
 Bu tür paylaşımların talebin kapsamıyla sınırlı olması ve yalnızca hukuken gerekli verilerin aktarılması hedeflenir.
 
 Mevzuatın izin verdiği ölçüde kullanıcı gizliliğinin korunması esastır.
 
 29. Bulut ve Teknik Hizmet Sağlayıcıları
-Plango; kimlik doğrulama, veri saklama, uygulama altyapısı, hata izleme veya benzeri teknik hizmetlerde üçüncü taraf teknoloji sağlayıcılarından yararlanabilir.
+Tasarruf Planım; kimlik doğrulama, veri saklama, uygulama altyapısı, hata izleme veya benzeri teknik hizmetlerde üçüncü taraf teknoloji sağlayıcılarından yararlanabilir.
 
-Bu sağlayıcılar, sundukları hizmetin niteliğine göre kullanıcı verilerini Plango adına işleyebilir.
+Bu sağlayıcılar, sundukları hizmetin niteliğine göre kullanıcı verilerini Tasarruf Planım adına işleyebilir.
 
 Teknik sağlayıcı seçiminde güvenlik, veri koruma yükümlülükleri ve hizmetin gerektirdiği veri kapsamı dikkate alınmalıdır.
 
 30. Yurt Dışına Veri Aktarımı
-Plango’nun kullandığı bazı teknik altyapı veya bulut hizmetlerinin sunucuları Türkiye dışında bulunabilir ya da hizmet kapsamında yurt dışına veri aktarımı gündeme gelebilir.
+Tasarruf Planım’ın kullandığı bazı teknik altyapı veya bulut hizmetlerinin sunucuları Türkiye dışında bulunabilir ya da hizmet kapsamında yurt dışına veri aktarımı gündeme gelebilir.
 
 Yurt dışına kişisel veri aktarımı söz konusu olduğunda yürürlükteki KVKK düzenlemeleri ve uygun aktarım mekanizmaları dikkate alınmalıdır.
 
-Plango, yurt dışına aktarım faaliyetlerini gerekli hukuki ve teknik değerlendirmeler yapılmadan gerçekleştirmemeyi hedefler.
+Tasarruf Planım, yurt dışına aktarım faaliyetlerini gerekli hukuki ve teknik değerlendirmeler yapılmadan gerçekleştirmemeyi hedefler.
 
 31. Veri Saklama Süreleri
 Kişisel veriler, işlendikleri amaç için gerekli olan süre boyunca veya ilgili mevzuatta öngörülen saklama süresi kadar muhafaza edilmelidir.
@@ -950,7 +950,7 @@ Her veri kategorisi için aynı saklama süresi uygulanmak zorunda değildir. He
 Saklama ihtiyacı sona erdiğinde verilerin silinmesi, yok edilmesi veya anonim hale getirilmesi ilgili teknik ve hukuki koşullar çerçevesinde değerlendirilir.
 
 32. Hesap Silme
-Plango kullanıcıya hesabını silme imkanı sunmayı hedefler.
+Tasarruf Planım kullanıcıya hesabını silme imkanı sunmayı hedefler.
 
 Hesap silme talebi sonrasında, hesabın aktif kullanım için gerekli verileri silinebilir veya erişilemez hale getirilebilir. Ancak yasal saklama zorunluluğu bulunan, güvenlik veya uyuşmazlık çözümü için belirli süre tutulması gereken kayıtlar ilgili süre boyunca saklanabilir.
 
@@ -964,7 +964,7 @@ Plan silme işlemi kullanıcı arayüzünden tamamlandığında, ilgili verinin 
 Teknik yedekler veya güvenlik kopyalarında bulunan verilerin tamamen ortadan kalkması, kullanılan altyapının yedekleme ve imha döngülerine bağlı olarak belirli bir süre alabilir.
 
 34. Veri Güvenliği
-Plango kişisel verilerin hukuka aykırı işlenmesini veya erişilmesini önlemek ve verilerin güvenli şekilde muhafazasını sağlamak amacıyla uygun teknik ve idari önlemler uygulamayı hedefler.
+Tasarruf Planım kişisel verilerin hukuka aykırı işlenmesini veya erişilmesini önlemek ve verilerin güvenli şekilde muhafazasını sağlamak amacıyla uygun teknik ve idari önlemler uygulamayı hedefler.
 
 Yetkilendirme kuralları, kullanıcı kimlik doğrulaması, rol bazlı erişim, veri erişim kontrolleri ve güvenli yazılım geliştirme uygulamaları bu yaklaşımın parçaları olabilir.
 
@@ -973,33 +973,33 @@ Hiçbir dijital sistem mutlak güvenlik garantisi sunamaz. Bu nedenle güvenlik 
 35. Hesap Güvenliği
 Kullanıcı kendi hesabının güvenliğini korumak için güçlü ve benzersiz bir parola kullanmalı, doğrulama kodlarını üçüncü kişilerle paylaşmamalı ve hesabına izinsiz erişim şüphesi olduğunda gerekli güvenlik adımlarını uygulamalıdır.
 
-Plango hiçbir uzmanın veya çalışan olduğunu iddia eden kişinin kullanıcıdan banka şifresi, kart şifresi veya tek kullanımlık güvenlik kodu istemesini normal bir uygulama olarak kabul etmez.
+Tasarruf Planım hiçbir uzmanın veya çalışan olduğunu iddia eden kişinin kullanıcıdan banka şifresi, kart şifresi veya tek kullanımlık güvenlik kodu istemesini normal bir uygulama olarak kabul etmez.
 
-Şüpheli durumların Plango’ya bildirilmesi güvenliğin geliştirilmesine yardımcı olabilir.
+Şüpheli durumların Tasarruf Planım’a bildirilmesi güvenliğin geliştirilmesine yardımcı olabilir.
 
 36. Veri İhlali Durumları
 Kişisel verilerin güvenliğini etkileyen bir olay meydana gelmesi halinde olayın kapsamının belirlenmesi, gerekli teknik tedbirlerin alınması ve yürürlükteki mevzuatın gerektirdiği bildirim süreçlerinin değerlendirilmesi gerekir.
 
-Plango, olası güvenlik ihlallerini ciddiyetle ele almayı ve gerekli düzeltici önlemleri mümkün olan en kısa sürede uygulamayı hedefler.
+Tasarruf Planım, olası güvenlik ihlallerini ciddiyetle ele almayı ve gerekli düzeltici önlemleri mümkün olan en kısa sürede uygulamayı hedefler.
 
-Kullanıcının hesabıyla ilgili şüpheli bir işlem fark etmesi halinde Plango’ya bildirimde bulunması önerilir.
+Kullanıcının hesabıyla ilgili şüpheli bir işlem fark etmesi halinde Tasarruf Planım’a bildirimde bulunması önerilir.
 
 37. Analitik ve Ürün Geliştirme
-Plango’nun hangi özelliklerinin kullanıldığı, hangi ekranlarda hata oluştuğu veya uygulamanın teknik performansı gibi veriler ürün geliştirme amacıyla analiz edilebilir.
+Tasarruf Planım’ın hangi özelliklerinin kullanıldığı, hangi ekranlarda hata oluştuğu veya uygulamanın teknik performansı gibi veriler ürün geliştirme amacıyla analiz edilebilir.
 
 Analitik faaliyetlerin mümkün olduğunca kullanıcı mahremiyetine saygılı, amaçla sınırlı ve ölçülü biçimde yürütülmesi hedeflenir.
 
-Kişisel kullanıcı profili oluşturmak veya kullanıcının finansal durumunu gereksiz şekilde sınıflandırmak Plango’nun temel analitik amacı değildir.
+Kişisel kullanıcı profili oluşturmak veya kullanıcının finansal durumunu gereksiz şekilde sınıflandırmak Tasarruf Planım’ın temel analitik amacı değildir.
 
 38. Reklam ve Pazarlama
-Plango gelecekte reklam veya ticari iletişim özellikleri sunarsa, kişisel verilerin pazarlama amacıyla kullanılması ayrı bir değerlendirmeye tabi tutulmalıdır.
+Tasarruf Planım gelecekte reklam veya ticari iletişim özellikleri sunarsa, kişisel verilerin pazarlama amacıyla kullanılması ayrı bir değerlendirmeye tabi tutulmalıdır.
 
 Elektronik ticari ileti, hedefli pazarlama veya benzeri faaliyetlerin ilgili mevzuatın gerektirdiği izin ve bilgilendirme süreçleri olmadan yürütülmemesi hedeflenir.
 
-FP Engine hesaplama verilerinin kullanıcıyı haberi olmadan belirli bir şirkete pazarlamak amacıyla kullanılmaması Plango’nun bağımsızlık ve gizlilik ilkelerinin bir parçasıdır.
+FP Engine hesaplama verilerinin kullanıcıyı haberi olmadan belirli bir şirkete pazarlamak amacıyla kullanılmaması Tasarruf Planım’ın bağımsızlık ve gizlilik ilkelerinin bir parçasıdır.
 
 39. Çerezler ve Benzeri Teknolojiler
-Plango’nun web tabanlı veya gelecekte sunulabilecek internet hizmetlerinde çerezler, yerel depolama veya benzeri teknolojiler kullanılabilir.
+Tasarruf Planım’ın web tabanlı veya gelecekte sunulabilecek internet hizmetlerinde çerezler, yerel depolama veya benzeri teknolojiler kullanılabilir.
 
 Bu teknolojilerin zorunlu, analitik veya pazarlama amaçları birbirinden farklı olabilir.
 
@@ -1013,32 +1013,32 @@ Kanuni şartların oluşması halinde kullanıcı, kişisel verilerin düzeltilm
 Başvuruların kimlik doğrulamasını sağlayacak ve kullanıcı güvenliğini koruyacak uygun yöntemlerle alınması hedeflenir.
 
 41. Başvuru ve İletişim
-Kullanıcılar gizlilik, kişisel veri veya hesap verileriyle ilgili talep ve sorularını Plango tarafından ilan edilen iletişim kanalları üzerinden iletebilir.
+Kullanıcılar gizlilik, kişisel veri veya hesap verileriyle ilgili genel talep ve sorularını info@tasarrufplanim.com adresi üzerinden iletebilir. Uygulama ve hesap desteği için destek@tasarrufplanim.com adresi kullanılabilir.
 
 KVKK kapsamındaki resmî başvurular için veri sorumlusunun kimliği, başvuru yöntemi ve iletişim bilgileri ayrıca açık ve güncel şekilde yayımlanmalıdır.
 
-Plango’nun tüzel kişilik, veri sorumlusu ve resmî iletişim bilgileri kesinleştiğinde bu alanların politika ve aydınlatma metinlerinde açıkça belirtilmesi gerekir.
+Tasarruf Planım’ın tüzel kişilik, veri sorumlusu ve resmî iletişim bilgileri kesinleştiğinde bu alanların politika ve aydınlatma metinlerinde açıkça belirtilmesi gerekir.
 
 42. Gizlilik Politikasındaki Değişiklikler
-Plango’nun hizmet kapsamı, teknik altyapısı veya yasal yükümlülükleri değiştikçe bu Gizlilik Politikası güncellenebilir.
+Tasarruf Planım’ın hizmet kapsamı, teknik altyapısı veya yasal yükümlülükleri değiştikçe bu Gizlilik Politikası güncellenebilir.
 
 Önemli değişikliklerde kullanıcıların güncel politika hakkında bilgilendirilmesini sağlayacak uygulama içi yöntemler kullanılabilir.
 
 Güncel politika uygulama içerisinden erişilebilir şekilde tutulmalıdır.
 
 43. Gizlilik ve Bağımsızlık İlişkisi
-Plango’nun bağımsızlık ilkesi yalnızca şirket sıralaması veya hesaplama sonuçlarıyla sınırlı değildir.
+Tasarruf Planım’ın bağımsızlık ilkesi yalnızca şirket sıralaması veya hesaplama sonuçlarıyla sınırlı değildir.
 
-Kullanıcı verilerinin belirli şirketlerin satış hedefleri için gizli şekilde kullanılması veya kullanıcıların finansal senaryolarının habersiz biçimde pazarlama profiline dönüştürülmesi Plango’nun bağımsızlık yaklaşımıyla bağdaşmaz.
+Kullanıcı verilerinin belirli şirketlerin satış hedefleri için gizli şekilde kullanılması veya kullanıcıların finansal senaryolarının habersiz biçimde pazarlama profiline dönüştürülmesi Tasarruf Planım’ın bağımsızlık yaklaşımıyla bağdaşmaz.
 
-Kullanıcının Plango’ya duyduğu güvenin korunması, ürünün uzun vadeli değerinin temel unsurlarından biridir.
+Kullanıcının Tasarruf Planım’a duyduğu güvenin korunması, ürünün uzun vadeli değerinin temel unsurlarından biridir.
 
 44. Son Bilgilendirme
-Plango’nun gizlilik yaklaşımının temelinde mümkün olduğunca az veri toplamak, toplanan veriyi açık amaçlarla kullanmak, kullanıcı güvenliğini korumak ve veriler üzerinde kullanıcıya şeffaflık sağlamak vardır.
+Tasarruf Planım’ın gizlilik yaklaşımının temelinde mümkün olduğunca az veri toplamak, toplanan veriyi açık amaçlarla kullanmak, kullanıcı güvenliğini korumak ve veriler üzerinde kullanıcıya şeffaflık sağlamak vardır.
 
-Bu politika Plango’nun genel gizlilik çerçevesini açıklar. Belirli veri işleme faaliyetleri için ayrıca KVKK Aydınlatma Metni, açık rıza metni, kullanıcı sözleşmesi veya uzman sözleşmesi sunulabilir.
+Bu politika Tasarruf Planım’ın genel gizlilik çerçevesini açıklar. Belirli veri işleme faaliyetleri için ayrıca KVKK Aydınlatma Metni, açık rıza metni, kullanıcı sözleşmesi veya uzman sözleşmesi sunulabilir.
 
-Kullanıcı gizliliği Plango açısından yalnızca yasal bir yükümlülük değil, ürün güveninin temel bir parçasıdır.''';
+Kullanıcı gizliliği Tasarruf Planım açısından yalnızca yasal bir yükümlülük değil, ürün güveninin temel bir parçasıdır.''';
 
   @override
   Widget build(BuildContext context) {
@@ -1503,7 +1503,7 @@ class _RegisterHeader extends StatelessWidget {
         Text(
           completeAnonymousAccount
               ? 'Hesabınızı Tamamlayın'
-              : 'Plango Hesabınızı Oluşturun',
+              : 'Tasarruf Planım Hesabınızı Oluşturun',
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: _RegisterScreenState._textDark,
@@ -1642,7 +1642,7 @@ class _LegalDocumentText extends StatelessWidget {
     }
 
     // Belge ana başlığı.
-    if (value.startsWith('PLANGO ')) {
+    if (value.startsWith('TASARRUF PLANIM ')) {
       return true;
     }
 
@@ -1665,7 +1665,7 @@ class _LegalDocumentText extends StatelessWidget {
               line,
               style: TextStyle(
                 color: _RegisterScreenState._textDark,
-                fontSize: line.startsWith('PLANGO ') ? 16 : 14.5,
+                fontSize: line.startsWith('TASARRUF PLANIM ') ? 16 : 14.5,
                 height: 1.6,
                 fontWeight: _isHeading(line)
                     ? FontWeight.w800

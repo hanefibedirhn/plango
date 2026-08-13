@@ -27,7 +27,7 @@ class PlangoApp extends StatelessWidget {
       valueListenable: PlangoThemeController.themeMode,
       builder: (context, themeMode, _) {
         return MaterialApp(
-          title: 'Plango',
+          title: 'Tasarruf Planım',
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,
           theme: ThemeData(
@@ -76,6 +76,7 @@ class AppColors {
   static const softTeal = Color(0xFFE8F7F5);
 }
 
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -86,10 +87,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _logoScale;
-  late final Animation<double> _logoOpacity;
-  late final Animation<double> _textOpacity;
-  late final Animation<Offset> _textOffset;
+
+  late final Animation<double> _symbolReveal;
+  late final Animation<double> _nameReveal;
+  late final Animation<double> _sloganReveal;
+  late final Animation<double> _finalScale;
 
   @override
   void initState() {
@@ -97,62 +99,33 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 3000),
     );
 
-    _logoScale = Tween<double>(
-      begin: 0.84,
-      end: 1,
+    // Ev + araç artık tek kesintisiz reveal içinde açılır.
+    // Böylece ev bittikten sonra araç başlarken oluşan görsel duraklama kalkar.
+    _symbolReveal = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.00, 0.52, curve: Curves.easeOutCubic),
+    );
+
+    _nameReveal = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.42, 0.74, curve: Curves.easeOutCubic),
+    );
+
+    _sloganReveal = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.66, 0.92, curve: Curves.easeOutCubic),
+    );
+
+    _finalScale = Tween<double>(
+      begin: 0.985,
+      end: 1.0,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(
-          0,
-          0.68,
-          curve: Curves.easeOutBack,
-        ),
-      ),
-    );
-
-    _logoOpacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0,
-          0.55,
-          curve: Curves.easeOut,
-        ),
-      ),
-    );
-
-    _textOpacity = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0.42,
-          1,
-          curve: Curves.easeOut,
-        ),
-      ),
-    );
-
-    _textOffset = Tween<Offset>(
-      begin: const Offset(0, 0.18),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(
-          0.42,
-          1,
-          curve: Curves.easeOutCubic,
-        ),
+        curve: const Interval(0.72, 1.0, curve: Curves.easeOutCubic),
       ),
     );
 
@@ -161,23 +134,14 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _startSplash() async {
     await _controller.forward();
-
-    await Future<void>.delayed(
-      const Duration(milliseconds: 650),
-    );
+    await Future<void>.delayed(const Duration(milliseconds: 850));
 
     if (!mounted) return;
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
-        transitionDuration: const Duration(
-          milliseconds: 420,
-        ),
-        pageBuilder: (
-          context,
-          animation,
-          secondaryAnimation,
-        ) {
+        transitionDuration: const Duration(milliseconds: 460),
+        pageBuilder: (context, animation, secondaryAnimation) {
           return const DisclaimerScreen();
         },
         transitionsBuilder: (
@@ -203,59 +167,154 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    const String logoAsset =
+        'assets/images/tasarruf_planim_splash_slogan.png';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 28,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ScaleTransition(
-                  scale: _logoScale,
-                  child: FadeTransition(
-                    opacity: _logoOpacity,
-                    child: Image.asset(
-                      'assets/images/plango_logo.png',
-                      width: 310,
-                      fit: BoxFit.contain,
-                      errorBuilder: (
-                        context,
-                        error,
-                        stackTrace,
-                      ) {
-                        return const _FallbackLogo();
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                FadeTransition(
-                  opacity: _textOpacity,
-                  child: SlideTransition(
-                    position: _textOffset,
-                    child: const Text(
-                      'Planla • Karşılaştır • Karar Ver',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.teal,
-                        fontSize: 13,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 470),
+              child: AspectRatio(
+                aspectRatio: 920 / 640,
+                child: ScaleTransition(
+                  scale: _finalScale,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // 1) SEMBOL: Ev + araç tek ve kesintisiz hareketle açılır.
+                      AnimatedBuilder(
+                        animation: _symbolReveal,
+                        builder: (context, child) {
+                          return ClipPath(
+                            clipper: _LogoBandRevealClipper(
+                              progress: _symbolReveal.value,
+                              left: 0.24,
+                              top: 0.08,
+                              right: 0.86,
+                              bottom: 0.54,
+                            ),
+                            child: child,
+                          );
+                        },
+                        child: Image.asset(
+                          logoAsset,
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                    ),
+
+                      // 3) MARKA ADI: PNG içindeki seçilmiş yuvarlak wordmark.
+                      AnimatedBuilder(
+                        animation: _nameReveal,
+                        builder: (context, child) {
+                          final double p = _nameReveal.value;
+                          return Opacity(
+                            opacity: p,
+                            child: Transform.translate(
+                              offset: Offset(0, 12 * (1 - p)),
+                              child: ClipPath(
+                                clipper: _LogoBandRevealClipper(
+                                  progress: p,
+                                  left: 0.07,
+                                  top: 0.54,
+                                  right: 0.94,
+                                  bottom: 0.79,
+                                ),
+                                child: child,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          logoAsset,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+
+                      // 4) SLOGAN.
+                      AnimatedBuilder(
+                        animation: _sloganReveal,
+                        builder: (context, child) {
+                          final double p = _sloganReveal.value;
+                          return Opacity(
+                            opacity: p,
+                            child: Transform.translate(
+                              offset: Offset(0, 10 * (1 - p)),
+                              child: ClipPath(
+                                clipper: _LogoBandRevealClipper(
+                                  progress: p,
+                                  left: 0.16,
+                                  top: 0.77,
+                                  right: 0.90,
+                                  bottom: 0.94,
+                                ),
+                                child: child,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Image.asset(
+                          logoAsset,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+class _LogoBandRevealClipper extends CustomClipper<Path> {
+  const _LogoBandRevealClipper({
+    required this.progress,
+    required this.left,
+    required this.top,
+    required this.right,
+    required this.bottom,
+  });
+
+  final double progress;
+  final double left;
+  final double top;
+  final double right;
+  final double bottom;
+
+  @override
+  Path getClip(Size size) {
+    final double p = progress.clamp(0.0, 1.0);
+    final double x1 = size.width * left;
+    final double x2 = size.width * right;
+    final double y1 = size.height * top;
+    final double y2 = size.height * bottom;
+
+    final Rect rect = Rect.fromLTRB(
+      x1,
+      y1,
+      x1 + ((x2 - x1) * p),
+      y2,
+    );
+
+    return Path()..addRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(18)),
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant _LogoBandRevealClipper oldClipper) {
+    return oldClipper.progress != progress ||
+        oldClipper.left != left ||
+        oldClipper.top != top ||
+        oldClipper.right != right ||
+        oldClipper.bottom != bottom;
   }
 }
 
@@ -423,7 +482,7 @@ class _DisclaimerScreenState
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    'Plango’yu kullanmadan önce aşağıdaki bilgileri okumanı rica ediyoruz.',
+                                    'Tasarruf Planım’ı kullanmadan önce aşağıdaki bilgileri okumanı rica ediyoruz.',
                                     style: TextStyle(
                                       color:
                                           AppColors.muted,
@@ -445,7 +504,7 @@ class _DisclaimerScreenState
                               .shield_outlined,
                           title: 'Bağımsız Platform',
                           description:
-                              'Plango, bağımsız bir tasarruf finansmanı karar destek platformudur.',
+                              'Tasarruf Planım, bağımsız bir tasarruf finansmanı karar destek platformudur.',
                         ),
                         const _InfoItem(
                           icon:
@@ -459,7 +518,7 @@ class _DisclaimerScreenState
                               Icons.description_outlined,
                           title: 'Resmî Plan ve Sözleşme',
                           description:
-                              'Plango sözleşme oluşturmaz, ödeme kabul etmez ve hiçbir tasarruf finansman kuruluşu adına işlem yapmaz.',
+                              'Tasarruf Planım sözleşme oluşturmaz, ödeme kabul etmez ve hiçbir tasarruf finansman kuruluşu adına işlem yapmaz.',
                         ),
                         const _InfoItem(
                           icon: Icons
@@ -582,18 +641,32 @@ class _DisclaimerScreenState
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 14),
                         const Center(
-                          child: Text(
-                            'Planla • Karşılaştır • Karar Ver',
-                            style: TextStyle(
-                              color:
-                                  AppColors.muted,
-                              fontSize: 9.5,
-                              fontWeight:
-                                  FontWeight.w700,
-                              letterSpacing: 0.45,
-                            ),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Kurucu & Geliştirici',
+                                style: TextStyle(
+                                  color: AppColors.muted,
+                                  fontSize: 9,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.35,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Hanefi Bedirhan Turanoğlu',
+                                style: TextStyle(
+                                  color: AppColors.navy,
+                                  fontSize: 10.5,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -755,7 +828,7 @@ class _FallbackLogo extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         const Text(
-          'PLANGO',
+          'TASARRUF PLANIM',
           style: TextStyle(
             color: AppColors.navy,
             fontSize: 28,

@@ -11,6 +11,7 @@ import 'privacy_policy_screen.dart';
 import 'user_agreement_screen.dart';
 import 'expert_agreement_screen.dart';
 import 'feedback_screen.dart';
+import 'my_consultation_requests_screen.dart';
 
 enum ExpertApplicationStatus {
   none,
@@ -123,7 +124,7 @@ class _AccountScreenState extends State<AccountScreen> {
   String get _expertSubtitle {
     switch (widget.expertStatus) {
       case ExpertApplicationStatus.none:
-        return 'Plango uzmanlık başvurunu oluştur.';
+        return 'Tasarruf Planım uzmanlık başvurunu oluştur.';
       case ExpertApplicationStatus.pending:
         return 'Başvurun yönetici değerlendirmesinde.';
       case ExpertApplicationStatus.rejected:
@@ -346,6 +347,26 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
 
                 _ProfileMenuTile(
+  icon: Icons.support_agent_outlined,
+  title: 'Danışma Taleplerim',
+  subtitle: 'Danışma taleplerini ve durumlarını takip et.',
+  iconBackground: _softTeal,
+  iconColor: _teal,
+  titleColor: _primaryText,
+  subtitleColor: _secondaryText,
+  dividerColor: _divider,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const MyConsultationRequestsScreen(),
+      ),
+    );
+  },
+),
+
+                _ProfileMenuTile(
                   icon: _expertIcon,
                   title: _expertTitle,
                   subtitle: _expertSubtitle,
@@ -363,7 +384,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         Icons.admin_panel_settings_outlined,
                     title: 'Yönetici Paneli',
                     subtitle:
-                        'Plango içeriklerini ve yönetim işlemlerini yönet.',
+                        'Tasarruf Planım içeriklerini ve yönetim işlemlerini yönet.',
                     iconBackground:
                         _darkMode
                             ? const Color(0xFF2C2940)
@@ -396,7 +417,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
             const SizedBox(height: 22),
 
-            _buildSectionLabel('Plango Hakkında'),
+            _buildSectionLabel('Tasarruf Planım Hakkında'),
 
             const SizedBox(height: 8),
 
@@ -482,7 +503,7 @@ _ProfileMenuTile(
 
             Center(
               child: Text(
-                'Plango',
+                'Tasarruf Planım',
                 style: TextStyle(
                   color: _secondaryText,
                   fontSize: 11,
@@ -500,7 +521,7 @@ _ProfileMenuTile(
   Widget _buildProfileHeader() {
     final String cleanName = widget.userName.trim();
     final String visibleName =
-        cleanName.isEmpty ? 'Plango Kullanıcısı' : cleanName;
+        cleanName.isEmpty ? 'Tasarruf Planım Kullanıcısı' : cleanName;
 
     String initials = 'P';
 

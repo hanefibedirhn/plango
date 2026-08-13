@@ -19,11 +19,11 @@ class MyConsultationRequestsScreen extends StatefulWidget {
 
 class _MyConsultationRequestsScreenState
     extends State<MyConsultationRequestsScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _green = Color(0xFF087C72);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = Color(0xFF0B2239);
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
 
     final ConsultationRepository _repository =
       ConsultationRepository();
@@ -199,11 +199,11 @@ class ConsultationRequestDetailScreen
 class _ConsultationRequestDetailScreenState
     extends State<
         ConsultationRequestDetailScreen> {
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _background = Color(0xFFF7F8F5);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _green = Color(0xFF087C72);
+  static const Color _background = Color(0xFFF7F9FB);
+  static const Color _textDark = Color(0xFF0B2239);
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
 
   final ConsultationRepository _repository =
       ConsultationRepository();
@@ -626,10 +626,10 @@ class _ConsultationCard extends StatelessWidget {
   final ConsultationRequest request;
   final VoidCallback onTap;
 
-  static const Color _green = Color(0xFF0B5D3B);
-  static const Color _textDark = Color(0xFF111827);
-  static const Color _textMuted = Color(0xFF6B7280);
-  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _green = Color(0xFF087C72);
+  static const Color _textDark = Color(0xFF0B2239);
+  static const Color _textMuted = Color(0xFF748193);
+  static const Color _border = Color(0xFFE4EBEE);
 
   @override
   Widget build(BuildContext context) {
@@ -671,7 +671,7 @@ class _ConsultationCard extends StatelessWidget {
                     height: 45,
                     decoration: BoxDecoration(
                       color:
-                          const Color(0xFFE8F1EC),
+                          const Color(0xFFE8F7F5),
                       borderRadius:
                           BorderRadius.circular(14),
                     ),
@@ -826,7 +826,7 @@ class _ExpertNameText extends StatelessWidget {
           return const Text(
             'Uzman bilgisi yükleniyor',
             style: TextStyle(
-              color: Color(0xFF6B7280),
+              color: Color(0xFF748193),
               fontSize: 12.5,
             ),
           );
@@ -838,7 +838,7 @@ class _ExpertNameText extends StatelessWidget {
         return Text(
           _readExpertName(data),
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF748193),
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
           ),
@@ -1007,7 +1007,7 @@ class _ExpertContactSection
                 contact.expertCorporateEmail != null)
               const Divider(
                 height: 1,
-                color: Color(0xFFE5E7EB),
+                color: Color(0xFFE4EBEE),
               ),
             if (contact.expertCorporateEmail != null)
               _DetailRow(
@@ -1018,7 +1018,7 @@ class _ExpertContactSection
             if (contact.contactSharedAt != null) ...[
               const Divider(
                 height: 1,
-                color: Color(0xFFE5E7EB),
+                color: Color(0xFFE4EBEE),
               ),
               _DetailRow(
                 label: 'Paylaşım Tarihi',
@@ -1050,11 +1050,11 @@ class _ContactMessageCard
   Widget build(BuildContext context) {
     final Color foreground = isError
         ? const Color(0xFFB42318)
-        : const Color(0xFF0B5D3B);
+        : const Color(0xFF087C72);
 
     final Color background = isError
         ? const Color(0xFFFDECEC)
-        : const Color(0xFFE8F1EC);
+        : const Color(0xFFE8F7F5);
 
     return Container(
       width: double.infinity,
@@ -1096,7 +1096,7 @@ class _AcceptedNotice extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F1EC),
+        color: const Color(0xFFE8F7F5),
         borderRadius: BorderRadius.circular(18),
       ),
       child: const Row(
@@ -1105,7 +1105,7 @@ class _AcceptedNotice extends StatelessWidget {
         children: [
           Icon(
             Icons.verified_rounded,
-            color: Color(0xFF0B5D3B),
+            color: Color(0xFF087C72),
             size: 22,
           ),
           SizedBox(width: 11),
@@ -1115,7 +1115,7 @@ class _AcceptedNotice extends StatelessWidget {
               'Uzman sizinle kayıtlı telefon numaranız '
               'üzerinden iletişime geçecektir.',
               style: TextStyle(
-                color: Color(0xFF0B5D3B),
+                color: Color(0xFF087C72),
                 fontSize: 13,
                 height: 1.45,
                 fontWeight: FontWeight.w700,
@@ -1142,7 +1142,7 @@ class _DetailCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE5E7EB),
+          color: const Color(0xFFE4EBEE),
         ),
       ),
       child: Column(
@@ -1178,7 +1178,7 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF748193),
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -1191,8 +1191,8 @@ class _DetailRow extends StatelessWidget {
               textAlign: TextAlign.end,
               style: TextStyle(
                 color: highlighted
-                    ? const Color(0xFF0B5D3B)
-                    : const Color(0xFF111827),
+                    ? const Color(0xFF087C72)
+                    : const Color(0xFF0B2239),
                 fontSize: 14,
                 height: 1.4,
                 fontWeight: FontWeight.w900,
@@ -1218,7 +1218,7 @@ class _DetailSectionTitle
     return Text(
       title,
       style: const TextStyle(
-        color: Color(0xFF111827),
+        color: Color(0xFF0B2239),
         fontSize: 16,
         fontWeight: FontWeight.w900,
       ),
@@ -1244,7 +1244,7 @@ class _CardValue extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-            color: Color(0xFF6B7280),
+            color: Color(0xFF748193),
             fontSize: 11.5,
             fontWeight: FontWeight.w600,
           ),
@@ -1255,7 +1255,7 @@ class _CardValue extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Color(0xFF111827),
+            color: Color(0xFF0B2239),
             fontSize: 13,
             fontWeight: FontWeight.w900,
           ),
@@ -1295,7 +1295,7 @@ class _LoadingView extends StatelessWidget {
             borderRadius:
                 BorderRadius.circular(22),
             border: Border.all(
-              color: const Color(0xFFE5E7EB),
+              color: const Color(0xFFE4EBEE),
             ),
           ),
         );
@@ -1375,12 +1375,12 @@ class _MessageView extends StatelessWidget {
               width: 68,
               height: 68,
               decoration: const BoxDecoration(
-                color: Color(0xFFE8F1EC),
+                color: Color(0xFFE8F7F5),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF0B5D3B),
+                color: const Color(0xFF087C72),
                 size: 32,
               ),
             ),
@@ -1389,7 +1389,7 @@ class _MessageView extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFF111827),
+                color: Color(0xFF0B2239),
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
@@ -1399,7 +1399,7 @@ class _MessageView extends StatelessWidget {
               description,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFF6B7280),
+                color: Color(0xFF748193),
                 fontSize: 13.5,
                 height: 1.5,
               ),
@@ -1464,8 +1464,8 @@ if (request.status == 'pending' &&
         description:
             'Uzman talebinizi kabul etti ve sizinle '
             'iletişime geçecektir.',
-        foreground: Color(0xFF0B5D3B),
-        background: Color(0xFFE8F1EC),
+        foreground: Color(0xFF087C72),
+        background: Color(0xFFE8F7F5),
         icon: Icons.check_circle_outline_rounded,
       );
 
@@ -1485,8 +1485,8 @@ if (request.status == 'pending' &&
         label: 'Tamamlandı',
         description:
             'Danışma süreci tamamlandı.',
-        foreground: Color(0xFF0B5D3B),
-        background: Color(0xFFE8F1EC),
+        foreground: Color(0xFF087C72),
+        background: Color(0xFFE8F7F5),
         icon: Icons.verified_outlined,
       );
 
@@ -1520,7 +1520,7 @@ if (request.status == 'pending' &&
         description:
             'Danışma talebi kullanıcı tarafından '
             'iptal edildi.',
-        foreground: Color(0xFF6B7280),
+        foreground: Color(0xFF748193),
         background: Color(0xFFF3F4F6),
         icon: Icons.cancel_outlined,
       );
@@ -1551,7 +1551,7 @@ if (request.status == 'pending' &&
         label: 'İnceleniyor',
         description:
             'Danışma talebiniz işleme alındı.',
-        foreground: Color(0xFF6B7280),
+        foreground: Color(0xFF748193),
         background: Color(0xFFF3F4F6),
         icon: Icons.info_outline_rounded,
       );
@@ -1578,7 +1578,7 @@ String _readExpertName(
       '$firstName $lastName'.trim();
 
   return combined.isEmpty
-      ? 'Plango Uzmanı'
+      ? 'Tasarruf Planım Uzmanı'
       : combined;
 }
 

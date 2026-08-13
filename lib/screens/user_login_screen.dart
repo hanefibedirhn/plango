@@ -243,7 +243,7 @@ class _LoginHeader extends StatelessWidget {
         ),
         SizedBox(height: 9),
         Text(
-          'Plango hesabınıza e-posta adresiniz ve şifrenizle giriş yapın.',
+          'Tasarruf Planım hesabınıza e-posta adresiniz ve şifrenizle giriş yapın.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: _UserLoginScreenState._textMuted,

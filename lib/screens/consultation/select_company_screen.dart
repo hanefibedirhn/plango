@@ -277,7 +277,7 @@ class _SelectCompanyScreenState
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Plango herhangi bir şirketi '
+                      'Tasarruf Planım herhangi bir şirketi '
                       'tavsiye etmez veya öne çıkarmaz. '
                       'Seçim yalnızca danışma talebinizin '
                       'hangi şirketteki uzmana '

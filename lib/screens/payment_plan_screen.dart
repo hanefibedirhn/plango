@@ -8,6 +8,7 @@ import '../models/calculation_plan.dart';
 import '../repositories/saved_plan_repository.dart';
 import '../services/plango_pdf_service.dart';
 import 'consultation/select_company_screen.dart';
+import 'user_login_screen.dart';
 
 class PaymentPlanScreen extends StatefulWidget {
   const PaymentPlanScreen({
@@ -146,13 +147,25 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
   Future<void> _savePlan() async {
     if (_isSavingPlan) return;
 
-    final User? user = FirebaseAuth.instance.currentUser;
+    User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null || user.isAnonymous) {
-      _showMessage(
-        'Plan kaydetmek için kullanıcı hesabınızla giriş yapmanız gerekir.',
+      final bool shouldLogin = await _showLoginRequiredDialog();
+      if (!shouldLogin || !mounted) return;
+
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const UserLoginScreen(),
+        ),
       );
-      return;
+
+      if (!mounted) return;
+
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user == null || user.isAnonymous) {
+        return;
+      }
     }
 
     setState(() => _isSavingPlan = true);
@@ -187,6 +200,82 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
         setState(() => _isSavingPlan = false);
       }
     }
+  }
+
+  Future<bool> _showLoginRequiredDialog() async {
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(22, 22, 22, 0),
+          contentPadding: const EdgeInsets.fromLTRB(22, 12, 22, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+          title: const Row(
+            children: [
+              Icon(
+                Icons.bookmark_add_outlined,
+                color: _teal,
+                size: 25,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Planını Kaydet',
+                  style: TextStyle(
+                    color: _navy,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Planını kaydetmek ve daha sonra Planlarım bölümünden '
+            'ulaşabilmek için kullanıcı hesabınla giriş yapmalısın.',
+            style: TextStyle(
+              color: _muted,
+              fontSize: 13.5,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              style: TextButton.styleFrom(
+                foregroundColor: _muted,
+              ),
+              child: const Text(
+                'Vazgeç',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                backgroundColor: _teal,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Giriş Yap',
+                style: TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   Future<void> _saveToDevice() async {
@@ -257,39 +346,11 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
         elevation: 0,
         titleSpacing: 2,
         iconTheme: const IconThemeData(color: _navy),
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _PaymentPlanRoadLogo(size: 36),
-            SizedBox(width: 9),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'PLANGO',
-                  style: TextStyle(
-                    color: _navy,
-                    fontSize: 20,
-                    height: 1,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.9,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Planla • Karşılaştır • Karar Ver',
-                  style: TextStyle(
-                    color: _teal,
-                    fontSize: 8.5,
-                    height: 1,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.35,
-                  ),
-                ),
-              ],
-            ),
-          ],
+        title: Image.asset(
+          'assets/images/tasarruf_planim_home_logo.png',
+          height: 43,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerLeft,
         ),
         actions: [
           PopupMenuButton<String>(
@@ -346,24 +407,12 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
           const SizedBox(width: 7),
         ],
       ),
-      floatingActionButton: FloatingActionButton.small(
-        onPressed: _isAtBottom ? _scrollToTop : _scrollToBottom,
-        backgroundColor: _petrol,
-        foregroundColor: Colors.white,
-        elevation: 5,
-        tooltip:
-            _isAtBottom ? 'Sayfanın başına git' : 'Planın sonuna git',
-        child: Icon(
-          _isAtBottom
-              ? Icons.keyboard_arrow_up_rounded
-              : Icons.keyboard_arrow_down_rounded,
-          size: 30,
-        ),
-      ),
-      body: ListView(
-        controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(18, 4, 18, 42),
+      body: Stack(
         children: [
+          ListView(
+            controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 96),
+            children: [
           const Text(
             'Ödeme Planı',
             style: TextStyle(
@@ -408,7 +457,37 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
             onPressed: _openConsultationFlow,
           ),
           const SizedBox(height: 16),
-          _buildDisclaimer(),
+              _buildDisclaimer(),
+            ],
+          ),
+          Positioned(
+            right: 18,
+            bottom: 18,
+            child: SafeArea(
+              top: false,
+              child: Material(
+                color: _petrol,
+                elevation: 5,
+                shadowColor: _navy.withOpacity(0.18),
+                borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  onTap: _isAtBottom ? _scrollToTop : _scrollToBottom,
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Icon(
+                      _isAtBottom
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      color: Colors.white,
+                      size: 29,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1087,7 +1166,7 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Plango sonuçları tahmini ve bilgilendirme amaçlıdır. '
+              'Tasarruf Planım sonuçları tahmini ve bilgilendirme amaçlıdır. '
               'Kesin plan, sözleşme, organizasyon ücreti ve teslimat '
               'koşulları ilgili tasarruf finansman kuruluşu tarafından '
               'belirlenir.',
@@ -1149,105 +1228,5 @@ class _PaymentPlanScreenState extends State<PaymentPlanScreen> {
         color: _border,
       ),
     );
-  }
-}
-
-class _PaymentPlanRoadLogo extends StatelessWidget {
-  const _PaymentPlanRoadLogo({
-    this.size = 48,
-  });
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _PaymentPlanLogoPainter(),
-      ),
-    );
-  }
-}
-
-class _PaymentPlanLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Rect rect = Offset.zero & size;
-
-    final Paint gradientPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF17C9B0),
-          Color(0xFF087C72),
-          Color(0xFF0A3451),
-        ],
-      ).createShader(rect);
-
-    final RRect body = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        size.width * 0.12,
-        size.height * 0.06,
-        size.width * 0.72,
-        size.height * 0.88,
-      ),
-      Radius.circular(size.width * 0.22),
-    );
-
-    canvas.drawRRect(body, gradientPaint);
-
-    final Paint cutPaint = Paint()
-      ..color = const Color(0xFFF7F9FB)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.15
-      ..strokeCap = StrokeCap.round;
-
-    final Path road = Path()
-      ..moveTo(size.width * 0.30, size.height * 0.88)
-      ..cubicTo(
-        size.width * 0.30,
-        size.height * 0.68,
-        size.width * 0.67,
-        size.height * 0.69,
-        size.width * 0.67,
-        size.height * 0.42,
-      )
-      ..cubicTo(
-        size.width * 0.67,
-        size.height * 0.24,
-        size.width * 0.49,
-        size.height * 0.23,
-        size.width * 0.31,
-        size.height * 0.34,
-      );
-
-    canvas.drawPath(road, cutPaint);
-
-    final Paint centerLinePaint = Paint()
-      ..color = const Color(0xFF26D6BF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.035
-      ..strokeCap = StrokeCap.round;
-
-    final Path centerLine = Path()
-      ..moveTo(size.width * 0.31, size.height * 0.86)
-      ..cubicTo(
-        size.width * 0.35,
-        size.height * 0.68,
-        size.width * 0.60,
-        size.height * 0.65,
-        size.width * 0.60,
-        size.height * 0.43,
-      );
-
-    canvas.drawPath(centerLine, centerLinePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
