@@ -77,13 +77,14 @@ class ConsultationRepository {
       );
     }
 
-    final bool hasOpenRequest = await _hasOpenRequest(
-      userId: request.userId,
+    final bool hasDuplicateOpenRequest =
+        await _hasDuplicateOpenRequest(
+      request: request,
     );
 
-    if (hasOpenRequest) {
+    if (hasDuplicateOpenRequest) {
       throw const ConsultationRepositoryException(
-        'Devam eden danışma talebiniz tamamlanmadan yeni bir talep oluşturamazsınız.',
+        'Bu plan için seçtiğiniz şirkete ait devam eden bir danışma talebiniz bulunuyor.',
       );
     }
 
@@ -219,12 +220,15 @@ class ConsultationRepository {
     }
   }
 
-  Future<bool> _hasOpenRequest({
-    required String userId,
+  Future<bool> _hasDuplicateOpenRequest({
+    required ConsultationRequest request,
   }) async {
     final QuerySnapshot<Map<String, dynamic>> snapshot =
         await _requestsCollection
-            .where('userId', isEqualTo: userId)
+            .where(
+              'userId',
+              isEqualTo: request.userId,
+            )
             .where(
               'status',
               whereIn: const [
@@ -235,10 +239,56 @@ class ConsultationRepository {
                 'waiting_for_admin',
               ],
             )
-            .limit(1)
             .get();
 
-    return snapshot.docs.isNotEmpty;
+    final String company = _normalize(request.companyName);
+    final String increaseModel =
+        _normalize(request.plan.increaseModel);
+
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> document
+        in snapshot.docs) {
+      final Map<String, dynamic> data = document.data();
+
+      final String existingCompany = _normalize(
+        data['companyName'] as String? ?? '',
+      );
+
+      final String existingIncreaseModel = _normalize(
+        data['increaseModel'] as String? ?? '',
+      );
+
+      final double existingFinanceAmount =
+          (data['financeAmount'] as num?)?.toDouble() ?? 0;
+
+      final double existingDownPayment =
+          (data['downPayment'] as num?)?.toDouble() ?? 0;
+
+      final double existingMonthlyInstallment =
+          (data['monthlyInstallment'] as num?)?.toDouble() ?? 0;
+
+      final int existingEstimatedDelivery =
+          (data['estimatedDelivery'] as num?)?.toInt() ?? 0;
+
+      final int existingEstimatedTerm =
+          (data['estimatedTerm'] as num?)?.toInt() ?? 0;
+
+      final bool samePlan =
+          existingCompany == company &&
+          existingFinanceAmount == request.plan.financeAmount &&
+          existingDownPayment == request.plan.downPayment &&
+          existingMonthlyInstallment ==
+              request.plan.monthlyInstallment &&
+          existingIncreaseModel == increaseModel &&
+          existingEstimatedDelivery ==
+              request.plan.estimatedDelivery &&
+          existingEstimatedTerm == request.plan.estimatedTerm;
+
+      if (samePlan) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Aynı şirketteki uygun uzmanlar arasından en düşük iş yüküne sahip

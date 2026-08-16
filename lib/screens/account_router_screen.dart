@@ -47,7 +47,7 @@ class AccountRouterScreen extends StatelessWidget {
 
         final User? firebaseUser = authSnapshot.data;
 
-        if (firebaseUser == null) {
+if (firebaseUser == null || firebaseUser.isAnonymous) {
   return const GuestProfileScreen();
 }
 
@@ -207,14 +207,27 @@ class GuestProfileScreen extends StatelessWidget {
     );
   }
 
-  void _openRegister(BuildContext context) {
-    Navigator.push(
+  Future<void> _openRegister(BuildContext context) async {
+  final bool? accountCreated = await Navigator.push<bool>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const RegisterScreen(),
+    ),
+  );
+
+  if (!context.mounted) {
+    return;
+  }
+
+  if (accountCreated == true) {
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => const RegisterScreen(),
+        builder: (_) => AccountRouterScreen(),
       ),
     );
   }
+}
 
   void _openAbout(BuildContext context) {
     Navigator.push(

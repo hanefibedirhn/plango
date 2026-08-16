@@ -811,29 +811,64 @@ class _ExpertNameText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (expertId.trim().isEmpty) {
+      return const Text(
+        'Henüz uzman atanmadı',
+        style: TextStyle(
+          color: Color(0xFF748193),
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+    }
+
     return FutureBuilder<
         DocumentSnapshot<Map<String, dynamic>>>(
       future: FirebaseFirestore.instance
           .collection('expertProfiles')
-          .doc(expertId)
+          .doc(expertId.trim())
           .get(),
       builder: (
         context,
         snapshot,
       ) {
-        if (!snapshot.hasData ||
-            snapshot.data?.data() == null) {
+        if (snapshot.hasError) {
+          return const Text(
+            'Uzman bilgisi alınamadı',
+            style: TextStyle(
+              color: Color(0xFF748193),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+            ),
+          );
+        }
+
+        if (snapshot.connectionState ==
+                ConnectionState.waiting &&
+            !snapshot.hasData) {
           return const Text(
             'Uzman bilgisi yükleniyor',
             style: TextStyle(
               color: Color(0xFF748193),
               fontSize: 12.5,
+              fontWeight: FontWeight.w600,
             ),
           );
         }
 
-        final Map<String, dynamic> data =
-            snapshot.data!.data()!;
+        final Map<String, dynamic>? data =
+            snapshot.data?.data();
+
+        if (data == null) {
+          return const Text(
+            'Uzman bilgisi bulunamadı',
+            style: TextStyle(
+              color: Color(0xFF748193),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+            ),
+          );
+        }
 
         return Text(
           _readExpertName(data),
@@ -857,11 +892,18 @@ class _ExpertNameRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (expertId.trim().isEmpty) {
+      return const _DetailRow(
+        label: 'Uzman',
+        value: 'Henüz uzman atanmadı',
+      );
+    }
+
     return FutureBuilder<
         DocumentSnapshot<Map<String, dynamic>>>(
       future: FirebaseFirestore.instance
           .collection('expertProfiles')
-          .doc(expertId)
+          .doc(expertId.trim())
           .get(),
       builder: (
         context,
@@ -869,11 +911,15 @@ class _ExpertNameRow extends StatelessWidget {
       ) {
         String value = 'Uzman bilgisi yükleniyor';
 
-        if (snapshot.hasData &&
-            snapshot.data?.data() != null) {
-          value = _readExpertName(
-            snapshot.data!.data()!,
-          );
+        if (snapshot.hasError) {
+          value = 'Uzman bilgisi alınamadı';
+        } else if (snapshot.hasData) {
+          final Map<String, dynamic>? data =
+              snapshot.data?.data();
+
+          value = data == null
+              ? 'Uzman bilgisi bulunamadı'
+              : _readExpertName(data);
         }
 
         return _DetailRow(

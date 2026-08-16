@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/user_model.dart';
+import 'package:flutter/foundation.dart';
 
 class UserNotFoundException implements Exception {
   const UserNotFoundException();
@@ -25,21 +26,41 @@ class UserRepository {
 
   /// Kullanıcı profilini oluşturur.
   Future<void> createUserProfile(AppUser user) async {
-    final DocumentReference<Map<String, dynamic>>
-        userReference =
-        _usersCollection.doc(user.uid);
+  final DocumentReference<Map<String, dynamic>> userReference =
+      _usersCollection.doc(user.uid);
 
-    await userReference.set({
-      ...user.toMap(),
-      'uid': user.uid,
-      'email': user.email.trim().toLowerCase(),
-      'roles': const ['user'],
-      'expertStatus': 'none',
-      'phone': user.phone?.trim(),
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+  final Map<String, dynamic> data = {
+    ...user.toMap(),
+    'uid': user.uid,
+    'email': user.email.trim().toLowerCase(),
+    'roles': const ['user'],
+    'expertStatus': 'none',
+    'phone': user.phone?.trim(),
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+  };
+
+  debugPrint('========== USER PROFILE CREATE ==========');
+  debugPrint('DOCUMENT UID => ${userReference.id}');
+  debugPrint('APP USER UID => ${user.uid}');
+  debugPrint('DATA => $data');
+  debugPrint('=========================================');
+
+  try {
+    await userReference.set(data);
+
+    debugPrint('USER PROFILE CREATE => SUCCESS');
+  } on FirebaseException catch (error, stackTrace) {
+    debugPrint('USER PROFILE FIREBASE ERROR => ${error.code}');
+    debugPrint('USER PROFILE MESSAGE => ${error.message}');
+    debugPrint('USER PROFILE STACKTRACE => $stackTrace');
+    rethrow;
+  } catch (error, stackTrace) {
+    debugPrint('USER PROFILE UNKNOWN ERROR => $error');
+    debugPrint('USER PROFILE STACKTRACE => $stackTrace');
+    rethrow;
   }
+}
 
   Future<AppUser> getUserById(String uid) async {
     final DocumentSnapshot<Map<String, dynamic>> document =

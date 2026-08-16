@@ -255,7 +255,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         createdAt: DateTime.now(),
       );
 
-      await _userRepository.createUserProfile(appUser);
+      debugPrint(
+  'AUTH CURRENT UID => ${FirebaseAuth.instance.currentUser?.uid}',
+);
+debugPrint(
+  'AUTH IS ANONYMOUS => ${FirebaseAuth.instance.currentUser?.isAnonymous}',
+);
+debugPrint(
+  'APP USER UID => ${appUser.uid}',
+);
+
+await _userRepository.createUserProfile(appUser);
 
       _authenticatedUserPendingProfile = null;
       _shouldRollbackNewAccount = false;
@@ -293,7 +303,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+  debugPrint('REGISTER ERROR => $error');
+  debugPrint('REGISTER STACKTRACE => $stackTrace');
       if (_shouldRollbackNewAccount) {
         await _authService.rollbackNewlyCreatedUser();
         _authenticatedUserPendingProfile = null;
