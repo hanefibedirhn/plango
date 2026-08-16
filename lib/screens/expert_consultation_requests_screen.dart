@@ -38,42 +38,42 @@ class _ExpertConsultationRequestsScreenState
 
   static const List<_ExpertFilter> _filters = [
     _ExpertFilter(key: 'active', label: 'Aktif'),
-    _ExpertFilter(key: 'pending', label: 'Yeni'),
-    _ExpertFilter(key: 'accepted', label: 'Kabul'),
-    _ExpertFilter(key: 'contacted', label: 'İletişim'),
-    _ExpertFilter(key: 'completed', label: 'Tamamlanan'),
-    _ExpertFilter(key: 'rejected', label: 'Reddedilen'),
-    _ExpertFilter(key: 'expired', label: 'Süresi Dolan'),
-    _ExpertFilter(key: 'all', label: 'Tümü'),
+    _ExpertFilter(key: 'completed', label: 'Biten'),
   ];
 
-  List<ConsultationRequest> _filtered(List<ConsultationRequest> requests) {
-    switch (_selectedFilter) {
-      case 'active':
-        return requests
-            .where((request) => const {
-                  'pending',
-                  'accepted',
-                  'contacted',
-                }.contains(request.status))
-            .toList();
-      case 'pending':
-      case 'accepted':
-      case 'contacted':
-      case 'completed':
-      case 'rejected':
-      case 'expired':
-        return requests
-            .where((request) => request.status == _selectedFilter)
-            .toList();
-      case 'all':
-      default:
-        return requests;
+  bool _isVisibleToExpert(ConsultationRequest request) {
+    if (request.status == 'rejected' || request.status == 'expired') {
+      return false;
     }
+
+    if (request.status == 'pending') {
+      final DateTime? deadline = request.expiresAt;
+      if (deadline != null && !deadline.isAfter(DateTime.now())) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
-  int _countStatus(List<ConsultationRequest> requests, String status) {
-    return requests.where((request) => request.status == status).length;
+  List<ConsultationRequest> _filtered(List<ConsultationRequest> requests) {
+    final visible = requests.where(_isVisibleToExpert);
+
+    if (_selectedFilter == 'completed') {
+      return visible
+          .where((request) => request.status == 'completed')
+          .toList();
+    }
+
+    return visible
+        .where(
+          (request) => const {
+            'pending',
+            'accepted',
+            'contacted',
+          }.contains(request.status),
+        )
+        .toList();
   }
 
   String _formatCurrency(double value) => _currencyFormatter.format(value);
@@ -118,43 +118,42 @@ class _ExpertConsultationRequestsScreenState
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
               children: [
-                _ExpertSummary(
-                  newCount: _countStatus(allRequests, 'pending'),
-                  acceptedCount: _countStatus(allRequests, 'accepted'),
-                  contactedCount: _countStatus(allRequests, 'contacted'),
-                  completedCount: _countStatus(allRequests, 'completed'),
-                ),
-                const SizedBox(height: 17),
-                SizedBox(
-                  height: 40,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _filters.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final filter = _filters[index];
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: _border),
+                  ),
+                  child: Row(
+                    children: _filters.map((filter) {
                       final selected = filter.key == _selectedFilter;
-
-                      return ChoiceChip(
-                        selected: selected,
-                        showCheckmark: false,
-                        onSelected: (_) {
-                          setState(() => _selectedFilter = filter.key);
-                        },
-                        label: Text(filter.label),
-                        labelStyle: TextStyle(
-                          color: selected ? Colors.white : _petrol,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        selectedColor: _teal,
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: selected ? _teal : _border),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
+                      return Expanded(
+                        child: InkWell(
+                          onTap: () => setState(
+                            () => _selectedFilter = filter.key,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            height: 40,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selected ? _teal : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              filter.label,
+                              style: TextStyle(
+                                color: selected ? Colors.white : _petrol,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
                         ),
                       );
-                    },
+                    }).toList(),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -162,7 +161,7 @@ class _ExpertConsultationRequestsScreenState
                   children: [
                     const Expanded(
                       child: Text(
-                        'Talepler',
+                        'Danışma Talepleri',
                         style: TextStyle(
                           color: _navy,
                           fontSize: 17,
@@ -186,7 +185,7 @@ class _ExpertConsultationRequestsScreenState
                     icon: Icons.inbox_outlined,
                     title: 'Talep Bulunmuyor',
                     message:
-                        'Seçtiğiniz filtreye ait danışma talebi bulunmuyor.',
+                        'Bu bölümde gösterilecek danışma talebi bulunmuyor.',
                     embedded: true,
                   )
                 else
@@ -218,115 +217,6 @@ class _ExpertConsultationRequestsScreenState
   }
 }
 
-class _ExpertSummary extends StatelessWidget {
-  const _ExpertSummary({
-    required this.newCount,
-    required this.acceptedCount,
-    required this.contactedCount,
-    required this.completedCount,
-  });
-
-  final int newCount;
-  final int acceptedCount;
-  final int contactedCount;
-  final int completedCount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF052F3D), Color(0xFF087C72)],
-        ),
-        borderRadius: BorderRadius.circular(23),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF052F3D).withOpacity(0.15),
-            blurRadius: 22,
-            offset: const Offset(0, 9),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Danışma Özeti',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              _SummaryItem(label: 'Yeni', value: newCount),
-              const _SummaryDivider(),
-              _SummaryItem(label: 'Kabul', value: acceptedCount),
-              const _SummaryDivider(),
-              _SummaryItem(label: 'İletişim', value: contactedCount),
-              const _SummaryDivider(),
-              _SummaryItem(label: 'Biten', value: completedCount),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryItem extends StatelessWidget {
-  const _SummaryItem({required this.label, required this.value});
-
-  final String label;
-  final int value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            '$value',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              height: 1,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFFD8F6F0),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryDivider extends StatelessWidget {
-  const _SummaryDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 34,
-      color: Colors.white.withOpacity(0.16),
-    );
-  }
-}
-
 class _ExpertRequestCard extends StatelessWidget {
   const _ExpertRequestCard({
     required this.request,
@@ -349,10 +239,10 @@ class _ExpertRequestCard extends StatelessWidget {
     final status = _statusStyle(request.status);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 11),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(17),
         border: Border.all(color: _ExpertConsultationRequestsScreenState._border),
         boxShadow: [
           BoxShadow(
@@ -364,12 +254,12 @@ class _ExpertRequestCard extends StatelessWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(17),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(21),
+          borderRadius: BorderRadius.circular(17),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(12, 11, 12, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -377,12 +267,12 @@ class _ExpertRequestCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 45,
-                      height: 45,
+                      width: 38,
+                      height: 38,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: const Color(0xFFEAF8F5),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         _initials(request.userFullName),
@@ -393,7 +283,7 @@ class _ExpertRequestCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 9),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,66 +330,48 @@ class _ExpertRequestCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _MetricBox(label: 'Finansman', value: financeText),
-                    ),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: _MetricBox(
-                        label: 'İlk Taksit',
-                        value: installmentText,
-                      ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 9),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _MetricBox(
-                        label: 'Teslim',
-                        value: '${request.plan.estimatedDelivery}. ay',
-                      ),
-                    ),
-                    const SizedBox(width: 9),
-                    Expanded(
-                      child: _MetricBox(
-                        label: 'Vade',
-                        value: '${request.plan.estimatedTerm} ay',
-                      ),
-                    ),
-                  ],
-                ),
-                if ((request.userNote ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 11),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF7F9FB),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    child: Text(
-                      request.userNote!.trim(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _ExpertConsultationRequestsScreenState._muted,
-                        fontSize: 12,
-                        height: 1.4,
-                      ),
-                    ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
                   ),
-                ],
-                const SizedBox(height: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F9FB),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _CompactMetric(
+                          label: 'Finansman',
+                          value: financeText,
+                        ),
+                      ),
+                      const _CompactDivider(),
+                      Expanded(
+                        child: _CompactMetric(
+                          label: 'Taksit',
+                          value: installmentText,
+                        ),
+                      ),
+                      const _CompactDivider(),
+                      Expanded(
+                        child: _CompactMetric(
+                          label: 'Teslim',
+                          value: '${request.plan.estimatedDelivery}. ay',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
                 const Divider(
                   height: 1,
                   color: _ExpertConsultationRequestsScreenState._border,
                 ),
-                const SizedBox(height: 11),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     const Icon(
@@ -605,44 +477,54 @@ class _ExpertRequestCard extends StatelessWidget {
   }
 }
 
-class _MetricBox extends StatelessWidget {
-  const _MetricBox({required this.label, required this.value});
+class _CompactMetric extends StatelessWidget {
+  const _CompactMetric({
+    required this.label,
+    required this.value,
+  });
 
   final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: _ExpertConsultationRequestsScreenState._muted,
+            fontSize: 9,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: _ExpertConsultationRequestsScreenState._petrol,
+            fontSize: 10.5,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CompactDivider extends StatelessWidget {
+  const _CompactDivider();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F9FB),
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: _ExpertConsultationRequestsScreenState._muted,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: _ExpertConsultationRequestsScreenState._petrol,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
+      width: 1,
+      height: 27,
+      margin: const EdgeInsets.symmetric(horizontal: 7),
+      color: _ExpertConsultationRequestsScreenState._border,
     );
   }
 }
@@ -701,7 +583,7 @@ class _MessageView extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(21),
+        borderRadius: BorderRadius.circular(17),
         border: Border.all(
           color: _ExpertConsultationRequestsScreenState._border,
         ),

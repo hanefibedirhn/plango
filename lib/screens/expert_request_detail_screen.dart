@@ -162,142 +162,141 @@ class _ExpertRequestDetailScreenState
       showDragHandle: true,
       backgroundColor: Colors.white,
       builder: (sheetContext) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            2,
-            20,
-            MediaQuery.of(sheetContext)
-                    .viewInsets
-                    .bottom +
-                22,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Talebi Reddet',
-                style: TextStyle(
-                  color: _navy,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                ),
+        String? validationMessage;
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                2,
+                20,
+                MediaQuery.of(sheetContext).viewInsets.bottom + 22,
               ),
-              const SizedBox(height: 7),
-              const Text(
-                'Talep başka bir uzmana yönlendirilebilmesi '
-                'için yönetici kuyruğuna alınacaktır.',
-                style: TextStyle(
-                  color: _muted,
-                  fontSize: 13,
-                  height: 1.45,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                minLines: 3,
-                maxLines: 5,
-                maxLength: 250,
-                textCapitalization:
-                    TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: 'Red nedeni',
-                  hintText:
-                      'Örn. yoğunluk, izin, yanlış uzman ataması...',
-                  filled: true,
-                  fillColor: const Color(0xFFF7F9FB),
-                  border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: _border,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: _border,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: _teal,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.pop(sheetContext);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _muted,
-                        side: const BorderSide(
-                          color: _border,
-                        ),
-                        minimumSize:
-                            const Size.fromHeight(52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text('Vazgeç'),
+                  const Text(
+                    'Talebi Reddet',
+                    style: TextStyle(
+                      color: _navy,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () {
-                        final String reason =
-                            controller.text.trim();
-
-                        if (reason.length < 3) {
-                          ScaffoldMessenger.of(
-                            sheetContext,
-                          ).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Lütfen geçerli bir red nedeni yazınız.',
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-
-                        Navigator.pop(
-                          sheetContext,
-                          reason,
-                        );
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _danger,
-                        foregroundColor: Colors.white,
-                        minimumSize:
-                            const Size.fromHeight(52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(16),
+                  const SizedBox(height: 7),
+                  const Text(
+                    'Talep başka bir uzmana yönlendirilebilmesi '
+                    'için yönetici kuyruğuna alınacaktır.',
+                    style: TextStyle(
+                      color: _muted,
+                      fontSize: 13,
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: controller,
+                    minLines: 3,
+                    maxLines: 5,
+                    maxLength: 250,
+                    textCapitalization: TextCapitalization.sentences,
+                    onChanged: (_) {
+                      if (validationMessage != null) {
+                        setSheetState(() {
+                          validationMessage = null;
+                        });
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Red nedeni',
+                      hintText:
+                          'Örn. yoğunluk, izin, yanlış uzman ataması...',
+                      errorText: validationMessage,
+                      filled: true,
+                      fillColor: const Color(0xFFF7F9FB),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: _border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: _border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: _teal,
+                          width: 1.5,
                         ),
                       ),
-                      child: const Text('Talebi Reddet'),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: _danger),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: _danger,
+                          width: 1.5,
+                        ),
+                      ),
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.pop(sheetContext);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _muted,
+                            side: const BorderSide(color: _border),
+                            minimumSize: const Size.fromHeight(52),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text('Vazgeç'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {
+                            final String reason =
+                                controller.text.trim();
+
+                            if (reason.length < 3) {
+                              setSheetState(() {
+                                validationMessage =
+                                    'Lütfen geçerli bir red nedeni yazınız.';
+                              });
+                              return;
+                            }
+
+                            Navigator.pop(sheetContext, reason);
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _danger,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size.fromHeight(52),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text('Talebi Reddet'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     ).whenComplete(controller.dispose);

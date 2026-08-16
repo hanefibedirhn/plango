@@ -1,11 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/notification_model.dart';
 import '../repositories/notification_repository.dart';
-import 'user_login_screen.dart';
-import 'register_screen.dart';
+import '../repositories/notification_seen_store.dart';
+import '../repositories/content_repository.dart';
+import 'featured_screen.dart';
 
 class NotificationCenterScreen extends StatefulWidget {
   const NotificationCenterScreen({super.key});
@@ -27,6 +27,22 @@ class _NotificationCenterScreenState
   final NotificationRepository _repository =
       NotificationRepository();
 
+  final ContentRepository _contentRepository =
+      ContentRepository();
+
+  final NotificationSeenStore _seenStore =
+      NotificationSeenStore();
+
+  @override
+  void initState() {
+    super.initState();
+    _markNotificationsSeen();
+  }
+
+  Future<void> _markNotificationsSeen() async {
+    await _seenStore.markSeenNow();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,47 +62,14 @@ class _NotificationCenterScreenState
         ),
       ),
       body: SafeArea(
-        child: StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          initialData: FirebaseAuth.instance.currentUser,
-          builder: (context, authSnapshot) {
-            final User? user = authSnapshot.data;
-
-            if (user == null) {
-              return _SignedOutNotificationView(
-                onLogin: _openLogin,
-                onRegister: _openRegister,
-              );
-            }
-
-            return _buildNotificationContent(user);
-          },
-        ),
+        child: _buildNotificationContent(),
       ),
     );
   }
 
-  void _openLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const UserLoginScreen(),
-      ),
-    );
-  }
-
-  void _openRegister() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const RegisterScreen(),
-      ),
-    );
-  }
-
-  Widget _buildNotificationContent(User user) {
+  Widget _buildNotificationContent() {
     return StreamBuilder<List<AppNotification>>(
-      stream: _repository.watchUserNotifications(user.uid),
+      stream: _repository.watchGlobalNotifications(),
       builder: (context, snapshot) {
         if (snapshot.connectionState ==
                 ConnectionState.waiting &&
@@ -217,135 +200,53 @@ class _NotificationCenterScreenState
   Future<void> _openNotification(
     AppNotification notification,
   ) async {
-    if (!notification.isRead) {
+    final String? targetId = notification.targetId;
+
+    if (targetId == null || targetId.trim().isEmpty) {
+      return;
+    }
+
+    if (notification.targetScreen == 'featured' ||
+        notification.targetScreen == 'featured_detail') {
       try {
-        await _repository.markAsRead(
-          notification.notificationId,
+        final content =
+            await _contentRepository.getContentById(targetId);
+
+        if (!mounted) return;
+
+        if (content == null || !content.isVisibleToUsers) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Bu içerik artık yayında değil.',
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          return;
+        }
+
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FeaturedDetailScreen(
+              content: content,
+            ),
+          ),
         );
-      } catch (_) {
-        // Okundu işaretleme hatası ekranı bozmaz.
+      } catch (error) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'İçerik açılamadı: $error',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
-  }
-}
-
-class _SignedOutNotificationView extends StatelessWidget {
-  const _SignedOutNotificationView({
-    required this.onLogin,
-    required this.onRegister,
-  });
-
-  final VoidCallback onLogin;
-  final VoidCallback onRegister;
-
-  static const Color _navy = Color(0xFF0B2239);
-  static const Color _teal = Color(0xFF087C72);
-  static const Color _muted = Color(0xFF748193);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 28,
-          vertical: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 68,
-              height: 68,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEAF8F5),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                color: _teal,
-                size: 32,
-              ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              'Bildirimlerinizi Takip Edin',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _navy,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Tasarruf Planım’daki yeni içerikleri ve önemli gelişmeleri '
-              'görüntülemek için hesabınıza giriş yapın.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _muted,
-                fontSize: 13,
-                height: 1.5,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 4,
-              children: [
-                TextButton(
-                  onPressed: onLogin,
-                  style: TextButton.styleFrom(
-                    foregroundColor: _teal,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 4,
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Giriş Yap',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                const Text(
-                  '•',
-                  style: TextStyle(
-                    color: _muted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                TextButton(
-                  onPressed: onRegister,
-                  style: TextButton.styleFrom(
-                    foregroundColor: _teal,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 4,
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    'Hesap Oluştur',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -506,28 +407,10 @@ class _NotificationRow extends StatelessWidget {
                               fontSize: 14,
                               height: 1.25,
                               fontWeight:
-                                  notification.isRead
-                                      ? FontWeight.w700
-                                      : FontWeight.w900,
+                                  FontWeight.w800,
                             ),
                           ),
                         ),
-                        if (!notification.isRead) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            margin:
-                                const EdgeInsets.only(
-                              top: 4,
-                            ),
-                            decoration:
-                                const BoxDecoration(
-                              color: _turquoise,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                     if (notification.message

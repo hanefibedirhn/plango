@@ -1103,95 +1103,219 @@ match /content/{contentId} {
   // Fiziksel silme yok.
   allow delete: if false;
 }
+    // ==================================================
+    // NOTIFICATIONS
+    // ==================================================
 
-  // ==================================================
-// NOTIFICATIONS
-// ==================================================
+    match /notifications/{notificationId} {
 
-match /notifications/{notificationId} {
-  function linkedConsultationPath() {
-    return /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId);
-  }
+      // Global bildirimler giriş yapmadan okunabilir.
+      // Eski kişisel bildirimler yalnızca sahibi veya admin tarafından okunur.
+      allow read: if (
+          resource.data.audience == 'all'
+        ) || (
+          isSignedIn() &&
+          resource.data.userId == request.auth.uid
+        ) || isAdmin();
 
-  allow read: if isSignedIn()
-    && resource.data.userId == request.auth.uid;
+      // Yeni global bildirimleri yalnızca admin oluşturabilir.
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'targetScreen',
+          'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'targetScreen',
+          'targetId',
+          'createdAt'
+        ])
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.audience == 'all'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.message is string
+        && request.resource.data.type in [
+          'featured',
+          'system',
+          'announcement'
+        ]
+        && request.resource.data.targetScreen is string
+        && request.resource.data.createdAt is timestamp
+        && (
+          request.resource.data.targetId == null ||
+          request.resource.data.targetId is string
+        );
 
-  allow create: if isSignedIn()
-    && request.resource.data.keys().hasAll([
-      'notificationId',
-      'userId',
-      'title',
-      'message',
-      'type',
-      'status',
-      'targetScreen',
-      'createdAt',
-      'readAt'
-    ])
-    && request.resource.data.keys().hasOnly([
-      'notificationId',
-      'userId',
-      'title',
-      'message',
-      'type',
-      'status',
-      'targetScreen',
-      'targetId',
-      'actorId',
-      'createdAt',
-      'readAt'
-    ])
-    && request.resource.data.notificationId == notificationId
-    && request.resource.data.userId is string
-    && request.resource.data.title is string
-    && request.resource.data.message is string
-    && request.resource.data.type in [
-      'consultation',
-      'expert',
-      'system',
-      'announcement'
-    ]
-    && request.resource.data.status == 'unread'
-    && request.resource.data.targetScreen is string
-    && request.resource.data.createdAt is timestamp
-    && request.resource.data.readAt == null
-    && (
-      request.resource.data.targetId == null ||
-      request.resource.data.targetId is string
-    )
-    && (
-      request.resource.data.actorId == null ||
-      request.resource.data.actorId is string
-    )
-    && (
-      request.resource.data.userId == request.auth.uid ||
-      isAdmin() ||
-      (
-        request.resource.data.type == 'consultation' &&
-        request.resource.data.targetId is string &&
-        exists(linkedConsultationPath()) &&
-        get(linkedConsultationPath()).data.expertId ==
-            request.auth.uid &&
-        get(linkedConsultationPath()).data.userId ==
-            request.resource.data.userId
-      )
-    );
-
-  allow update: if isSignedIn()
-    && resource.data.userId == request.auth.uid
-    && request.resource.data
-        .diff(resource.data)
-        .affectedKeys()
-        .hasOnly([
+      // LEGACY: Mevcut NotificationService çağrıları derlenmeye ve
+      // çalışmaya devam etsin. Bu belgeler global akışta gösterilmez.
+      allow create: if isSignedIn()
+        && !request.resource.data.keys().hasAny(['audience'])
+        && request.resource.data.keys().hasAll([
+          'notificationId',
+          'userId',
+          'title',
+          'message',
+          'type',
           'status',
+          'targetScreen',
+          'createdAt',
           'readAt'
         ])
-    && request.resource.data.status == 'read'
-    && request.resource.data.readAt is timestamp;
+        && request.resource.data.keys().hasOnly([
+          'notificationId',
+          'userId',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'actorId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.userId is string
+        && request.resource.data.title is string
+        && request.resource.data.message is string
+        && request.resource.data.type in [
+          'consultation',
+          'expert',
+          'system',
+          'announcement',
+          'featured'
+        ]
+        && request.resource.data.status == 'unread'
+        && request.resource.data.targetScreen is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.readAt == null
+        && (
+          request.resource.data.targetId == null ||
+          request.resource.data.targetId is string
+        )
+        && (
+          request.resource.data.actorId == null ||
+          request.resource.data.actorId is string
+        )
+        && (
+          request.resource.data.userId == request.auth.uid ||
+          isAdmin()
+        );
 
-  allow delete: if isSignedIn()
-    && resource.data.userId == request.auth.uid;
-}
+      // Global belgeler istemciden değiştirilemez.
+      // Eski kişisel belgelerin read geçişi korunur.
+      allow update: if isSignedIn()
+        && !resource.data.keys().hasAny(['audience'])
+        && resource.data.userId == request.auth.uid
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'readAt'
+            ])
+        && request.resource.data.status == 'read'
+        && request.resource.data.readAt is timestamp;
+
+      allow delete: if false;
+    }
+
+
+    // ==================================================
+    // FEEDBACK REQUESTS - ŞİKAYET & ÖNERİ
+    // ==================================================
+
+    match /feedbackRequests/{feedbackId} {
+
+      // Giriş yapan kullanıcı kendi talebini oluşturabilir.
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll([
+          'userId',
+          'userEmail',
+          'type',
+          'subject',
+          'message',
+          'status',
+          'adminReply',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'userId',
+          'userEmail',
+          'type',
+          'subject',
+          'message',
+          'status',
+          'adminReply',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userId is string
+        && request.resource.data.userEmail is string
+        && request.resource.data.type is string
+        && request.resource.data.type.size() > 0
+        && request.resource.data.type.size() <= 50
+        && request.resource.data.subject is string
+        && request.resource.data.subject.size() >= 3
+        && request.resource.data.subject.size() <= 150
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.message.size() <= 5000
+        && request.resource.data.status == 'pending'
+        && request.resource.data.adminReply == ''
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      // Kullanıcı yalnızca kendi taleplerini görür.
+      // Yönetici bütün talepleri görebilir.
+      allow read: if isAdmin()
+        || (
+          isSignedIn()
+          && resource.data.userId == request.auth.uid
+        );
+
+      // Durum ve yönetici yanıtını yalnızca admin değiştirebilir.
+      allow update: if isAdmin()
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.userEmail == resource.data.userEmail
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.subject == resource.data.subject
+        && request.resource.data.message == resource.data.message
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'adminReply',
+              'updatedAt'
+            ])
+        && request.resource.data.status in [
+          'pending',
+          'reviewing',
+          'answered',
+          'resolved'
+        ]
+        && request.resource.data.adminReply is string
+        && request.resource.data.adminReply.size() <= 5000
+        && request.resource.data.updatedAt is timestamp;
+
+      // Kayıtlar uygulamadan fiziksel olarak silinmez.
+      allow delete: if false;
+    }
+
     // ==================================================
     // VARSAYILAN
     // ==================================================

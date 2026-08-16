@@ -391,18 +391,8 @@ class _FeaturedDetailScreenState
                       const SizedBox(
                         height: 20,
                       ),
-                      Text(
-                        content.body,
-                        style:
-                            const TextStyle(
-                          color: Color(
-                            0xFF24384A,
-                          ),
-                          fontSize: 14,
-                          height: 1.72,
-                          fontWeight:
-                              FontWeight.w500,
-                        ),
+                      _ArticleBody(
+                        body: content.body,
                       ),
                       if (hasSource) ...[
                         const SizedBox(
@@ -466,6 +456,198 @@ class _FeaturedDetailScreenState
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class _ArticleBody extends StatelessWidget {
+  const _ArticleBody({required this.body});
+
+  final String body;
+
+  static const Color _navy = Color(0xFF0B2239);
+  static const Color _text = Color(0xFF24384A);
+  static const Color _teal = Color(0xFF087C72);
+  static const Color _soft = Color(0xFFF2F8F8);
+  static const Color _border = Color(0xFFDCECEB);
+
+  @override
+  Widget build(BuildContext context) {
+    final blocks = body
+        .replaceAll('\r\n', '\n')
+        .split(RegExp(r'\n\s*\n'))
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < blocks.length; i++) ...[
+          _buildBlock(blocks[i]),
+          if (i != blocks.length - 1) const SizedBox(height: 18),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBlock(String block) {
+    final lines = block
+        .split('\n')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    if (lines.isEmpty) return const SizedBox.shrink();
+
+    if (lines.every(_isBullet)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: lines
+            .map((line) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _BulletItem(text: _stripBullet(line)),
+                ))
+            .toList(),
+      );
+    }
+
+    if (lines.length == 1 && _isMajorHeading(lines.first)) {
+      return Text(
+        _clean(lines.first),
+        style: const TextStyle(
+          color: _navy,
+          fontSize: 20,
+          height: 1.25,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.35,
+        ),
+      );
+    }
+
+    if (lines.length == 1 && _isSectionHeading(lines.first)) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        decoration: BoxDecoration(
+          color: _soft,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _border),
+        ),
+        child: Text(
+          _clean(lines.first),
+          style: const TextStyle(
+            color: _teal,
+            fontSize: 13,
+            height: 1.35,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.15,
+          ),
+        ),
+      );
+    }
+
+    if (lines.length > 1 &&
+        (_isMajorHeading(lines.first) || _isSectionHeading(lines.first))) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildBlock(lines.first),
+          const SizedBox(height: 12),
+          _buildParagraph(lines.skip(1).join('\n')),
+        ],
+      );
+    }
+
+    if (lines.any(_isBullet)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final line in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _isBullet(line)
+                  ? _BulletItem(text: _stripBullet(line))
+                  : _buildParagraph(line),
+            ),
+        ],
+      );
+    }
+
+    return _buildParagraph(lines.join('\n'));
+  }
+
+  Widget _buildParagraph(String value) {
+    return Text(
+      value,
+      style: const TextStyle(
+        color: _text,
+        fontSize: 14,
+        height: 1.72,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  bool _isBullet(String value) =>
+      RegExp(r'^\s*[•\-–—]\s+').hasMatch(value);
+
+  String _stripBullet(String value) =>
+      value.replaceFirst(RegExp(r'^\s*[•\-–—]\s*'), '').trim();
+
+  bool _isMajorHeading(String value) {
+    final text = _clean(value);
+    return RegExp(r'^\d+[\.\)]\s+').hasMatch(text) ||
+        (text.endsWith('?') && text.length <= 80);
+  }
+
+  bool _isSectionHeading(String value) {
+    final text = _clean(value);
+    if (text.length > 70) return false;
+
+    final letters = text.replaceAll(
+      RegExp(r'[^A-Za-zÇĞİÖŞÜçğıöşü]'),
+      '',
+    );
+    return letters.isNotEmpty && letters == letters.toUpperCase();
+  }
+
+  String _clean(String value) =>
+      value.trim().replaceAll(RegExp(r'\s+'), ' ');
+}
+
+class _BulletItem extends StatelessWidget {
+  const _BulletItem({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          margin: const EdgeInsets.only(top: 8, right: 10),
+          decoration: const BoxDecoration(
+            color: Color(0xFF087C72),
+            shape: BoxShape.circle,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFF24384A),
+              fontSize: 14,
+              height: 1.65,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

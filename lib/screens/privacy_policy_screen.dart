@@ -346,7 +346,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       body:
           'Kullanıcılar gizlilik, kişisel veri veya hesap verileriyle ilgili talep ve sorularını info@tasarrufplanim.com adresi üzerinden iletebilir.\n\n'
           'Uygulamanın kullanımı, hesap işlemleri veya teknik destek konularında destek@tasarrufplanim.com adresi kullanılabilir.\n\n'
-          'KVKK kapsamındaki resmî başvurular için veri sorumlusunun kimliği, başvuru yöntemi ve gerekli diğer resmî bilgiler, nihai hukuki yapı doğrultusunda ayrıca açık ve güncel şekilde yayımlanacaktır.',
+          'info@tasarrufplanim.com adresi gizlilik ve kişisel verilerle ilgili genel soru ve talepler için kullanılabilir. KVKK kapsamındaki resmî başvurularda ise veri sorumlusunun kimliği, mevzuata uygun başvuru yöntemi ve varsa ek doğrulama gereklilikleri, nihai hukuki yapı doğrultusunda ayrıca açık ve güncel şekilde yayımlanır.',
     ),
     _PrivacySection(
       icon: Icons.update_outlined,

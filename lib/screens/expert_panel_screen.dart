@@ -153,11 +153,23 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
                 final requests =
                     requestSnapshot.data ?? <ConsultationRequest>[];
 
-                final newCount = _countStatus(requests, 'pending');
-                final ongoingCount =
-                    _countStatus(requests, 'accepted') +
-                    _countStatus(requests, 'contacted');
-                final completedCount = _countStatus(requests, 'completed');
+                final now = DateTime.now();
+
+                final newCount = requests.where((request) {
+                  if (request.status != 'pending') return false;
+
+                  final deadline = request.expiresAt;
+                  return deadline == null || deadline.isAfter(now);
+                }).length;
+
+                final ongoingCount = requests.where((request) {
+                  return request.status == 'accepted' ||
+                      request.status == 'contacted';
+                }).length;
+
+                final completedCount = requests
+                    .where((request) => request.status == 'completed')
+                    .length;
 
                 return _buildPanel(
                   expert: expert,
@@ -172,13 +184,6 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
         ),
       ),
     );
-  }
-
-  int _countStatus(
-    List<ConsultationRequest> requests,
-    String status,
-  ) {
-    return requests.where((request) => request.status == status).length;
   }
 
   Widget _buildPanel({
@@ -206,19 +211,12 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
           hasError: requestError,
         ),
 
-        const SizedBox(height: 22),
-        const _SectionTitle(
-          icon: Icons.forum_outlined,
-          title: 'Danışma Yönetimi',
-          subtitle: 'Danışma süreçlerinizi tek noktadan yönetin.',
-        ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
 
         _PrimaryActionCard(
           icon: Icons.inbox_outlined,
           title: 'Danışma Taleplerim',
-          subtitle:
-              'Yeni, devam eden ve tamamlanan danışma taleplerinizi yönetin.',
+          subtitle: null,
           badgeText: newCount > 0 ? '$newCount YENİ' : null,
           onTap: () {
             Navigator.push(
@@ -245,19 +243,12 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
           },
         ),
 
-        const SizedBox(height: 22),
-        const _SectionTitle(
-          icon: Icons.verified_user_outlined,
-          title: 'Hesap & Doğrulama',
-          subtitle: 'Doğrulanmış uzmanlık bilgilerinizi yönetin.',
-        ),
         const SizedBox(height: 10),
 
         _SecondaryActionCard(
           icon: Icons.sync_alt_rounded,
           title: 'Şirket / Pozisyon Değişikliği',
-          subtitle:
-              'Değişen şirket, şube veya görev bilgilerinizi yeniden doğrulamaya gönderin.',
+          subtitle: null,
           onTap: () {
             Navigator.push(
               context,
@@ -496,7 +487,7 @@ class _ConsultationSummary extends StatelessWidget {
           child: _SummaryCard(
             icon: Icons.mark_unread_chat_alt_outlined,
             value: newCount,
-            label: 'Yeni Talepler',
+            label: 'Yeni',
           ),
         ),
         const SizedBox(width: 9),
@@ -504,7 +495,7 @@ class _ConsultationSummary extends StatelessWidget {
           child: _SummaryCard(
             icon: Icons.forum_outlined,
             value: ongoingCount,
-            label: 'Devam Eden',
+            label: 'Devam',
           ),
         ),
         const SizedBox(width: 9),
@@ -512,7 +503,7 @@ class _ConsultationSummary extends StatelessWidget {
           child: _SummaryCard(
             icon: Icons.task_alt_rounded,
             value: completedCount,
-            label: 'Tamamlanan',
+            label: 'Biten',
           ),
         ),
       ],
@@ -534,8 +525,8 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 104),
-      padding: const EdgeInsets.fromLTRB(12, 12, 10, 11),
+      constraints: const BoxConstraints(minHeight: 88),
+      padding: const EdgeInsets.fromLTRB(11, 10, 9, 9),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -553,8 +544,8 @@ class _SummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 31,
-            height: 31,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
               color: _ExpertPanelScreenState._softTeal,
               borderRadius: BorderRadius.circular(10),
@@ -565,7 +556,7 @@ class _SummaryCard extends StatelessWidget {
               color: _ExpertPanelScreenState._teal,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             '$value',
             style: const TextStyle(
@@ -655,14 +646,14 @@ class _PrimaryActionCard extends StatelessWidget {
   const _PrimaryActionCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.onTap,
     this.badgeText,
   });
 
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
   final String? badgeText;
 
@@ -735,16 +726,18 @@ class _PrimaryActionCard extends StatelessWidget {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: _ExpertPanelScreenState._muted,
-                        fontSize: 11.5,
-                        height: 1.35,
-                        fontWeight: FontWeight.w600,
+                    if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle!,
+                        style: const TextStyle(
+                          color: _ExpertPanelScreenState._muted,
+                          fontSize: 11.5,
+                          height: 1.35,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -810,23 +803,14 @@ class _AvailabilityCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Yeni danışma talepleri',
+                  'Yeni Talep Bildirimleri',
                   style: TextStyle(
                     color: _ExpertPanelScreenState._navy,
                     fontSize: 13.5,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'Kullanıcıların size yeni talep gönderebilmesini yönetin.',
-                  style: TextStyle(
-                    color: _ExpertPanelScreenState._muted,
-                    fontSize: 11.5,
-                    height: 1.35,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+
               ],
             ),
           ),
@@ -876,13 +860,13 @@ class _SecondaryActionCard extends StatelessWidget {
   const _SecondaryActionCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
 
   @override
@@ -927,16 +911,18 @@ class _SecondaryActionCard extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: _ExpertPanelScreenState._muted,
-                        fontSize: 11.5,
-                        height: 1.35,
-                        fontWeight: FontWeight.w600,
+                    if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle!,
+                        style: const TextStyle(
+                          color: _ExpertPanelScreenState._muted,
+                          fontSize: 11.5,
+                          height: 1.35,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

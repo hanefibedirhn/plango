@@ -240,6 +240,14 @@ class _AboutScreenState extends State<AboutScreen> {
           'Tasarruf Planım’ın amacı karar vermek değildir.\n\n'
           'Tasarruf Planım’ın amacı, kullanıcının kararını daha bilinçli verebilmesine yardımcı olmaktır.',
     ),
+    _AboutSection(
+      icon: Icons.mail_outline_rounded,
+      title: 'İletişim',
+      body:
+          'Tasarruf Planım hakkında genel bilgi, kurumsal iletişim ve içeriklere ilişkin soru veya talepler için info@tasarrufplanim.com adresini kullanabilirsiniz.\n\n'
+          'Uygulamanın kullanımı, hesap işlemleri, giriş sorunları veya teknik destek talepleri için destek@tasarrufplanim.com adresi kullanılabilir.\n\n'
+          'Gizlilik ve kişisel verilerle ilgili genel talepler info@tasarrufplanim.com üzerinden iletilebilir; KVKK kapsamındaki resmî başvuru usulleri ilgili Aydınlatma Metni ve Gizlilik Politikası kapsamında ayrıca belirtilir.',
+    ),
   ];
 
   @override

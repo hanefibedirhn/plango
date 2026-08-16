@@ -1,71 +1,106 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/notification_model.dart';
+import 'notification_seen_store.dart';
 
 class NotificationRepository {
   NotificationRepository({
     FirebaseFirestore? firestore,
-  }) : _firestore =
-            firestore ?? FirebaseFirestore.instance;
+    NotificationSeenStore? seenStore,
+  })  : _firestore =
+            firestore ?? FirebaseFirestore.instance,
+        _seenStore =
+            seenStore ?? NotificationSeenStore();
 
   final FirebaseFirestore _firestore;
+  final NotificationSeenStore _seenStore;
 
   CollectionReference<Map<String, dynamic>>
       get _collection {
-    return _firestore.collection(
-      'notifications',
-    );
+    return _firestore.collection('notifications');
   }
 
-  Stream<List<AppNotification>>
-      watchUserNotifications(
-    String userId,
-  ) {
+  Stream<List<AppNotification>> watchGlobalNotifications({
+    int limit = 100,
+  }) {
     return _collection
-        .where(
-          'userId',
-          isEqualTo: userId,
-        )
-        .limit(100)
+        .where('audience', isEqualTo: 'all')
+        .limit(limit)
         .snapshots()
         .map((snapshot) {
-      final List<AppNotification>
-          notifications = snapshot.docs
-              .map(
-                AppNotification.fromDocument,
-              )
-              .toList();
+      final notifications = snapshot.docs
+          .map(AppNotification.fromDocument)
+          .toList();
 
       notifications.sort(
         (first, second) =>
-            second.createdAt.compareTo(
-          first.createdAt,
-        ),
+            second.createdAt.compareTo(first.createdAt),
       );
 
       return notifications;
     });
   }
 
-  Stream<int> watchUnreadCount(
+  Stream<List<AppNotification>> watchUserNotifications(
     String userId,
   ) {
-    return _collection
-        .where(
-          'userId',
-          isEqualTo: userId,
-        )
-        .where(
-          'status',
-          isEqualTo: 'unread',
-        )
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.length,
-        );
+    return watchGlobalNotifications();
   }
 
+  /// Global bildirimlerde cihazın son görülme zamanından
+  /// sonra oluşturulan bildirimleri sayar.
+  /// userId sadece eski çağrılarla uyumluluk için tutulur.
+  Stream<int> watchUnreadCount([
+    String? userId,
+  ]) {
+    return watchGlobalNotifications().asyncMap(
+      (notifications) async {
+        final DateTime? lastSeenAt =
+            await _seenStore.getLastSeenAt();
+
+        if (lastSeenAt == null) {
+          return notifications.length;
+        }
+
+        return notifications
+            .where(
+              (notification) =>
+                  notification.createdAt.isAfter(lastSeenAt),
+            )
+            .length;
+      },
+    );
+  }
+
+  Future<void> markGlobalNotificationsSeen() async {
+    await _seenStore.markSeenNow();
+  }
+
+  Future<String> createGlobalNotification({
+    required String title,
+    required String message,
+    required String type,
+    required String targetScreen,
+    String? targetId,
+  }) async {
+    final reference = _collection.doc();
+
+    await reference.set({
+      'notificationId': reference.id,
+      'audience': 'all',
+      'title': title.trim(),
+      'message': message.trim(),
+      'type': type,
+      'targetScreen': targetScreen,
+      'targetId': targetId,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    return reference.id;
+  }
+
+  /// LEGACY: Mevcut kişisel bildirim çağrılarını kırmamak için korunur.
+  /// Bu belgeler global Bildirim Merkezi akışında gösterilmez.
   Future<String> createNotification({
     required String userId,
     required String title,
@@ -75,9 +110,7 @@ class NotificationRepository {
     String? targetId,
     String? actorId,
   }) async {
-    final DocumentReference<
-        Map<String, dynamic>> reference =
-        _collection.doc();
+    final reference = _collection.doc();
 
     await reference.set({
       'notificationId': reference.id,
@@ -89,8 +122,7 @@ class NotificationRepository {
       'targetScreen': targetScreen,
       'targetId': targetId,
       'actorId': actorId,
-      'createdAt':
-          FieldValue.serverTimestamp(),
+      'createdAt': FieldValue.serverTimestamp(),
       'readAt': null,
     });
 
@@ -119,52 +151,9 @@ class NotificationRepository {
 
   Future<void> markAsRead(
     String notificationId,
-  ) async {
-    await _collection
-        .doc(notificationId)
-        .update({
-      'status': 'read',
-      'readAt':
-          FieldValue.serverTimestamp(),
-    });
-  }
+  ) async {}
 
   Future<void> markAllAsRead(
     String userId,
-  ) async {
-    final QuerySnapshot<
-        Map<String, dynamic>> snapshot =
-        await _collection
-            .where(
-              'userId',
-              isEqualTo: userId,
-            )
-            .where(
-              'status',
-              isEqualTo: 'unread',
-            )
-            .get();
-
-    if (snapshot.docs.isEmpty) {
-      return;
-    }
-
-    final WriteBatch batch =
-        _firestore.batch();
-
-    for (final QueryDocumentSnapshot<
-        Map<String, dynamic>>
-        document in snapshot.docs) {
-      batch.update(
-        document.reference,
-        {
-          'status': 'read',
-          'readAt':
-              FieldValue.serverTimestamp(),
-        },
-      );
-    }
-
-    await batch.commit();
-  }
+  ) async {}
 }

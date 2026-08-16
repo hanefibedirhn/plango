@@ -3,31 +3,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AppNotification {
   const AppNotification({
     required this.notificationId,
-    required this.userId,
     required this.title,
     required this.message,
     required this.type,
-    required this.status,
     required this.targetScreen,
     required this.createdAt,
     this.targetId,
-    this.actorId,
-    this.readAt,
+    this.audience = 'all',
   });
 
   final String notificationId;
-  final String userId;
   final String title;
   final String message;
   final String type;
-  final String status;
   final String targetScreen;
   final DateTime createdAt;
   final String? targetId;
-  final String? actorId;
-  final DateTime? readAt;
+  final String audience;
 
-  bool get isRead => status == 'read';
+  // Eski ekran/widget kodlarıyla uyumluluk için.
+  // Genel bildirimlerde Firestore üzerinde kullanıcı bazlı read tutulmaz.
+  bool get isRead => false;
 
   factory AppNotification.fromDocument(
     DocumentSnapshot<Map<String, dynamic>> document,
@@ -40,25 +36,16 @@ class AppNotification {
       return DateTime.fromMillisecondsSinceEpoch(0);
     }
 
-    DateTime? readNullableDate(dynamic value) {
-      if (value is Timestamp) return value.toDate();
-      if (value is DateTime) return value;
-      return null;
-    }
-
     return AppNotification(
       notificationId:
           data['notificationId'] as String? ?? document.id,
-      userId: data['userId'] as String? ?? '',
       title: data['title'] as String? ?? '',
       message: data['message'] as String? ?? '',
-      type: data['type'] as String? ?? 'system',
-      status: data['status'] as String? ?? 'unread',
+      type: data['type'] as String? ?? 'announcement',
       targetScreen: data['targetScreen'] as String? ?? 'none',
       targetId: data['targetId'] as String?,
-      actorId: data['actorId'] as String?,
       createdAt: readDate(data['createdAt']),
-      readAt: readNullableDate(data['readAt']),
+      audience: data['audience'] as String? ?? '',
     );
   }
 }

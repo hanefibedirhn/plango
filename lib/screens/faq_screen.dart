@@ -181,6 +181,13 @@ class FaqScreen extends StatelessWidget {
           'Evet. Profil Bilgilerim ekranından mevcut şifrenizi doğrulayarak '
           'hesabınızı kalıcı olarak silebilirsiniz. Bu işlem geri alınamaz.',
     ),
+    _FaqItem(
+      question: 'Tasarruf Planım ile nasıl iletişime geçebilirim?',
+      answer:
+          'Genel bilgi ve kurumsal iletişim için info@tasarrufplanim.com; '
+          'uygulama, hesap ve teknik destek konuları için '
+          'destek@tasarrufplanim.com adresini kullanabilirsiniz.',
+    ),
   ];
 
   @override

@@ -45,17 +45,20 @@ dependencies:
   pdf: ^3.12.0
   printing: ^5.14.2
   path_provider: ^2.1.5
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,3 +70,9 @@ flutter:
   assets:
     - assets/images/
     - assets/images/companies/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/tasarruf_planim_app_icon.png"
+  min_sdk_android: 21    

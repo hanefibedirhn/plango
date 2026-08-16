@@ -105,14 +105,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _openNotificationCenter() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const NotificationCenterScreen(),
-    ),
-  );
-}
+  Future<void> _openNotificationCenter() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NotificationCenterScreen(),
+      ),
+    );
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   void _handleBottomNavigation(int index) {
     if (index == 0) {
@@ -202,7 +206,7 @@ _buildHighlightsSection(),
     return AppBar(
       elevation: 0,
       toolbarHeight: 66,
-      backgroundColor: const Color(0xFFEEF3F5),
+      backgroundColor: _background,
       surfaceTintColor: Colors.transparent,
       iconTheme: const IconThemeData(color: _navy, size: 25),
       titleSpacing: 3,
@@ -222,66 +226,50 @@ _buildHighlightsSection(),
         ),
       ),
       actions: [
-        Builder(
-          builder: (context) {
-            final User? user = FirebaseAuth.instance.currentUser;
+        StreamBuilder<int>(
+          stream: _notificationRepository.watchUnreadCount(),
+          builder: (context, snapshot) {
+            final int unreadCount = snapshot.data ?? 0;
 
-            if (user == null) {
-              return IconButton(
-                tooltip: 'Bildirim Merkezi',
-                onPressed: _openNotificationCenter,
-                icon: const Icon(
-                  Icons.notifications_none_rounded,
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton(
+                  tooltip: 'Bildirim Merkezi',
+                  onPressed: _openNotificationCenter,
+                  icon: const Icon(
+                    Icons.notifications_none_rounded,
+                  ),
                 ),
-              );
-            }
-
-            return StreamBuilder<int>(
-              stream: _notificationRepository.watchUnreadCount(user.uid),
-              builder: (context, snapshot) {
-                final int unreadCount = snapshot.data ?? 0;
-
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconButton(
-                      tooltip: 'Bildirim Merkezi',
-                      onPressed: _openNotificationCenter,
-                      icon: const Icon(
-                        Icons.notifications_none_rounded,
+                if (unreadCount > 0)
+                  Positioned(
+                    right: 3,
+                    top: 4,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
                       ),
-                    ),
-                    if (unreadCount > 0)
-                      Positioned(
-                        right: 3,
-                        top: 4,
-                        child: Container(
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                          ),
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF5A4F),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            unreadCount > 99 ? '99+' : '$unreadCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                              height: 1,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                      ),
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFF5A4F),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        unreadCount > 99 ? '99+' : '$unreadCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          height: 1,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
-                  ],
-                );
-              },
+                    ),
+                  ),
+              ],
             );
           },
         ),

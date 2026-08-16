@@ -24,7 +24,7 @@ class _UserAgreementScreenState extends State<UserAgreementScreen> {
       title: 'Taraflar',
       body:
           'İşbu Kullanıcı Sözleşmesi, Tasarruf Planım dijital platformunu kullanan gerçek kişi kullanıcı ile Tasarruf Planım hizmetinin veri sorumlusu ve/veya hizmet sağlayıcısı sıfatıyla faaliyet gösterecek gerçek veya tüzel kişi arasında, kullanıcının üyelik işlemini tamamlaması ve sözleşmeyi elektronik ortamda kabul etmesiyle kurulur.\n\n'
-          'Tasarruf Planım’ın nihai ticari unvanı, merkez adresi, iletişim kanalları ve varsa MERSİS/vergi bilgileri yayına çıkmadan önce sözleşmenin bu bölümüne açık biçimde eklenmelidir.\n\n'
+          'Tasarruf Planım ile genel ve sözleşmesel iletişim için info@tasarrufplanim.com; uygulama, hesap ve teknik destek talepleri için destek@tasarrufplanim.com adresleri kullanılabilir. Varsa ticari unvan, merkez adresi, MERSİS/vergi ve diğer zorunlu resmî bilgiler hukuki yapının kesinleşmesiyle ayrıca güncel şekilde yayımlanır.\n\n'
           'Bu sözleşmede “Kullanıcı”, Tasarruf Planım’da hesap oluşturan veya üyelik kapsamında sunulan hizmetlerden yararlanan kişiyi; “Tasarruf Planım” ise uygulama, hesaplama altyapısı ve ilgili dijital hizmetlerin bütününü ifade eder.',
     ),
     _AgreementSection(

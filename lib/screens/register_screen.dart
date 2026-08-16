@@ -737,7 +737,7 @@ Veriler, hizmetin gerektirdiği süre boyunca ve yürürlükteki yükümlülükl
 Kullanıcı, yürürlükteki kişisel verilerin korunması mevzuatı kapsamında verileriyle ilgili yasal haklarını kullanabilir.
 
 7. İletişim
-Kişisel verilerle ilgili genel soru ve talepler info@tasarrufplanim.com adresi üzerinden iletilebilir.
+Kişisel verilerle ilgili genel soru ve talepler info@tasarrufplanim.com adresi üzerinden iletilebilir. Uygulama, hesap ve teknik destek konularında destek@tasarrufplanim.com adresi kullanılabilir. KVKK kapsamındaki resmî başvuru usulleri, veri sorumlusunun nihai hukuki yapısı doğrultusunda ayrıca açık ve güncel şekilde yayımlanır.
 ''';
 
   String get _privacyPolicyText => '''TASARRUF PLANIM GİZLİLİK POLİTİKASI
@@ -1731,6 +1731,16 @@ class _LegalDocumentDialogState extends State<_LegalDocumentDialog> {
     }
   }
 
+  Future<void> _scrollToBottom() async {
+    if (!_scrollController.hasClients) return;
+
+    await _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   void dispose() {
     _scrollController
@@ -1819,34 +1829,62 @@ class _LegalDocumentDialogState extends State<_LegalDocumentDialog> {
                 ),
               ),
               Expanded(
-                child: Container(
-                  color: const Color(0xFFF1F4F7),
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: Center(
-                      child: Container(
-                        width: double.infinity,
-                        constraints: const BoxConstraints(maxWidth: 680),
-                        padding: const EdgeInsets.fromLTRB(26, 30, 26, 34),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
-                              blurRadius: 18,
-                              offset: const Offset(0, 7),
+                child: Stack(
+                  children: [
+                    Container(
+                      color: const Color(0xFFF1F4F7),
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(bottom: 82),
+                        child: Center(
+                          child: Container(
+                            width: double.infinity,
+                            constraints: const BoxConstraints(maxWidth: 680),
+                            padding: const EdgeInsets.fromLTRB(26, 30, 26, 34),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 7),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: _LegalDocumentText(
-                          text: widget.documentText,
+                            child: _LegalDocumentText(
+                              text: widget.documentText,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    if (!_reachedBottom)
+                      Positioned(
+                        right: 22,
+                        bottom: 18,
+                        child: Material(
+                          color: _RegisterScreenState._teal,
+                          elevation: 5,
+                          shadowColor: Colors.black.withValues(alpha: 0.18),
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: _scrollToBottom,
+                            child: const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               Container(

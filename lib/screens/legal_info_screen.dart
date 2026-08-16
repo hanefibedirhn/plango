@@ -319,6 +319,14 @@ class _LegalInformationScreenState extends State<LegalInformationScreen> {
           'Resmî finansman planı, organizasyon ücreti, ödeme yükümlülüğü, teslim koşulları, teslim tarihi ve diğer bağlayıcı hükümler ilgili tasarruf finansman şirketi ile kullanıcı arasındaki resmî süreçte belirlenir.\n\n'
           'Nihai karar vermeden önce ilgili şirketin güncel teklifinin, sözleşme hükümlerinin ve yürürlükteki mevzuatın incelenmesi önerilir.',
     ),
+    _LegalSection(
+      icon: Icons.mail_outline_rounded,
+      title: 'İletişim ve Destek',
+      body:
+          'Tasarruf Planım ile genel bilgi, kurumsal iletişim ve yasal metinlere ilişkin soru veya talepler için info@tasarrufplanim.com adresi üzerinden iletişime geçilebilir.\n\n'
+          'Uygulama kullanımı, hesap işlemleri ve teknik destek konularında destek@tasarrufplanim.com adresi kullanılabilir.\n\n'
+          'Kişisel verilere ilişkin genel soru ve talepler info@tasarrufplanim.com üzerinden iletilebilir. KVKK kapsamındaki resmî başvuru yöntemi ve veri sorumlusuna ilişkin zorunlu bilgiler ilgili Aydınlatma Metni ve Gizlilik Politikası kapsamında güncel olarak yayımlanır.',
+    ),
   ];
 
   @override

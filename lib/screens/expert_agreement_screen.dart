@@ -26,7 +26,7 @@ class _ExpertAgreementScreenState extends State<ExpertAgreementScreen> {
       body:
           'İşbu Uzman Sözleşmesi, Tasarruf Planım dijital platformunda uzman olarak başvuru yapan ve uzman hesabı kullanmaya hak kazanan gerçek kişi ile Tasarruf Planım hizmetinin sağlayıcısı arasında elektronik ortamda kurulur.\n\n'
           'Bu sözleşmede “Uzman”, Tasarruf Planım’ın uzman başvuru ve doğrulama süreçlerini tamamlayan ve uzman rolü verilen kişiyi; “Tasarruf Planım” ise tasarruf finansmanı alanında hesaplama, bilgilendirme, danışma yönlendirmesi ve karar destek hizmetleri sunan dijital platformu ifade eder.\n\n'
-          'Tasarruf Planım’ın nihai ticari unvanı, resmî adresi ve iletişim bilgileri yayına çıkmadan önce bu sözleşmede açık biçimde yer almalıdır.',
+          'Tasarruf Planım ile uzman başvurusu, doğrulama ve sözleşmeye ilişkin genel iletişim için info@tasarrufplanim.com; uzman hesabı, giriş, hesap güvenliği ve teknik destek talepleri için destek@tasarrufplanim.com adresleri kullanılabilir. Varsa ticari unvan, resmî adres ve diğer zorunlu bilgiler hukuki yapının kesinleşmesiyle ayrıca güncel şekilde yayımlanır.',
     ),
     _ExpertAgreementSection(
       icon: Icons.description_outlined,

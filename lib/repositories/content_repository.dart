@@ -19,33 +19,27 @@ class ContentRepository {
     return _firestore.collection('content');
   }
 
-  /// Admin panelinde bütün içerikleri getirir.
-  Stream<List<ContentModel>>
-      watchAllContents() {
-    return _contentCollection
-        .snapshots()
-        .map((snapshot) {
+  CollectionReference<Map<String, dynamic>>
+      get _notificationCollection {
+    return _firestore.collection('notifications');
+  }
+
+  Stream<List<ContentModel>> watchAllContents() {
+    return _contentCollection.snapshots().map((snapshot) {
       final contents = snapshot.docs
           .map(ContentModel.fromFirestore)
           .toList();
 
       contents.sort(_sortForAdmin);
-
       return contents;
     });
   }
 
-  /// Admin panelinde sadece seçilen
-  /// içerik türünü getirir.
-  Stream<List<ContentModel>>
-      watchAdminContentsByType(
+  Stream<List<ContentModel>> watchAdminContentsByType(
     ContentType type,
   ) {
     return _contentCollection
-        .where(
-          'type',
-          isEqualTo: type.value,
-        )
+        .where('type', isEqualTo: type.value)
         .snapshots()
         .map((snapshot) {
       final contents = snapshot.docs
@@ -53,15 +47,11 @@ class ContentRepository {
           .toList();
 
       contents.sort(_sortForAdmin);
-
       return contents;
     });
   }
 
-  /// Kullanıcı tarafında yayınlanabilir
-  /// Öne Çıkan içerikleri getirir.
-  Stream<List<ContentModel>>
-      watchPublishedFeatured({
+  Stream<List<ContentModel>> watchPublishedFeatured({
     int? limit,
   }) {
     return _watchPublishedContents(
@@ -70,10 +60,7 @@ class ContentRepository {
     );
   }
 
-  /// Kullanıcı tarafında yayınlanabilir
-  /// kampanyaları getirir.
-  Stream<List<ContentModel>>
-      watchPublishedCampaigns({
+  Stream<List<ContentModel>> watchPublishedCampaigns({
     int? limit,
   }) {
     return _watchPublishedContents(
@@ -82,63 +69,46 @@ class ContentRepository {
     );
   }
 
-  Stream<List<ContentModel>>
-      _watchPublishedContents({
+  Stream<List<ContentModel>> _watchPublishedContents({
     required ContentType type,
     int? limit,
   }) {
     return _contentCollection
-        .where(
-          'type',
-          isEqualTo: type.value,
-        )
+        .where('type', isEqualTo: type.value)
         .where(
           'status',
-          isEqualTo:
-              ContentStatus.published.value,
+          isEqualTo: ContentStatus.published.value,
         )
         .snapshots()
         .map((snapshot) {
       final contents = snapshot.docs
           .map(ContentModel.fromFirestore)
-          .where(
-            (content) =>
-                content.isVisibleToUsers,
-          )
+          .where((content) => content.isVisibleToUsers)
           .toList();
 
       contents.sort(_sortForUsers);
 
-      if (limit != null &&
-          contents.length > limit) {
-        return contents
-            .take(limit)
-            .toList(growable: false);
+      if (limit != null && contents.length > limit) {
+        return contents.take(limit).toList(growable: false);
       }
 
       return contents;
     });
   }
 
-  /// Tek bir içeriği kimliğiyle getirir.
   Future<ContentModel?> getContentById(
     String contentId,
   ) async {
     final document =
-        await _contentCollection
-            .doc(contentId)
-            .get();
+        await _contentCollection.doc(contentId).get();
 
     if (!document.exists) {
       return null;
     }
 
-    return ContentModel.fromFirestore(
-      document,
-    );
+    return ContentModel.fromFirestore(document);
   }
 
-  /// Yeni içerik oluşturur.
   Future<String> createContent(
     ContentModel content,
   ) async {
@@ -148,50 +118,81 @@ class ContentRepository {
 
     if (currentUser == null) {
       throw StateError(
-        'İçerik oluşturmak için yönetici '
-        'oturumu gereklidir.',
+        'İçerik oluşturmak için yönetici oturumu gereklidir.',
       );
     }
 
-    final document =
-        _contentCollection.doc();
+    final document = _contentCollection.doc();
 
-    final contentToCreate =
-        content.copyWith(
+    final contentToCreate = content.copyWith(
       id: document.id,
       createdBy: currentUser.uid,
     );
 
-    await document.set(
+    final WriteBatch batch = _firestore.batch();
+
+    batch.set(
+      document,
       contentToCreate.toFirestore(),
     );
 
+    if (_shouldCreateFeaturedNotification(
+      oldStatus: null,
+      newContent: contentToCreate,
+    )) {
+      _addFeaturedNotificationToBatch(
+        batch: batch,
+        content: contentToCreate,
+      );
+    }
+
+    await batch.commit();
     return document.id;
   }
 
-  /// Mevcut içeriği günceller.
   Future<void> updateContent(
     ContentModel content,
   ) async {
     if (content.id.trim().isEmpty) {
       throw ArgumentError(
-        'Güncellenecek içerik kimliği '
-        'bulunamadı.',
+        'Güncellenecek içerik kimliği bulunamadı.',
       );
     }
 
     _validateContent(content);
 
-    final data = content.toFirestore();
+    final reference = _contentCollection.doc(content.id);
 
-    data.remove('createdAt');
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(reference);
 
-    await _contentCollection
-        .doc(content.id)
-        .update(data);
+      if (!snapshot.exists) {
+        throw StateError('Güncellenecek içerik bulunamadı.');
+      }
+
+      final oldContent =
+          ContentModel.fromFirestore(snapshot);
+
+      final data = content.toFirestore();
+      data.remove('createdAt');
+
+      transaction.update(reference, data);
+
+      if (_shouldCreateFeaturedNotification(
+        oldStatus: oldContent.status,
+        newContent: content,
+      )) {
+        final notificationReference =
+            _featuredNotificationReference(content.id);
+
+        transaction.set(
+          notificationReference,
+          _featuredNotificationData(content),
+        );
+      }
+    });
   }
 
-  /// İçeriğin durumunu günceller.
   Future<void> updateStatus({
     required String contentId,
     required ContentStatus status,
@@ -202,27 +203,46 @@ class ContentRepository {
       );
     }
 
-    final Map<String, dynamic>
-        updates = {
-      'status': status.value,
-      'updatedAt':
-          FieldValue.serverTimestamp(),
-    };
+    final reference = _contentCollection.doc(contentId);
 
-    if (status ==
-        ContentStatus.published) {
-      updates['publishDate'] =
-          FieldValue.serverTimestamp();
-    } else {
-      updates['publishDate'] = null;
-    }
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(reference);
 
-    await _contentCollection
-        .doc(contentId)
-        .update(updates);
+      if (!snapshot.exists) {
+        throw StateError('İçerik bulunamadı.');
+      }
+
+      final oldContent =
+          ContentModel.fromFirestore(snapshot);
+
+      final Map<String, dynamic> updates = {
+        'status': status.value,
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+
+      if (status == ContentStatus.published) {
+        updates['publishDate'] =
+            FieldValue.serverTimestamp();
+      } else {
+        updates['publishDate'] = null;
+      }
+
+      transaction.update(reference, updates);
+
+      if (oldContent.type == ContentType.featured &&
+          oldContent.status != ContentStatus.published &&
+          status == ContentStatus.published) {
+        final notificationReference =
+            _featuredNotificationReference(contentId);
+
+        transaction.set(
+          notificationReference,
+          _featuredNotificationData(oldContent),
+        );
+      }
+    });
   }
 
-  /// İçeriğin önceliğini günceller.
   Future<void> updatePriority({
     required String contentId,
     required int priority,
@@ -235,21 +255,16 @@ class ContentRepository {
 
     if (priority < 0) {
       throw ArgumentError(
-        'Öncelik değeri sıfırdan '
-        'küçük olamaz.',
+        'Öncelik değeri sıfırdan küçük olamaz.',
       );
     }
 
-    await _contentCollection
-        .doc(contentId)
-        .update({
+    await _contentCollection.doc(contentId).update({
       'priority': priority,
-      'updatedAt':
-          FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
   }
 
-  /// Görüntülenme sayısını artırır.
   Future<void> incrementViewCount(
     String contentId,
   ) async {
@@ -257,12 +272,68 @@ class ContentRepository {
       return;
     }
 
-    await _contentCollection
-        .doc(contentId)
-        .update({
-      'viewCount':
-          FieldValue.increment(1),
+    await _contentCollection.doc(contentId).update({
+      'viewCount': FieldValue.increment(1),
     });
+  }
+
+  bool _shouldCreateFeaturedNotification({
+    required ContentStatus? oldStatus,
+    required ContentModel newContent,
+  }) {
+    return newContent.type == ContentType.featured &&
+        newContent.status == ContentStatus.published &&
+        oldStatus != ContentStatus.published;
+  }
+
+  DocumentReference<Map<String, dynamic>>
+      _featuredNotificationReference(
+    String contentId,
+  ) {
+    return _notificationCollection.doc(
+      'featured_$contentId',
+    );
+  }
+
+  Map<String, dynamic> _featuredNotificationData(
+    ContentModel content,
+  ) {
+    final String notificationId =
+        'featured_${content.id}';
+
+    return {
+      'notificationId': notificationId,
+      'audience': 'all',
+      'title': _notificationTitleFor(content),
+      'message': content.title.trim(),
+      'type': 'featured',
+      'targetScreen': 'featured_detail',
+      'targetId': content.id,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+  }
+
+  String _notificationTitleFor(
+    ContentModel content,
+  ) {
+    final String category =
+        content.category?.trim() ?? '';
+
+    if (category.isEmpty) {
+      return 'Yeni Bilgilendirme';
+    }
+
+    return 'Yeni $category Bilgilendirmesi';
+  }
+
+  void _addFeaturedNotificationToBatch({
+    required WriteBatch batch,
+    required ContentModel content,
+  }) {
+    batch.set(
+      _featuredNotificationReference(content.id),
+      _featuredNotificationData(content),
+    );
   }
 
   void _validateContent(
@@ -274,9 +345,7 @@ class ContentRepository {
       );
     }
 
-    if (content.summary
-        .trim()
-        .isEmpty) {
+    if (content.summary.trim().isEmpty) {
       throw ArgumentError(
         'İçerik özeti boş bırakılamaz.',
       );
@@ -290,45 +359,34 @@ class ContentRepository {
 
     if (content.priority < 0) {
       throw ArgumentError(
-        'Öncelik değeri sıfırdan '
-        'küçük olamaz.',
+        'Öncelik değeri sıfırdan küçük olamaz.',
       );
     }
 
-    if (content.type ==
-        ContentType.campaign) {
+    if (content.type == ContentType.campaign) {
       if (content.companyId == null ||
-          content.companyId!
-              .trim()
-              .isEmpty) {
+          content.companyId!.trim().isEmpty) {
         throw ArgumentError(
-          'Kampanya için firma '
-          'seçilmelidir.',
+          'Kampanya için firma seçilmelidir.',
         );
       }
 
-      if (content.companyName ==
-              null ||
-          content.companyName!
-              .trim()
-              .isEmpty) {
+      if (content.companyName == null ||
+          content.companyName!.trim().isEmpty) {
         throw ArgumentError(
-          'Kampanya firma adı '
-          'bulunamadı.',
+          'Kampanya firma adı bulunamadı.',
         );
       }
 
       if (content.startDate == null) {
         throw ArgumentError(
-          'Kampanya başlangıç tarihi '
-          'seçilmelidir.',
+          'Kampanya başlangıç tarihi seçilmelidir.',
         );
       }
 
       if (content.endDate == null) {
         throw ArgumentError(
-          'Kampanya bitiş tarihi '
-          'seçilmelidir.',
+          'Kampanya bitiş tarihi seçilmelidir.',
         );
       }
 
@@ -336,9 +394,7 @@ class ContentRepository {
         content.startDate!,
       )) {
         throw ArgumentError(
-          'Kampanya bitiş tarihi '
-          'başlangıç tarihinden önce '
-          'olamaz.',
+          'Kampanya bitiş tarihi başlangıç tarihinden önce olamaz.',
         );
       }
     }
@@ -352,21 +408,15 @@ class ContentRepository {
         first.updatedAt ??
         first.createdAt ??
         first.publishDate ??
-        DateTime.fromMillisecondsSinceEpoch(
-          0,
-        );
+        DateTime.fromMillisecondsSinceEpoch(0);
 
     final secondDate =
         second.updatedAt ??
         second.createdAt ??
         second.publishDate ??
-        DateTime.fromMillisecondsSinceEpoch(
-          0,
-        );
+        DateTime.fromMillisecondsSinceEpoch(0);
 
-    return secondDate.compareTo(
-      firstDate,
-    );
+    return secondDate.compareTo(firstDate);
   }
 
   static int _sortForUsers(
@@ -374,9 +424,7 @@ class ContentRepository {
     ContentModel second,
   ) {
     final priorityComparison =
-        first.priority.compareTo(
-      second.priority,
-    );
+        first.priority.compareTo(second.priority);
 
     if (priorityComparison != 0) {
       return priorityComparison;
@@ -385,19 +433,13 @@ class ContentRepository {
     final firstDate =
         first.publishDate ??
         first.createdAt ??
-        DateTime.fromMillisecondsSinceEpoch(
-          0,
-        );
+        DateTime.fromMillisecondsSinceEpoch(0);
 
     final secondDate =
         second.publishDate ??
         second.createdAt ??
-        DateTime.fromMillisecondsSinceEpoch(
-          0,
-        );
+        DateTime.fromMillisecondsSinceEpoch(0);
 
-    return secondDate.compareTo(
-      firstDate,
-    );
+    return secondDate.compareTo(firstDate);
   }
 }
