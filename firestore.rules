@@ -85,8 +85,17 @@ service cloud.firestore {
           'name',
           'surname',
           'email',
-          'username',
-          'usernameLowercase',
+          'roles',
+          'expertStatus',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid',
+          'name',
+          'surname',
+          'email',
+          'phone',
           'roles',
           'expertStatus',
           'createdAt',
@@ -96,8 +105,10 @@ service cloud.firestore {
         && request.resource.data.name is string
         && request.resource.data.surname is string
         && request.resource.data.email is string
-        && request.resource.data.username is string
-        && request.resource.data.usernameLowercase is string
+        && (
+          request.resource.data.phone == null ||
+          request.resource.data.phone is string
+        )
         && request.resource.data.roles == ['user']
         && request.resource.data.expertStatus == 'none'
         && request.resource.data.createdAt is timestamp
@@ -111,10 +122,6 @@ service cloud.firestore {
             resource.data.uid
         && request.resource.data.email ==
             resource.data.email
-        && request.resource.data.username ==
-            resource.data.username
-        && request.resource.data.usernameLowercase ==
-            resource.data.usernameLowercase
         && request.resource.data.roles ==
             resource.data.roles
         && request.resource.data.expertStatus ==
@@ -135,10 +142,6 @@ service cloud.firestore {
             resource.data.uid
         && request.resource.data.email ==
             resource.data.email
-        && request.resource.data.username ==
-            resource.data.username
-        && request.resource.data.usernameLowercase ==
-            resource.data.usernameLowercase
         && request.resource.data.roles ==
             resource.data.roles
         && resource.data.expertStatus in [
