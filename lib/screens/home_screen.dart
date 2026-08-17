@@ -1099,6 +1099,11 @@ DateTime? _findDeliveryDate(SavedPlan plan) {
     required int index,
     required int itemCount,
   }) {
+    final String category = content.category?.trim() ?? '';
+    final String categoryLabel =
+        category.isEmpty ? 'ÖNE ÇIKAN' : category.toUpperCase();
+
+    // İlk tasarladığımız Öne Çıkanlar kartının orijinal renkleri.
     const List<List<Color>> gradients = [
       [Color(0xFF062538), Color(0xFF075B5A)],
       [Color(0xFF083C48), Color(0xFF119A88)],
@@ -1177,9 +1182,11 @@ DateTime? _findDeliveryDate(SavedPlan plan) {
                         color: _turquoise,
                         borderRadius: BorderRadius.circular(13),
                       ),
-                      child: const Text(
-                        'GÜNCEL',
-                        style: TextStyle(
+                      child: Text(
+                        categoryLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,

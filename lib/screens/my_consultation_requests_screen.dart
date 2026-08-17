@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../models/consultation_request_contact_model.dart';
 import '../models/consultation_request_model.dart';
 import '../repositories/consultation_repository.dart';
+import 'calculator_screen.dart';
 
 class MyConsultationRequestsScreen extends StatefulWidget {
   const MyConsultationRequestsScreen({
@@ -1355,13 +1356,22 @@ class _EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _MessageView(
+    return _MessageView(
       icon: Icons.handshake_outlined,
       title: 'Henüz danışma talebiniz yok',
       description:
           'FP Engine sonuç ekranından bir şirket '
           've uzman seçerek danışma talebi '
           'oluşturabilirsiniz.',
+      actionLabel: 'Plan Oluştur',
+      onAction: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const CalculatorScreen(),
+          ),
+        );
+      },
     );
   }
 }
@@ -1403,11 +1413,15 @@ class _MessageView extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.description,
+    this.actionLabel,
+    this.onAction,
   });
 
   final IconData icon;
   final String title;
   final String description;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -1450,6 +1464,31 @@ class _MessageView extends StatelessWidget {
                 height: 1.5,
               ),
             ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 48,
+                child: FilledButton.icon(
+                  onPressed: onAction,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF087C72),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add_chart_rounded, size: 19),
+                  label: Text(
+                    actionLabel!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

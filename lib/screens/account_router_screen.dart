@@ -536,17 +536,17 @@ class GuestProfileScreen extends StatelessWidget {
                     onTap: () => _openAbout(context),
                   ),
                   _GuestMenuTile(
-  icon: Icons.chat_bubble_outline_rounded,
-  title: 'Şikayet ve Öneri',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const FeedbackScreen(),
-      ),
-    );
-  },
-),
+                    icon: Icons.chat_bubble_outline_rounded,
+                    title: 'Şikayet ve Öneri',
+                    onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const FeedbackScreen(),
+    ),
+  );
+},
+                  ),
                   _GuestMenuTile(
                     icon: Icons.shield_outlined,
                     title: 'Gizlilik Politikası',
@@ -555,7 +555,6 @@ class GuestProfileScreen extends StatelessWidget {
                   _GuestMenuTile(
   icon: Icons.description_outlined,
   title: 'Kullanıcı Sözleşmesi',
-  showDivider: false,
   onTap: () => _openUserAgreement(context),
 ),
 _GuestMenuTile(

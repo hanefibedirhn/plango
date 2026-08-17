@@ -39,7 +39,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   User? get _currentUser => _auth.currentUser;
 
-  bool get _isLoggedIn => _currentUser != null;
+  bool get _isLoggedIn {
+  final user = _currentUser;
+  return user != null && !user.isAnonymous;
+}
 
   @override
   void dispose() {
@@ -88,10 +91,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Future<void> _sendFeedback() async {
     final user = _currentUser;
 
-    if (user == null) {
-      _showMessage('Talep göndermek için giriş yapmalısınız.');
-      return;
-    }
+    if (user == null || user.isAnonymous) {
+  _showMessage('Talep göndermek için hesabınıza giriş yapmalısınız.');
+  return;
+}
 
     final subject = _subjectController.text.trim();
     final message = _messageController.text.trim();

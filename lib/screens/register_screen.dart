@@ -1723,7 +1723,11 @@ class _LegalDocumentDialogState extends State<_LegalDocumentDialog> {
     if (!_scrollController.hasClients) return;
 
     final position = _scrollController.position;
-    final reachedBottom = position.maxScrollExtent <= 0 ||
+    // Belgenin tamamı ekrana sığıyorsa (tablet/geniş ekran),
+    // alttaki 82 px güvenlik boşluğu gerçek içerik taşması sayılmaz.
+    final bool contentFitsWithoutScrolling =
+        position.maxScrollExtent <= 82.5;
+    final bool reachedBottom = contentFitsWithoutScrolling ||
         position.pixels >= position.maxScrollExtent - 12;
 
     if (reachedBottom != _reachedBottom && mounted) {
