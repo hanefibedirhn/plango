@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../repositories/notification_repository.dart';
+
 import 'register_screen.dart';
 import 'user_login_screen.dart';
 
@@ -23,6 +25,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationRepository _notificationRepository =
+      NotificationRepository();
 
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
@@ -119,7 +123,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     });
 
     try {
-      await _firestore.collection('feedbackRequests').add({
+      final DocumentReference<Map<String, dynamic>> feedbackReference =
+          await _firestore.collection('feedbackRequests').add({
         'userId': user.uid,
         'userEmail': user.email ?? '',
         'type': _selectedType,
@@ -130,6 +135,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // Talep başarıyla kaydedildikten sonra admine olay bildirimi oluştur.
+      // Bildirim hatası kullanıcının gönderdiği talebi geçersiz kılmaz.
+      try {
+        await _notificationRepository.notifyAdminFeedback(
+          feedbackId: feedbackReference.id,
+          feedbackType: _selectedType,
+          actorUid: user.uid,
+        );
+      } on FirebaseException {
+        // Yardımcı bildirim katmanı ana geri bildirim akışını bozmaz.
+      }
 
       _subjectController.clear();
       _messageController.clear();

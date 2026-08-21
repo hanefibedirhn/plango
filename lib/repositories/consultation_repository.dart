@@ -43,7 +43,7 @@ class ConsultationRepository {
 
   final FirebaseFirestore _firestore;
 
-  static const Duration responseDuration = Duration(hours: 3);
+  static const Duration responseDuration = Duration(hours: 24);
 
   CollectionReference<Map<String, dynamic>> get _requestsCollection =>
       _firestore.collection('consultationRequests');
@@ -459,8 +459,9 @@ class ConsultationRepository {
           'rejectionReason': null,
           'adminQueueReason': null,
           'waitingForAdminAt': null,
-          'reassignedFromExpertId':
-              previousExpertId.isEmpty ? null : previousExpertId,
+          'reassignedFromExpertId': previousExpertId.isNotEmpty
+              ? previousExpertId
+              : requestData['reassignedFromExpertId'],
         },
       );
 
@@ -972,6 +973,88 @@ class ConsultationRepository {
     );
 
     return requestId;
+  }
+
+  /// Uzman kendi kullanıcı hesabını sildiğinde, o uzmana bağlı açık
+  /// danışma taleplerini sahipsiz bırakmaz. Talepler yönetici kuyruğuna
+  /// alınır ve daha sonra başka bir uzmana yeniden atanabilir.
+  Future<int> handleExpertAccountDeleted({
+    required String expertId,
+  }) async {
+    final String normalizedExpertId = expertId.trim();
+
+    if (normalizedExpertId.isEmpty) {
+      return 0;
+    }
+
+    final QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _requestsCollection
+            .where('expertId', isEqualTo: normalizedExpertId)
+            .get();
+
+    final List<QueryDocumentSnapshot<Map<String, dynamic>>> openRequests =
+        snapshot.docs.where((document) {
+      final String status =
+          document.data()['status'] as String? ?? '';
+
+      return const {
+        'pending',
+        'accepted',
+        'contacted',
+      }.contains(status);
+    }).toList();
+
+    if (openRequests.isEmpty) {
+      return 0;
+    }
+
+    const int requestsPerBatch = 200;
+
+    for (int start = 0;
+        start < openRequests.length;
+        start += requestsPerBatch) {
+      final int end =
+          (start + requestsPerBatch < openRequests.length)
+              ? start + requestsPerBatch
+              : openRequests.length;
+
+      final WriteBatch batch = _firestore.batch();
+
+      for (final document in openRequests.sublist(start, end)) {
+        final DocumentReference<Map<String, dynamic>> requestReference =
+            _requestsCollection.doc(document.id);
+        final DocumentReference<Map<String, dynamic>> contactReference =
+            _requestContactsCollection.doc(document.id);
+
+        batch.update(
+          requestReference,
+          {
+            'expertId': '',
+            'status': 'waiting_for_admin',
+            'expiresAt': null,
+            'waitingForAdminAt': FieldValue.serverTimestamp(),
+            'adminQueueReason': 'expert_account_deleted',
+            'reassignedFromExpertId': normalizedExpertId,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+        );
+
+        batch.update(
+          contactReference,
+          {
+            'expertId': '',
+            'expertPhone': null,
+            'expertCorporateEmail': null,
+            'contactSharedAt': null,
+            'updatedAt': FieldValue.serverTimestamp(),
+          },
+        );
+      }
+
+      await batch.commit();
+    }
+
+    return openRequests.length;
   }
 
   Future<void> _updateExpertOwnedStatus({

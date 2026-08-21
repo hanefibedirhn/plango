@@ -1104,21 +1104,118 @@ match /content/{contentId} {
   allow delete: if false;
 }
     // ==================================================
+    // DEVICE TOKENS - FCM (ANDROID + IOS)
+    // ==================================================
+
+    match /deviceTokens/{tokenId} {
+
+      function validDeviceTokenData() {
+        return request.resource.data.keys().hasAll([
+          'tokenId',
+          'token',
+          'platform',
+          'userUid',
+          'isActive',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'tokenId',
+          'token',
+          'platform',
+          'userUid',
+          'isActive',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.tokenId == tokenId
+        && request.resource.data.token is string
+        && request.resource.data.token.size() > 0
+        && request.resource.data.platform in [
+          'android',
+          'ios'
+        ]
+        && (
+          request.resource.data.userUid == null ||
+          (
+            isSignedIn() &&
+            request.resource.data.userUid == request.auth.uid
+          )
+        )
+        && request.resource.data.isActive is bool
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+      }
+
+      // Token listesi istemciler tarafından okunamaz.
+      // Push gönderimi Cloud Functions / Admin SDK tarafından yapılır.
+      allow read: if false;
+
+      // Misafir cihaz global push alabilmek için userUid=null ile,
+      // giriş yapan cihaz ise yalnız kendi uid'siyle token oluşturabilir.
+      allow create: if validDeviceTokenData()
+        && request.resource.data.isActive == true;
+
+      // İstemci yalnız aynı token belgesinin kullanıcı bağını,
+      // aktiflik durumunu ve updatedAt alanını değiştirebilir.
+      // Token/platform/createdAt/tokenId sonradan değiştirilemez.
+      allow update: if validDeviceTokenData()
+        && request.resource.data.tokenId == resource.data.tokenId
+        && request.resource.data.token == resource.data.token
+        && request.resource.data.platform == resource.data.platform
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'userUid',
+              'isActive',
+              'updatedAt'
+            ]);
+
+      // Token kayıtları istemciden fiziksel olarak silinmez.
+      allow delete: if false;
+    }
+
+
+    // ==================================================
     // NOTIFICATIONS
     // ==================================================
 
     match /notifications/{notificationId} {
 
-      // Global bildirimler giriş yapmadan okunabilir.
-      // Eski kişisel bildirimler yalnızca sahibi veya admin tarafından okunur.
-      allow read: if (
-          resource.data.audience == 'all'
-        ) || (
-          isSignedIn() &&
-          resource.data.userId == request.auth.uid
-        ) || isAdmin();
+      function isGlobalNotification() {
+        return resource.data.audience == 'all';
+      }
 
-      // Yeni global bildirimleri yalnızca admin oluşturabilir.
+      function isExpertNotification() {
+        return isSignedIn()
+          && resource.data.audience == 'expert'
+          && resource.data.recipientUid == request.auth.uid;
+      }
+
+      function isAdminNotification() {
+        return isAdmin()
+          && resource.data.audience == 'admin';
+      }
+
+      function isLegacyOwnerNotification() {
+        return isSignedIn()
+          && !resource.data.keys().hasAny(['audience'])
+          && resource.data.userId == request.auth.uid;
+      }
+
+      // Global: herkes.
+      // Expert: yalnız hedef uzman.
+      // Admin: yalnız admin.
+      // Legacy: yalnız eski kişisel bildirimin sahibi.
+      allow read: if isGlobalNotification()
+        || isExpertNotification()
+        || isAdminNotification()
+        || isLegacyOwnerNotification()
+        || isAdmin();
+
+      // Global bildirimleri yalnız admin oluşturabilir.
       allow create: if isAdmin()
         && request.resource.data.keys().hasAll([
           'notificationId',
@@ -1144,6 +1241,7 @@ match /content/{contentId} {
         && request.resource.data.title is string
         && request.resource.data.title.size() > 0
         && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
         && request.resource.data.type in [
           'featured',
           'system',
@@ -1156,8 +1254,191 @@ match /content/{contentId} {
           request.resource.data.targetId is string
         );
 
-      // LEGACY: Mevcut NotificationService çağrıları derlenmeye ve
-      // çalışmaya devam etsin. Bu belgeler global akışta gösterilmez.
+      // Uzman bildirimi:
+      // Talebi oluşturan kullanıcı otomatik atama sonrasında hedef uzmana
+      // yalnızca o danışma talebi için bildirim oluşturabilir.
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll([
+          'notificationId',
+          'audience',
+          'recipientUid',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'notificationId',
+          'audience',
+          'recipientUid',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'actorId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.audience == 'expert'
+        && request.resource.data.recipientUid is string
+        && request.resource.data.recipientUid != ''
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.type == 'consultation'
+        && request.resource.data.status == 'unread'
+        && request.resource.data.targetScreen ==
+            'expert_consultation_request'
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId != ''
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.readAt == null
+        && (
+          request.resource.data.actorId == null ||
+          request.resource.data.actorId == request.auth.uid
+        )
+        && exists(
+          /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId)
+        )
+        && get(
+          /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId)
+        ).data.userId == request.auth.uid
+        && get(
+          /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId)
+        ).data.expertId == request.resource.data.recipientUid
+        && get(
+          /databases/$(database)/documents/consultationRequests/$(request.resource.data.targetId)
+        ).data.status == 'pending';
+
+      // Admin uygulama bildirimleri.
+      // Admin kendi bildirimini oluşturabilir.
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasAll([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'actorId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.audience == 'admin'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.type in [
+          'expert_application',
+          'expert_account_deleted',
+          'expert_profile_update',
+          'consultation',
+          'feedback',
+          'system'
+        ]
+        && request.resource.data.status == 'unread'
+        && request.resource.data.targetScreen is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.readAt == null
+        && (
+          request.resource.data.targetId == null ||
+          request.resource.data.targetId is string
+        )
+        && (
+          request.resource.data.actorId == null ||
+          request.resource.data.actorId is string
+        );
+
+      // Kullanıcı tarafından doğrudan oluşan admin olayları.
+      // Hedef ekran ve olay tipi sabitlenerek keyfi admin bildirimi
+      // oluşturulması engellenir.
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'actorId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'notificationId',
+          'audience',
+          'title',
+          'message',
+          'type',
+          'status',
+          'targetScreen',
+          'targetId',
+          'actorId',
+          'createdAt',
+          'readAt'
+        ])
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.audience == 'admin'
+        && request.resource.data.status == 'unread'
+        && request.resource.data.readAt == null
+        && request.resource.data.actorId == request.auth.uid
+        && request.resource.data.targetId is string
+        && request.resource.data.targetId != ''
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && (
+          (
+            request.resource.data.type == 'expert_application'
+            && request.resource.data.targetScreen ==
+                'admin_expert_application_detail'
+            && exists(
+              /databases/$(database)/documents/expertApplications/$(request.resource.data.targetId)
+            )
+            && get(
+              /databases/$(database)/documents/expertApplications/$(request.resource.data.targetId)
+            ).data.uid == request.auth.uid
+          ) || (
+            request.resource.data.type == 'feedback'
+            && request.resource.data.targetScreen ==
+                'admin_feedback_detail'
+            && exists(
+              /databases/$(database)/documents/feedbackRequests/$(request.resource.data.targetId)
+            )
+            && get(
+              /databases/$(database)/documents/feedbackRequests/$(request.resource.data.targetId)
+            ).data.userId == request.auth.uid
+          )
+        );
+
+      // LEGACY kişisel bildirimler.
       allow create: if isSignedIn()
         && !request.resource.data.keys().hasAny(['audience'])
         && request.resource.data.keys().hasAll([
@@ -1212,11 +1493,32 @@ match /content/{contentId} {
           isAdmin()
         );
 
-      // Global belgeler istemciden değiştirilemez.
-      // Eski kişisel belgelerin read geçişi korunur.
-      allow update: if isSignedIn()
-        && !resource.data.keys().hasAny(['audience'])
-        && resource.data.userId == request.auth.uid
+      // Uzman yalnızca kendi uzman bildirimini okundu yapabilir.
+      allow update: if isExpertNotification()
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'readAt'
+            ])
+        && request.resource.data.status == 'read'
+        && request.resource.data.readAt is timestamp;
+
+      // Admin yalnızca admin bildirimlerinin okundu durumunu değiştirebilir.
+      allow update: if isAdminNotification()
+        && request.resource.data
+            .diff(resource.data)
+            .affectedKeys()
+            .hasOnly([
+              'status',
+              'readAt'
+            ])
+        && request.resource.data.status == 'read'
+        && request.resource.data.readAt is timestamp;
+
+      // Eski kişisel bildirimlerin read geçişi korunur.
+      allow update: if isLegacyOwnerNotification()
         && request.resource.data
             .diff(resource.data)
             .affectedKeys()

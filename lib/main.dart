@@ -5,6 +5,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'services/theme_controller.dart';
+import 'services/push_notification_router.dart';
+import 'services/push_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +16,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await PushNotificationService.instance.initialize();
+  await PushNotificationRouter.instance.initialize();
 
   runApp(const PlangoApp());
 }
@@ -27,6 +32,7 @@ class PlangoApp extends StatelessWidget {
       valueListenable: PlangoThemeController.themeMode,
       builder: (context, themeMode, _) {
         return MaterialApp(
+          navigatorKey: PushNotificationRouter.instance.navigatorKey,
           title: 'Tasarruf Planım',
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,
@@ -332,6 +338,8 @@ class _DisclaimerScreenState
 
   void _continue() {
     if (!accepted) return;
+
+    PushNotificationRouter.instance.markAppReady();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(

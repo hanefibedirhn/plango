@@ -26,6 +26,23 @@ class LoginSelectionScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _openRegister(BuildContext context) async {
+    final bool? accountCreated = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RegisterScreen(),
+      ),
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    if (accountCreated == true) {
+      Navigator.pop(context, true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,10 +101,7 @@ class LoginSelectionScreen extends StatelessWidget {
 
               _CreateAccountCard(
                 onTap: () {
-                  _openPage(
-                    context,
-                    const RegisterScreen(),
-                  );
+                  _openRegister(context);
                 },
               ),
             ],

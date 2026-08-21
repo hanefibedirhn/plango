@@ -10,18 +10,19 @@ class NotificationService {
   // ÖNE ÇIKANLAR
   // ==================================================
 
-  static Future<void> featuredPublished({
-    required String userId,
+  /// Yeni Öne Çıkanlar içeriği yayınlandığında tek bir global
+  /// bildirim oluşturur. Giriş yapmayan kullanıcıların cihazları da
+  /// push izni verdiyse sunucu tarafında bu bildirimi alabilir.
+  static Future<String> featuredPublished({
     required String contentId,
     required String title,
-  }) async {
-    await _repository.createNotification(
-      userId: userId,
+  }) {
+    return _repository.createGlobalNotification(
       title: 'Yeni Öne Çıkan İçerik',
-      message: title,
+      message: title.trim(),
       type: 'featured',
       targetScreen: 'featured',
-      targetId: contentId,
+      targetId: contentId.trim(),
     );
   }
 
@@ -29,18 +30,22 @@ class NotificationService {
   // KAMPANYALAR
   // ==================================================
 
-  static Future<void> campaignPublished({
-    required String userId,
+  /// Mevcut uygulamada kampanya akışı tekrar kullanılacaksa,
+  /// global Bildirim Merkezi ile aynı omurgadan yayınlanır.
+  ///
+  /// Global notification type kümesinde ayrı "campaign" türü
+  /// kullanmıyoruz; genel içerik/duyuru olarak "announcement"
+  /// altında tutulur. targetScreen değeri yönlendirmeyi korur.
+  static Future<String> campaignPublished({
     required String contentId,
     required String title,
-  }) async {
-    await _repository.createNotification(
-      userId: userId,
+  }) {
+    return _repository.createGlobalNotification(
       title: 'Yeni Kampanya',
-      message: title,
-      type: 'campaign',
+      message: title.trim(),
+      type: 'announcement',
       targetScreen: 'campaign',
-      targetId: contentId,
+      targetId: contentId.trim(),
     );
   }
 
@@ -48,19 +53,20 @@ class NotificationService {
   // SİSTEM DUYURUSU
   // ==================================================
 
-  static Future<void> systemAnnouncement({
-    required String userId,
+  static Future<String> systemAnnouncement({
     required String title,
     required String message,
     String? contentId,
-  }) async {
-    await _repository.createNotification(
-      userId: userId,
-      title: title,
-      message: message,
+  }) {
+    final String? normalizedContentId =
+        _normalizeOptional(contentId);
+
+    return _repository.createGlobalNotification(
+      title: title.trim(),
+      message: message.trim(),
       type: 'announcement',
       targetScreen: 'announcement',
-      targetId: contentId,
+      targetId: normalizedContentId,
     );
   }
 
@@ -68,18 +74,21 @@ class NotificationService {
   // UYGULAMA GÜNCELLEMESİ
   // ==================================================
 
-  static Future<void> appUpdate({
-    required String userId,
+  static Future<String> appUpdate({
     required String version,
     required String message,
-  }) async {
-    await _repository.createNotification(
-      userId: userId,
+  }) {
+    return _repository.createGlobalNotification(
       title: 'Tasarruf Planım Güncellendi',
-      message: message,
+      message: message.trim(),
       type: 'system',
       targetScreen: 'system',
-      targetId: version,
+      targetId: version.trim(),
     );
+  }
+
+  static String? _normalizeOptional(String? value) {
+    final String normalized = value?.trim() ?? '';
+    return normalized.isEmpty ? null : normalized;
   }
 }

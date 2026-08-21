@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/expert_application_model.dart';
 import '../models/expert_model.dart';
+import 'notification_repository.dart';
 
 class ExpertApplicationAlreadyPendingException
     implements Exception {
@@ -36,10 +37,14 @@ class ExpertProfileNotFoundException
 class ExpertApplicationRepository {
   ExpertApplicationRepository({
     FirebaseFirestore? firestore,
-  }) : _firestore =
-            firestore ?? FirebaseFirestore.instance;
+    NotificationRepository? notificationRepository,
+  })  : _firestore =
+            firestore ?? FirebaseFirestore.instance,
+        _notificationRepository =
+            notificationRepository ?? NotificationRepository();
 
   final FirebaseFirestore _firestore;
+  final NotificationRepository _notificationRepository;
 
   CollectionReference<Map<String, dynamic>>
       get _applicationsCollection {
@@ -169,6 +174,17 @@ class ExpertApplicationRepository {
       },
     );
 
+    // Başvuru kaydedildikten sonra admine olay bildirimi oluştur.
+    // Bildirim yazımı başarısız olsa bile başvurunun kendisi geçerlidir.
+    try {
+      await _notificationRepository.notifyAdminExpertApplication(
+        applicationId: applicationReference.id,
+        applicantUid: application.uid,
+      );
+    } on FirebaseException {
+      // Yardımcı bildirim katmanı ana başvuru akışını bozmaz.
+    }
+
     return applicationReference.id;
   }
 
@@ -290,6 +306,16 @@ class ExpertApplicationRepository {
       },
     );
     
+    // Şirket/profil değişikliği başvurusu admine ayrı bildirim gönderir.
+    try {
+      await _notificationRepository.notifyAdminExpertCompanyChange(
+        expertUid: application.uid,
+        expertName: '',
+      );
+    } on FirebaseException {
+      // Bildirim başarısız olsa bile güncelleme başvurusu kaydedilmiş kalır.
+    }
+
     return applicationReference.id;
   }
 

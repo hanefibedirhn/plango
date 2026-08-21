@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
+import '../repositories/consultation_repository.dart';
+import '../repositories/expert_repository.dart';
 import '../repositories/user_repository.dart';
 import 'change_password_screen.dart';
 import '../services/auth_service.dart';
@@ -30,6 +32,9 @@ class _ProfileInformationScreenState
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final UserRepository _userRepository = UserRepository();
+  final ExpertRepository _expertRepository = ExpertRepository();
+  final ConsultationRepository _consultationRepository =
+      ConsultationRepository();
 
   final AuthService _authService = AuthService();
 
@@ -371,12 +376,30 @@ AppUser? _currentProfile;
       currentPassword: password,
     );
 
-    // Kullanıcı hâlâ oturum açmışken Firestore kayıtları silinir.
+    // Kullanıcı hâlâ oturum açmışken uzman yaşam döngüsü tamamlanır.
+    // Uzman değilse normal kullanıcı hesabı silme akışına devam edilir.
+    try {
+      await _expertRepository.getExpert(firebaseUser.uid);
+
+      // Açık danışma taleplerini önce yönetici kuyruğuna al.
+      await _consultationRepository.handleExpertAccountDeleted(
+        expertId: firebaseUser.uid,
+      );
+
+      // Sonra özel ve herkese açık uzman profillerini temizle.
+      await _expertRepository.deleteExpert(
+        uid: firebaseUser.uid,
+      );
+    } on ExpertNotFoundException {
+      // Kullanıcı uzman değil.
+    }
+
+    // Uzman yaşam döngüsü tamamlandıktan sonra kullanıcı profilini sil.
     await _userRepository.deleteUserProfile(
       uid: firebaseUser.uid,
     );
 
-    // Son olarak Authentication hesabı silinir.
+    // En son Firebase Authentication hesabını sil.
     await _authService.deleteAuthenticatedUser();
 
     if (!mounted) {

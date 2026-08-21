@@ -53,6 +53,23 @@ bool _isSubmitting = false;
     );
   }
 
+  Future<void> _openRegister() async {
+    final bool? accountCreated = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RegisterScreen(),
+      ),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (accountCreated == true) {
+      Navigator.pop(context, true);
+    }
+  }
+
   Future<void> _login() async {
   FocusScope.of(context).unfocus();
 
@@ -205,11 +222,7 @@ bool _isSubmitting = false;
                 ),
                 const SizedBox(height: 22),
                 _RegisterSection(
-                  onRegister: () {
-                    _openPage(
-                      const RegisterScreen(),
-                    );
-                  },
+                  onRegister: _openRegister,
                 ),
                 const SizedBox(height: 22),
                 const _SessionNotice(),

@@ -4,6 +4,8 @@ import 'admin_consultation_management_screen.dart';
 import 'admin_experts_screen.dart';
 import 'admin_featured_list_screen.dart';
 import 'admin_feedback_screen.dart';
+import '../admin_notifications_screen.dart';
+import '../../repositories/notification_repository.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({
@@ -72,6 +74,17 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
+  void _openNotifications(
+    BuildContext context,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AdminNotificationsScreen(),
+      ),
+    );
+  }
+
   // ============================================================
   // BUILD
   // ============================================================
@@ -96,6 +109,70 @@ class AdminDashboardScreen extends StatelessWidget {
             letterSpacing: -0.35,
           ),
         ),
+        actions: [
+          StreamBuilder<int>(
+            stream: NotificationRepository()
+                .watchAdminUnreadCount(),
+            builder: (context, snapshot) {
+              final int unreadCount = snapshot.data ?? 0;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: IconButton(
+                  tooltip: 'Admin Bildirimleri',
+                  onPressed: () {
+                    _openNotifications(context);
+                  },
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(
+                        Icons.notifications_none_rounded,
+                        color: _navy,
+                        size: 26,
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: -7,
+                          top: -7,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _teal,
+                              borderRadius:
+                                  BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _background,
+                                width: 2,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              unreadCount > 9
+                                  ? '9+'
+                                  : '$unreadCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         top: false,

@@ -10,6 +10,10 @@ class AppNotification {
     required this.createdAt,
     this.targetId,
     this.audience = 'all',
+    this.recipientUid,
+    this.actorId,
+    this.status = 'unread',
+    this.readAt,
   });
 
   final String notificationId;
@@ -21,31 +25,85 @@ class AppNotification {
   final String? targetId;
   final String audience;
 
-  // Eski ekran/widget kodlarıyla uyumluluk için.
-  // Genel bildirimlerde Firestore üzerinde kullanıcı bazlı read tutulmaz.
-  bool get isRead => false;
+  /// Kişisel uzman/kullanıcı bildirimlerinde alıcı UID'si.
+  /// Global ve admin bildirimlerinde null olabilir.
+  final String? recipientUid;
+
+  /// Bildirimi oluşturan kullanıcı/uzman varsa UID'si.
+  final String? actorId;
+
+  /// Kişisel ve admin bildirimlerinde unread/read olarak tutulur.
+  /// Global bildirimlerin okunma durumu NotificationSeenStore tarafından
+  /// cihaz bazlı yönetildiği için bu alan global akışta kullanılmaz.
+  final String status;
+
+  final DateTime? readAt;
+
+  bool get isGlobal => audience == 'all';
+
+  bool get isExpert => audience == 'expert';
+
+  bool get isAdmin => audience == 'admin';
+
+  bool get isPersonalUser => audience == 'user';
+
+  bool get isRead {
+    if (isGlobal) {
+      return false;
+    }
+
+    return status == 'read' || readAt != null;
+  }
+
+  bool get isUnread => !isRead;
 
   factory AppNotification.fromDocument(
     DocumentSnapshot<Map<String, dynamic>> document,
   ) {
     final data = document.data() ?? const <String, dynamic>{};
 
-    DateTime readDate(dynamic value) {
-      if (value is Timestamp) return value.toDate();
-      if (value is DateTime) return value;
-      return DateTime.fromMillisecondsSinceEpoch(0);
-    }
-
     return AppNotification(
       notificationId:
-          data['notificationId'] as String? ?? document.id,
-      title: data['title'] as String? ?? '',
-      message: data['message'] as String? ?? '',
-      type: data['type'] as String? ?? 'announcement',
-      targetScreen: data['targetScreen'] as String? ?? 'none',
-      targetId: data['targetId'] as String?,
-      createdAt: readDate(data['createdAt']),
-      audience: data['audience'] as String? ?? '',
+          _readString(data['notificationId']) ?? document.id,
+      title: _readString(data['title']) ?? '',
+      message: _readString(data['message']) ?? '',
+      type: _readString(data['type']) ?? 'announcement',
+      targetScreen: _readString(data['targetScreen']) ?? 'none',
+      targetId: _readString(data['targetId']),
+      createdAt: _readDate(data['createdAt']) ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      audience: _readString(data['audience']) ?? 'all',
+      recipientUid: _readString(data['recipientUid']) ??
+          _readString(data['userId']),
+      actorId: _readString(data['actorId']),
+      status: _readString(data['status']) ?? 'unread',
+      readAt: _readDate(data['readAt']),
     );
+  }
+
+  static DateTime? _readDate(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    return null;
+  }
+
+  static String? _readString(dynamic value) {
+    if (value is! String) {
+      return null;
+    }
+
+    final String cleaned = value.trim();
+
+    if (cleaned.isEmpty) {
+      return null;
+    }
+
+    return cleaned;
   }
 }

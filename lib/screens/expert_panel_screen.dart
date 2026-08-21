@@ -5,8 +5,10 @@ import '../../models/consultation_request_model.dart';
 import '../../models/expert_model.dart';
 import '../../repositories/consultation_repository.dart';
 import '../../repositories/expert_repository.dart';
+import '../../repositories/notification_repository.dart';
 import 'expert_consultation_requests_screen.dart';
 import 'expert_profile_update_screen.dart';
+import 'expert_notifications_screen.dart';
 
 class ExpertPanelScreen extends StatefulWidget {
   const ExpertPanelScreen({super.key});
@@ -29,6 +31,8 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
   final ExpertRepository _expertRepository = ExpertRepository();
   final ConsultationRepository _consultationRepository =
       ConsultationRepository();
+  final NotificationRepository _notificationRepository =
+      NotificationRepository();
 
   bool _isUpdatingAvailability = false;
 
@@ -115,6 +119,71 @@ class _ExpertPanelScreenState extends State<ExpertPanelScreen> {
           'Uzman Paneli',
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
+        actions: [
+          StreamBuilder<int>(
+            stream: _notificationRepository.watchExpertUnreadCount(uid),
+            builder: (context, snapshot) {
+              final int unreadCount = snapshot.data ?? 0;
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: IconButton(
+                  tooltip: 'Uzman Bildirimleri',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const ExpertNotificationsScreen(),
+                      ),
+                    );
+                  },
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(
+                        Icons.notifications_none_rounded,
+                        size: 26,
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: -7,
+                          top: -7,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _teal,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _background,
+                                width: 2,
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              unreadCount > 9 ? '9+' : '$unreadCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: StreamBuilder<Expert?>(
