@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../repositories/feedback_repository.dart';
 import '../repositories/notification_repository.dart';
 
 import 'register_screen.dart';
@@ -24,7 +25,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   static const Color _border = Color(0xFFE4EBEE);
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FeedbackRepository _feedbackRepository = FeedbackRepository();
   final NotificationRepository _notificationRepository =
       NotificationRepository();
 
@@ -123,24 +124,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     });
 
     try {
-      final DocumentReference<Map<String, dynamic>> feedbackReference =
-          await _firestore.collection('feedbackRequests').add({
-        'userId': user.uid,
-        'userEmail': user.email ?? '',
-        'type': _selectedType,
-        'subject': subject,
-        'message': message,
-        'status': 'pending',
-        'adminReply': '',
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final String feedbackId = await _feedbackRepository.createFeedback(
+        userId: user.uid,
+        userEmail: user.email ?? '',
+        type: _selectedType,
+        subject: subject,
+        message: message,
+      );
 
       // Talep başarıyla kaydedildikten sonra admine olay bildirimi oluştur.
       // Bildirim hatası kullanıcının gönderdiği talebi geçersiz kılmaz.
       try {
         await _notificationRepository.notifyAdminFeedback(
-          feedbackId: feedbackReference.id,
+          feedbackId: feedbackId,
           feedbackType: _selectedType,
           actorUid: user.uid,
         );
@@ -504,10 +500,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     }
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _firestore
-          .collection('feedbackRequests')
-          .where('userId', isEqualTo: user.uid)
-          .snapshots(),
+      stream: _feedbackRepository.watchUserFeedback(
+        userId: user.uid,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _buildStateCard(

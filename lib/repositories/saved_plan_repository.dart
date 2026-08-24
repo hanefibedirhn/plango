@@ -6,8 +6,7 @@ import '../engine/fp_engine.dart';
 import '../models/calculation_plan.dart';
 import '../models/saved_plan_model.dart';
 
-class SavedPlanNotFoundException
-    implements Exception {
+class SavedPlanNotFoundException implements Exception {
   const SavedPlanNotFoundException();
 
   @override
@@ -20,8 +19,7 @@ class SavedPlanRepository {
   SavedPlanRepository({
     FirebaseFirestore? firestore,
   }) : _firestore =
-            firestore ??
-                FirebaseFirestore.instance;
+            firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -40,20 +38,18 @@ class SavedPlanRepository {
     required CalculationPlan plan,
     required FpResult result,
   }) async {
-    final String documentId =
-    _createDocumentId(
-  plan,
-  result,
-);
+    final String documentId = _createDocumentId(
+      plan,
+      result,
+    );
 
-    final DocumentReference<
-        Map<String, dynamic>> reference =
+    final DocumentReference<Map<String, dynamic>>
+        reference =
         _savedPlansCollection(userId).doc(
       documentId,
     );
 
-    final DocumentSnapshot<
-        Map<String, dynamic>>
+    final DocumentSnapshot<Map<String, dynamic>>
         existingDocument =
         await reference.get();
 
@@ -79,6 +75,9 @@ class SavedPlanRepository {
           result.paymentPlan.map((item) {
         return {
           'month': item.month,
+          'paymentDate': Timestamp.fromDate(
+            item.paymentDate,
+          ),
           'installment': item.installment,
           'totalSaving': item.totalSaving,
           'isDeliveryMonth':
@@ -115,8 +114,8 @@ class SavedPlanRepository {
     required String userId,
     required String planId,
   }) async {
-    final DocumentSnapshot<
-        Map<String, dynamic>> document =
+    final DocumentSnapshot<Map<String, dynamic>>
+        document =
         await _savedPlansCollection(userId)
             .doc(planId)
             .get();
@@ -138,33 +137,70 @@ class SavedPlanRepository {
         .delete();
   }
 
+  /// Kullanıcı hesabı silinirken kullanıcıya ait
+  /// tüm kayıtlı planları Firestore'dan temizler.
+  ///
+  /// Firestore'da parent document silindiğinde
+  /// subcollection'lar otomatik olarak silinmediği
+  /// için savedPlans ayrıca temizlenmelidir.
+  Future<void> deleteAllSavedPlans({
+    required String userId,
+  }) async {
+    const int batchSize = 400;
+
+    while (true) {
+      final QuerySnapshot<Map<String, dynamic>>
+          snapshot =
+          await _savedPlansCollection(userId)
+              .limit(batchSize)
+              .get();
+
+      if (snapshot.docs.isEmpty) {
+        return;
+      }
+
+      final WriteBatch batch =
+          _firestore.batch();
+
+      for (final document in snapshot.docs) {
+        batch.delete(document.reference);
+      }
+
+      await batch.commit();
+
+      if (snapshot.docs.length < batchSize) {
+        return;
+      }
+    }
+  }
+
   String _createDocumentId(
-  CalculationPlan plan,
-  FpResult result,
-) {
-  final DateTime? firstPaymentDate =
-      result.paymentPlan.isEmpty
-          ? null
-          : result
-              .paymentPlan.first.paymentDate;
+    CalculationPlan plan,
+    FpResult result,
+  ) {
+    final DateTime? firstPaymentDate =
+        result.paymentPlan.isEmpty
+            ? null
+            : result
+                .paymentPlan.first.paymentDate;
 
-  final String rawValue = [
-    (plan.financeAmount * 100).round(),
-    (plan.downPayment * 100).round(),
-    (plan.monthlyInstallment * 100)
-        .round(),
-    plan.increaseModel.trim(),
-    plan.estimatedDelivery,
-    plan.estimatedTerm,
-    firstPaymentDate?.year ?? 0,
-    firstPaymentDate?.month ?? 0,
-    firstPaymentDate?.day ?? 0,
-  ].join('_');
+    final String rawValue = [
+      (plan.financeAmount * 100).round(),
+      (plan.downPayment * 100).round(),
+      (plan.monthlyInstallment * 100)
+          .round(),
+      plan.increaseModel.trim(),
+      plan.estimatedDelivery,
+      plan.estimatedTerm,
+      firstPaymentDate?.year ?? 0,
+      firstPaymentDate?.month ?? 0,
+      firstPaymentDate?.day ?? 0,
+    ].join('_');
 
-  return base64Url
-      .encode(
-        utf8.encode(rawValue),
-      )
-      .replaceAll('=', '');
-}
+    return base64Url
+        .encode(
+          utf8.encode(rawValue),
+        )
+        .replaceAll('=', '');
+  }
 }

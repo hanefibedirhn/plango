@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/consultation_request_contact_model.dart';
 import '../models/consultation_request_model.dart';
+import 'notification_repository.dart';
 
 class ConsultationRepositoryException implements Exception {
   const ConsultationRepositoryException(this.message);
@@ -39,9 +40,13 @@ class ConsultationRequestExpiredException
 class ConsultationRepository {
   ConsultationRepository({
     FirebaseFirestore? firestore,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+    NotificationRepository? notificationRepository,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _notificationRepository =
+            notificationRepository ?? NotificationRepository();
 
   final FirebaseFirestore _firestore;
+  final NotificationRepository _notificationRepository;
 
   static const Duration responseDuration = Duration(hours: 24);
 
@@ -476,6 +481,15 @@ class ConsultationRepository {
         },
       );
     });
+
+    try {
+      await _notificationRepository.notifyExpertAboutConsultationRequest(
+        expertUid: normalizedExpertId,
+        requestId: requestId,
+      );
+    } on FirebaseException {
+      // Başarılı atamayı bildirim hatası nedeniyle geri almayız.
+    }
   }
 
   Future<ConsultationRequest> getRequestById(
@@ -916,7 +930,10 @@ class ConsultationRepository {
     final DocumentReference<Map<String, dynamic>> requestReference =
         _requestsCollection.doc(requestId);
 
-    return _firestore.runTransaction<bool>((transaction) async {
+    String expiredExpertId = '';
+
+    final bool expired =
+        await _firestore.runTransaction<bool>((transaction) async {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
           await transaction.get(requestReference);
 
@@ -938,6 +955,9 @@ class ConsultationRepository {
         return false;
       }
 
+      expiredExpertId =
+          (data['expertId'] as String? ?? '').trim();
+
       transaction.update(
         requestReference,
         {
@@ -950,6 +970,19 @@ class ConsultationRepository {
 
       return true;
     });
+
+    if (expired) {
+      try {
+        await _notificationRepository.notifyAdminResponseExpired(
+          requestId: requestId,
+          expertUid: expiredExpertId,
+        );
+      } on FirebaseException {
+        // Süre dolumu gerçekleşmiştir; bildirim hatası ana akışı bozmaz.
+      }
+    }
+
+    return expired;
   }
 
   /// Eski ekranlarla geçici uyumluluk için aynı talep belgesini
@@ -1054,7 +1087,81 @@ class ConsultationRepository {
       await batch.commit();
     }
 
+    try {
+      await _notificationRepository.notifyAdminExpertAccountDeleted(
+        expertUid: normalizedExpertId,
+        affectedRequestCount: openRequests.length,
+      );
+    } on FirebaseException {
+      // Talepler kuyruğa alınmıştır; bildirim hatası hesap silmeyi durdurmaz.
+    }
+
     return openRequests.length;
+  }
+
+  /// Kullanıcı kendi hesabını sildiğinde kullanıcıya ait danışma
+  /// taleplerini ve ayrı tutulan iletişim kayıtlarını temizler.
+  ///
+  /// Kullanıcıya ait talepler ana koleksiyonlarda tutulduğu için
+  /// users/{uid} profil belgesinin silinmesi bu kayıtları otomatik
+  /// olarak silmez.
+  ///
+  /// Talep bir uzmana atanmışsa, silme öncesinde ilgili uzman profilinin
+  /// aktif talep sayacı mümkünse güvenli biçimde azaltılır. Ardından
+  /// consultationRequests ve consultationRequestContacts belgeleri
+  /// birlikte silinir.
+  /// Kullanıcı kendi hesabını sildiğinde kullanıcıya ait danışma
+  /// taleplerini ve ayrı tutulan iletişim kayıtlarını temizler.
+  ///
+  /// Kullanıcıya ait talepler ana koleksiyonlarda tutulduğu için
+  /// users/{uid} profil belgesinin silinmesi bu kayıtları otomatik
+  /// olarak silmez.
+  ///
+  /// Hesap silme işlemi istemci tarafından çalıştığı için başka bir
+  /// uzmanın expertProfiles belgesinde sayaç güncellemesi yapılmaz.
+  /// Kullanıcının yalnızca kendi danışma ve iletişim kayıtları silinir.
+  Future<int> handleUserAccountDeleted({
+    required String userId,
+  }) async {
+    final String normalizedUserId = userId.trim();
+
+    if (normalizedUserId.isEmpty) {
+      return 0;
+    }
+
+    final QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _requestsCollection
+            .where('userId', isEqualTo: normalizedUserId)
+            .get();
+
+    if (snapshot.docs.isEmpty) {
+      return 0;
+    }
+
+    const int requestsPerBatch = 200;
+
+    for (int start = 0;
+        start < snapshot.docs.length;
+        start += requestsPerBatch) {
+      final int end =
+          (start + requestsPerBatch < snapshot.docs.length)
+              ? start + requestsPerBatch
+              : snapshot.docs.length;
+
+      final WriteBatch batch = _firestore.batch();
+
+      for (final document in snapshot.docs.sublist(start, end)) {
+        batch.delete(
+          _requestContactsCollection.doc(document.id),
+        );
+
+        batch.delete(document.reference);
+      }
+
+      await batch.commit();
+    }
+
+    return snapshot.docs.length;
   }
 
   Future<void> _updateExpertOwnedStatus({

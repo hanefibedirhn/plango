@@ -901,7 +901,7 @@ service cloud.firestore {
       allow update: if isAdmin()
         && hasValidRequestFields();
 
-      allow delete: if false;
+      allow delete: if isRequestUser() || isAdmin();
     }
 
     // ==================================================
@@ -1080,7 +1080,7 @@ service cloud.firestore {
       allow update: if isAdmin()
         && hasValidContactFields();
 
-      allow delete: if false;
+      allow delete: if isContactOwner() || isAdmin();
     }
 
 // ==================================================
@@ -1116,7 +1116,6 @@ match /content/{contentId} {
           'platform',
           'userUid',
           'isActive',
-          'createdAt',
           'updatedAt'
         ])
         && request.resource.data.keys().hasOnly([
@@ -1125,7 +1124,6 @@ match /content/{contentId} {
           'platform',
           'userUid',
           'isActive',
-          'createdAt',
           'updatedAt'
         ])
         && request.resource.data.tokenId == tokenId
@@ -1136,34 +1134,30 @@ match /content/{contentId} {
           'ios'
         ]
         && (
-          request.resource.data.userUid == null ||
-          (
-            isSignedIn() &&
-            request.resource.data.userUid == request.auth.uid
+          request.resource.data.userUid == null
+          || (
+            isSignedIn()
+            && request.resource.data.userUid == request.auth.uid
           )
         )
         && request.resource.data.isActive is bool
-        && request.resource.data.createdAt is timestamp
         && request.resource.data.updatedAt is timestamp;
       }
 
-      // Token listesi istemciler tarafından okunamaz.
-      // Push gönderimi Cloud Functions / Admin SDK tarafından yapılır.
-      allow read: if false;
+      // FCM tokenlari istemci tarafindan okunamaz veya listelenemez.
+      allow get, list: if false;
 
-      // Misafir cihaz global push alabilmek için userUid=null ile,
-      // giriş yapan cihaz ise yalnız kendi uid'siyle token oluşturabilir.
+      // Android ve iOS cihaz tokenlari olusturulabilir.
+      // Giris yapilmissa token yalnizca kullanicinin kendi UID'sine baglanabilir.
       allow create: if validDeviceTokenData()
         && request.resource.data.isActive == true;
 
-      // İstemci yalnız aynı token belgesinin kullanıcı bağını,
-      // aktiflik durumunu ve updatedAt alanını değiştirebilir.
-      // Token/platform/createdAt/tokenId sonradan değiştirilemez.
+      // Token kimligi, token degeri ve platform sonradan degistirilemez.
+      // Yalnizca userUid, isActive ve updatedAt alanlari guncellenebilir.
       allow update: if validDeviceTokenData()
         && request.resource.data.tokenId == resource.data.tokenId
         && request.resource.data.token == resource.data.token
         && request.resource.data.platform == resource.data.platform
-        && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data
             .diff(resource.data)
             .affectedKeys()
@@ -1173,14 +1167,9 @@ match /content/{contentId} {
               'updatedAt'
             ]);
 
-      // Token kayıtları istemciden fiziksel olarak silinmez.
+      // Token kayitlari istemciden fiziksel olarak silinmez.
       allow delete: if false;
     }
-
-
-    // ==================================================
-    // NOTIFICATIONS
-    // ==================================================
 
     match /notifications/{notificationId} {
 
@@ -1615,7 +1604,7 @@ match /content/{contentId} {
         && request.resource.data.updatedAt is timestamp;
 
       // Kayıtlar uygulamadan fiziksel olarak silinmez.
-      allow delete: if false;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
     // ==================================================

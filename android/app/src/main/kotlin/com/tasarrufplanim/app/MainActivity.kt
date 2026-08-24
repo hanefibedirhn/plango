@@ -1,4 +1,4 @@
-package com.example.plango
+package com.tasarrufplanim.app
 
 import io.flutter.embedding.android.FlutterActivity
 

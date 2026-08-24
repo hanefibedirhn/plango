@@ -2,10 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
-import '../repositories/consultation_repository.dart';
-import '../repositories/expert_repository.dart';
 import '../repositories/user_repository.dart';
 import 'change_password_screen.dart';
+import '../services/account_deletion_service.dart';
 import '../services/auth_service.dart';
 
 class ProfileInformationScreen extends StatefulWidget {
@@ -32,11 +31,10 @@ class _ProfileInformationScreenState
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final UserRepository _userRepository = UserRepository();
-  final ExpertRepository _expertRepository = ExpertRepository();
-  final ConsultationRepository _consultationRepository =
-      ConsultationRepository();
 
   final AuthService _authService = AuthService();
+  final AccountDeletionService _accountDeletionService =
+      AccountDeletionService();
 
   final TextEditingController _nameController =
       TextEditingController();
@@ -192,254 +190,68 @@ AppUser? _currentProfile;
   }
 
   Future<void> _showDeleteAccountDialog() async {
-  final TextEditingController passwordController =
-      TextEditingController();
+    if (_isDeletingAccount) return;
 
-  bool passwordVisible = false;
+    FocusScope.of(context).unfocus();
 
-  final String? password = await showDialog<String>(
-    context: context,
-    barrierDismissible: !_isDeletingAccount,
-    builder: (dialogContext) {
-      return StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            icon: const Icon(
-              Icons.warning_amber_rounded,
-              color: _danger,
-              size: 38,
-            ),
-            title: const Text(
-              'Hesabı Kalıcı Olarak Sil',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Hesabınız ve profil bilgileriniz kalıcı olarak '
-                  'silinecektir. Bu işlem geri alınamaz.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  controller: passwordController,
-                  obscureText: !passwordVisible,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: 'Mevcut Şifre',
-                    prefixIcon: const Icon(
-                      Icons.lock_outline_rounded,
-                    ),
-                    suffixIcon: IconButton(
-                      tooltip: passwordVisible
-                          ? 'Şifreyi gizle'
-                          : 'Şifreyi göster',
-                      onPressed: () {
-                        setDialogState(() {
-                          passwordVisible = !passwordVisible;
-                        });
-                      },
-                      icon: Icon(
-                        passwordVisible
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                      ),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                },
-                child: const Text('Vazgeç'),
-              ),
-              FilledButton(
-                onPressed: () {
-                  final String password =
-                      passwordController.text;
-
-                  if (password.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Devam etmek için mevcut şifrenizi giriniz.',
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                    return;
-                  }
-
-                  Navigator.pop(
-                    dialogContext,
-                    password,
-                  );
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: _danger,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Hesabı Sil'),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-
-  passwordController.dispose();
-
-  if (password == null || password.isEmpty || !mounted) {
-    return;
-  }
-
-  final User? firebaseUser =
-      FirebaseAuth.instance.currentUser;
-
-  if (firebaseUser == null) {
-    _showMessage(
-      'Aktif kullanıcı bilgileri bulunamadı.',
+    final String? password = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _DeleteAccountPasswordDialog(),
     );
-    return;
-  }
 
-  final bool? confirmed = await showDialog<bool>(
-    context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
-        title: const Text(
-          'Son Onay',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-          ),
-        ),
+    if (!mounted || password == null || password.trim().isEmpty) return;
+
+    final User? firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      _showMessage('Aktif kullanıcı bilgileri bulunamadı.');
+      return;
+    }
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: const Text('Son Onay', style: TextStyle(fontWeight: FontWeight.w900)),
         content: const Text(
-          'Hesabınızı kalıcı olarak silmek istediğinizden '
-          'emin misiniz? Bu işlem geri alınamaz.',
-          style: TextStyle(
-            height: 1.5,
-          ),
+          'Hesabınızı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+          style: TextStyle(height: 1.5),
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext, false);
-            },
+            onPressed: () => Navigator.of(dialogContext).pop(false),
             child: const Text('Vazgeç'),
           ),
           FilledButton(
-            onPressed: () {
-              Navigator.pop(dialogContext, true);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: _danger,
-              foregroundColor: Colors.white,
-            ),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: _danger, foregroundColor: Colors.white),
             child: const Text('Evet, Hesabımı Sil'),
           ),
         ],
-      );
-    },
-  );
-
-  if (confirmed != true || !mounted) {
-    return;
-  }
-
-  setState(() {
-    _isDeletingAccount = true;
-  });
-
-  try {
-    // Önce şifre kontrol edilir.
-    await _authService.reauthenticateCurrentUser(
-      currentPassword: password,
-    );
-
-    // Kullanıcı hâlâ oturum açmışken uzman yaşam döngüsü tamamlanır.
-    // Uzman değilse normal kullanıcı hesabı silme akışına devam edilir.
-    try {
-      await _expertRepository.getExpert(firebaseUser.uid);
-
-      // Açık danışma taleplerini önce yönetici kuyruğuna al.
-      await _consultationRepository.handleExpertAccountDeleted(
-        expertId: firebaseUser.uid,
-      );
-
-      // Sonra özel ve herkese açık uzman profillerini temizle.
-      await _expertRepository.deleteExpert(
-        uid: firebaseUser.uid,
-      );
-    } on ExpertNotFoundException {
-      // Kullanıcı uzman değil.
-    }
-
-    // Uzman yaşam döngüsü tamamlandıktan sonra kullanıcı profilini sil.
-    await _userRepository.deleteUserProfile(
-      uid: firebaseUser.uid,
-    );
-
-    // En son Firebase Authentication hesabını sil.
-    await _authService.deleteAuthenticatedUser();
-
-    if (!mounted) {
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Tasarruf Planım hesabınız kalıcı olarak silindi.',
-        ),
-        behavior: SnackBarBehavior.floating,
       ),
     );
 
-    Navigator.of(context).popUntil(
-      (route) => route.isFirst,
-    );
-  } on AuthServiceException catch (error) {
-    if (!mounted) {
-      return;
-    }
+    if (!mounted || confirmed != true) return;
 
-    _showMessage(error.message);
-  } catch (_) {
-    if (!mounted) {
-      return;
-    }
+    setState(() => _isDeletingAccount = true);
 
-    _showMessage(
-      'Hesap silinirken beklenmeyen bir hata oluştu.',
-    );
-  } finally {
-    if (mounted) {
-      setState(() {
-        _isDeletingAccount = false;
-      });
+    try {
+      await _authService.reauthenticateCurrentUser(currentPassword: password);
+      await _accountDeletionService.deleteCurrentAccount();
+
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } on AuthServiceException catch (error) {
+      if (!mounted) return;
+      _showMessage(error.message);
+      setState(() => _isDeletingAccount = false);
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Hesap silinirken beklenmeyen bir hata oluştu.');
+      setState(() => _isDeletingAccount = false);
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -701,6 +513,110 @@ AppUser? _currentProfile;
           ),
         );
       },
+    );
+  }
+}
+
+
+class _DeleteAccountPasswordDialog extends StatefulWidget {
+  const _DeleteAccountPasswordDialog();
+
+  @override
+  State<_DeleteAccountPasswordDialog> createState() =>
+      _DeleteAccountPasswordDialogState();
+}
+
+class _DeleteAccountPasswordDialogState
+    extends State<_DeleteAccountPasswordDialog> {
+  final TextEditingController _passwordController = TextEditingController();
+  bool _passwordVisible = false;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final String password = _passwordController.text.trim();
+    if (password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Devam etmek için mevcut şifrenizi giriniz.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    Navigator.of(context).pop(password);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      icon: const Icon(
+        Icons.warning_amber_rounded,
+        color: _ProfileInformationScreenState._danger,
+        size: 38,
+      ),
+      title: const Text(
+        'Hesabı Kalıcı Olarak Sil',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.w900),
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Hesabınız ve profil bilgileriniz kalıcı olarak silinecektir. Bu işlem geri alınamaz.',
+              textAlign: TextAlign.center,
+              style: TextStyle(height: 1.5),
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              controller: _passwordController,
+              obscureText: !_passwordVisible,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                labelText: 'Mevcut Şifre',
+                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                suffixIcon: IconButton(
+                  tooltip: _passwordVisible ? 'Şifreyi gizle' : 'Şifreyi göster',
+                  onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+                  icon: Icon(
+                    _passwordVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
+                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            FocusScope.of(context).unfocus();
+            Navigator.of(context).pop();
+          },
+          child: const Text('Vazgeç'),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          style: FilledButton.styleFrom(
+            backgroundColor: _ProfileInformationScreenState._danger,
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('Hesabı Sil'),
+        ),
+      ],
     );
   }
 }

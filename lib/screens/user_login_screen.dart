@@ -54,21 +54,27 @@ bool _isSubmitting = false;
   }
 
   Future<void> _openRegister() async {
-    final bool? accountCreated = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const RegisterScreen(),
-      ),
-    );
+  final bool? accountCreated = await Navigator.push<bool>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const RegisterScreen(),
+    ),
+  );
 
+  if (!mounted || accountCreated != true) {
+    return;
+  }
+
+  FocusManager.instance.primaryFocus?.unfocus();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     if (!mounted) {
       return;
     }
 
-    if (accountCreated == true) {
-      Navigator.pop(context, true);
-    }
-  }
+    Navigator.of(context).pop(true);
+  });
+}
 
   Future<void> _login() async {
   FocusScope.of(context).unfocus();

@@ -544,23 +544,22 @@ class _DisclaimerScreenState
                           showDivider: false,
                         ),
                         const SizedBox(height: 5),
-                        Container(
-                          decoration: BoxDecoration(
-                            color:
-                                const Color(
-                              0xFFF5F9FA,
-                            ),
+                        Material(
+                          color: const Color(
+                            0xFFF5F9FA,
+                          ),
+                          shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(
                               15,
                             ),
-                            border: Border.all(
-                              color:
-                                  const Color(
+                            side: const BorderSide(
+                              color: Color(
                                 0xFFE6EEF0,
                               ),
                             ),
                           ),
+                          clipBehavior: Clip.antiAlias,
                           child: CheckboxListTile(
                             value: accepted,
                             onChanged: (value) {
