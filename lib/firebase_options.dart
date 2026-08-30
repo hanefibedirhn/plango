@@ -58,11 +58,11 @@ class DefaultFirebaseOptions {
   );
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDnQxykeOC0v__ihwA0KAA37u6Ytg4hUnk',
-    appId: '1:87639162167:ios:96ead5c47328a3c7846eb2',
+    appId: '1:87639162167:ios:bcad24ddba658b13846eb2',
     messagingSenderId: '87639162167',
     projectId: 'plango-4e23f',
     storageBucket: 'plango-4e23f.firebasestorage.app',
-    iosBundleId: 'com.example.plango',
+    iosBundleId: 'com.tasarrufplanim.app',
   );
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDYXBJoPKr8zwp9CAxOwVcl0r9YpJRCWVI',
@@ -82,3 +82,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'plango-3f14a.firebasestorage.app',
   );
 }
+
